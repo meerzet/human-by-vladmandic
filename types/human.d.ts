@@ -266,7 +266,7 @@ export declare interface DrawOptions {
     gestureLabels: string;
 }
 
-export declare type Emotion = 'angry' | 'disgust' | 'fear' | 'happy' | 'sad' | 'surprise' | 'neutral';
+export declare type Emotion = '화남' | '불쾌' | '공포' | '행복' | '슬픔' | '놀람' | '무표정';
 
 export declare const empty: (error?: string | null) => Result;
 
@@ -594,7 +594,7 @@ export declare type FingerCurl = 'none' | 'half' | 'full';
 
 export declare type FingerDirection = 'verticalUp' | 'verticalDown' | 'horizontalLeft' | 'horizontalRight' | 'diagonalUpRight' | 'diagonalUpLeft' | 'diagonalDownRight' | 'diagonalDownLeft';
 
-export declare type Gender = 'male' | 'female' | 'unknown';
+export declare type Gender = '남성' | '여성' | 'unknown';
 
 /** Generic config type inherited by all module types */
 export declare interface GenericConfig {

@@ -12,7 +12,7 @@ import type { Config } from '../config';
 import type { Gender, Race } from '../result';
 import { constants } from '../tfjs/constants';
 import { loadModel } from '../tfjs/load';
-import type { GraphModel, Tensor, Tensor1D, Tensor4D } from '../tfjs/types';
+import type { GraphModel, Tensor, Tensor4D } from '../tfjs/types';
 import { env } from '../util/env';
 import { log, now } from '../util/util';
 
@@ -80,7 +80,6 @@ export async function predict(image: Tensor4D, config: Config, idx: number, coun
     return last[idx];
   }
   skipped = 0;
-  // TODO: 나이/성별 관련 로직 수정 필요 (with hmt)
   return new Promise(async (resolve) => {
     if (config.face.description?.enabled) {
       const enhanced = enhance(image, config);
@@ -94,14 +93,21 @@ export async function predict(image: Tensor4D, config: Config, idx: number, coun
         obj.gender = gender[0] <= 0.5 ? '여성' : '남성';
         obj.genderScore = Math.min(0.99, confidence);
       }
-      const argmax = tf.argMax(resT.find((t) => t.shape[1] === 100) as Tensor1D, 1);
-      const ageIdx: number = (await argmax.data())[0];
-      tf.dispose(argmax);
-      const ageT = resT.find((t) => t.shape[1] === 100) as Tensor;
-      const all = await ageT.data();
-      obj.age = Math.round(all[ageIdx - 1] > all[ageIdx + 1] ? 10 * ageIdx - 100 * all[ageIdx - 1] : 10 * ageIdx + 100 * all[ageIdx + 1]) / 10;
 
-      if (Number.isNaN(gender[0]) || Number.isNaN(all[0])) log('faceres error:', { model, result: resT });
+      const ageT = resT.find((t) => t.shape[1] === 100) as tf.Tensor2D;
+      const AGE_INDICES = tf.range(0, 100, 1, 'float32');
+      const expected = tf.sum(tf.mul(ageT, AGE_INDICES), -1);
+      const ageVal = (await expected.data())[0];
+      obj.age = Math.round(ageVal * 10) / 10;
+      tf.dispose([expected, ageT, AGE_INDICES]);
+      // const argmax = tf.argMax(resT.find((t) => t.shape[1] === 100) as Tensor1D, 1);
+      // const ageIdx: number = (await argmax.data())[0];
+      // tf.dispose(argmax);
+      // const ageT = resT.find((t) => t.shape[1] === 100) as Tensor;
+      // const all = await ageT.data();
+      // obj.age = Math.round(all[ageIdx - 1] > all[ageIdx + 1] ? 10 * ageIdx - 100 * all[ageIdx - 1] : 10 * ageIdx + 100 * all[ageIdx + 1]) / 10;
+
+      if (Number.isNaN(gender[0]) || Number.isNaN(ageVal)) log('faceres error:', { model, result: resT });
 
       const desc = resT.find((t) => t.shape[1] === 1024);
       // const reshape = desc.reshape([128, 8]); // reshape large 1024-element descriptor to 128 x 8

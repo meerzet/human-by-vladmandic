@@ -38188,8 +38188,8 @@ async function load4(config3) {
   if (!model4) {
     model4 = await loadModel((_a = config3.face.emotion) == null ? void 0 : _a.modelPath);
     rgb = ((_c2 = (_b = model4 == null ? void 0 : model4.inputs) == null ? void 0 : _b[0].shape) == null ? void 0 : _c2[3]) === 3;
-    if (!rgb) annotations = ["angry", "disgust", "fear", "happy", "sad", "surprise", "neutral"];
-    else annotations = ["angry", "disgust", "fear", "happy", "neutral", "sad", "surprise"];
+    if (!rgb) annotations = ["\uD654\uB0A8", "\uBD88\uCF8C", "\uACF5\uD3EC", "\uD589\uBCF5", "\uC2AC\uD514", "\uB180\uB78C", "\uBB34\uD45C\uC815"];
+    else annotations = ["\uD654\uB0A8", "\uBD88\uCF8C", "\uACF5\uD3EC", "\uD589\uBCF5", "\uBB34\uD45C\uC815", "\uC2AC\uD514", "\uB180\uB78C"];
   } else if (config3.debug) {
     log("cached model:", model4["modelUrl"]);
   }
@@ -38299,16 +38299,16 @@ async function predict3(image, config3, idx, count2) {
       const gender = await genderT.data();
       const confidence = Math.trunc(200 * Math.abs(gender[0] - 0.5)) / 100;
       if (confidence > (config3.face.description.minConfidence || 0)) {
-        obj.gender = gender[0] <= 0.5 ? "female" : "male";
+        obj.gender = gender[0] <= 0.5 ? "\uC5EC\uC131" : "\uB0A8\uC131";
         obj.genderScore = Math.min(0.99, confidence);
       }
-      const argmax = Ok(resT.find((t10) => t10.shape[1] === 100), 1);
-      const ageIdx = (await argmax.data())[0];
-      Ot(argmax);
       const ageT = resT.find((t10) => t10.shape[1] === 100);
-      const all2 = await ageT.data();
-      obj.age = Math.round(all2[ageIdx - 1] > all2[ageIdx + 1] ? 10 * ageIdx - 100 * all2[ageIdx - 1] : 10 * ageIdx + 100 * all2[ageIdx + 1]) / 10;
-      if (Number.isNaN(gender[0]) || Number.isNaN(all2[0])) log("faceres error:", { model: model5, result: resT });
+      const AGE_INDICES = cu(0, 100, 1, "float32");
+      const expected = ot(se(ageT, AGE_INDICES), -1);
+      const ageVal = (await expected.data())[0];
+      obj.age = Math.round(ageVal * 10) / 10;
+      Ot([expected, ageT, AGE_INDICES]);
+      if (Number.isNaN(gender[0]) || Number.isNaN(ageVal)) log("faceres error:", { model: model5, result: resT });
       const desc = resT.find((t10) => t10.shape[1] === 1024);
       const descriptor = desc ? await desc.data() : [];
       obj.descriptor = Array.from(descriptor);
@@ -38462,7 +38462,7 @@ async function predict6(image, config3, idx, count2) {
     const obj = { age: 0, gender: "unknown", genderScore: 0, race: [] };
     if ((_c2 = config3.face.gear) == null ? void 0 : _c2.enabled) [t10.age, t10.gender, t10.race] = model8.execute(t10.resize, ["age_output", "gender_output", "race_output"]);
     const gender = await t10.gender.data();
-    obj.gender = gender[0] > gender[1] ? "male" : "female";
+    obj.gender = gender[0] > gender[1] ? "\uB0A8\uC131" : "\uC5EC\uC131";
     obj.genderScore = Math.round(100 * (gender[0] > gender[1] ? gender[0] : gender[1])) / 100;
     const race = await t10.race.data();
     for (let i = 0; i < race.length; i++) {
@@ -38583,7 +38583,7 @@ async function predict8(image, config3, idx, count2) {
     const obj = { gender: "unknown", genderScore: 0 };
     if ((_c3 = config3.face["ssrnet"]) == null ? void 0 : _c3.enabled) t10.gender = model10.execute(t10.enhance);
     const data = await t10.gender.data();
-    obj.gender = data[0] > data[1] ? "female" : "male";
+    obj.gender = data[0] > data[1] ? "\uC5EC\uC131" : "\uB0A8\uC131";
     obj.genderScore = data[0] > data[1] ? Math.trunc(100 * data[0]) / 100 : Math.trunc(100 * data[1]) / 100;
     Object.keys(t10).forEach((tensor2) => Ot(t10[tensor2]));
     last6[idx] = obj;
