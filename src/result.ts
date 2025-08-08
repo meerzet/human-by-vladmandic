@@ -2,9 +2,9 @@
  * Type definitions for Human result object
  */
 
-import type { Tensor } from './tfjs/types';
-import type { FaceGesture, BodyGesture, HandGesture, IrisGesture } from './gesture/gesture';
 import type { AnyCanvas } from './exports';
+import type { BodyGesture, FaceGesture, HandGesture, IrisGesture } from './gesture/gesture';
+import type { Tensor } from './tfjs/types';
 
 /** generic box as [x, y, width, height] */
 export type Box = [number, number, number, number];
@@ -209,22 +209,12 @@ export interface PersonResult {
 export interface Result {
   /** {@link FaceResult}: detection & analysis results */
   face: FaceResult[],
-  /** {@link BodyResult}: detection & analysis results */
-  body: BodyResult[],
-  /** {@link HandResult}: detection & analysis results */
-  hand: HandResult[],
-  /** {@link GestureResult}: detection & analysis results */
-  gesture: GestureResult[],
-  /** {@link ObjectResult}: detection & analysis results */
-  object: ObjectResult[]
   /** global performance object with timing values for each operation */
   performance: Record<string, number>,
   /** optional processed canvas that can be used to draw input on screen */
   canvas?: AnyCanvas | null,
   /** timestamp of detection representing the milliseconds elapsed since the UNIX epoch */
   readonly timestamp: number,
-  /** getter property that returns unified persons object  */
-  persons: PersonResult[],
   /** Last known error message */
   error: string | null;
   /** Resolution width */
@@ -233,4 +223,4 @@ export interface Result {
   height: number,
 }
 
-export const empty = (error: string | null = null): Result => ({ face: [], body: [], hand: [], gesture: [], object: [], persons: [], performance: {}, timestamp: 0, width: 0, height: 0, error });
+export const empty = (error: string | null = null): Result => ({ face: [], performance: {}, timestamp: 0, width: 0, height: 0, error });

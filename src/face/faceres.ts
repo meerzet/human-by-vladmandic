@@ -8,13 +8,13 @@
  */
 
 import * as tf from 'dist/tfjs.esm.js';
-import { log, now } from '../util/util';
-import { env } from '../util/env';
-import { loadModel } from '../tfjs/load';
-import { constants } from '../tfjs/constants';
-import type { Tensor, GraphModel, Tensor4D, Tensor1D } from '../tfjs/types';
 import type { Config } from '../config';
 import type { Gender, Race } from '../result';
+import { constants } from '../tfjs/constants';
+import { loadModel } from '../tfjs/load';
+import type { GraphModel, Tensor, Tensor1D, Tensor4D } from '../tfjs/types';
+import { env } from '../util/env';
+import { log, now } from '../util/util';
 
 export interface FaceRes { age: number, gender: Gender, genderScore: number, descriptor: number[], race?: { score: number, race: Race }[] }
 
@@ -80,6 +80,7 @@ export async function predict(image: Tensor4D, config: Config, idx: number, coun
     return last[idx];
   }
   skipped = 0;
+  // TODO: 나이/성별 관련 로직 수정 필요 (with hmt)
   return new Promise(async (resolve) => {
     if (config.face.description?.enabled) {
       const enhanced = enhance(image, config);

@@ -31821,50 +31821,8 @@ var zce = "4.22.0";
 var Vce = { tfjs: jU, "tfjs-core": jU, "tfjs-converter": Oce, "tfjs-backend-cpu": Mce, "tfjs-backend-webgl": Lce, "tfjs-backend-wasm": Bce, "tfjs-backend-webgpu": zce };
 var EQt = void 0;
 
-// src/util/util.ts
-function log(...msg) {
-  const dt2 = /* @__PURE__ */ new Date();
-  const ts2 = `${dt2.getHours().toString().padStart(2, "0")}:${dt2.getMinutes().toString().padStart(2, "0")}:${dt2.getSeconds().toString().padStart(2, "0")}.${dt2.getMilliseconds().toString().padStart(3, "0")}`;
-  if (msg) console.log(ts2, "Human:", ...msg);
-}
-function join(folder, file) {
-  const separator = folder.endsWith("/") ? "" : "/";
-  const skipJoin = file.startsWith(".") || file.startsWith("/") || file.startsWith("http:") || file.startsWith("https:") || file.startsWith("file:");
-  const path = skipJoin ? `${file}` : `${folder}${separator}${file}`;
-  if (!path.toLocaleLowerCase().includes(".json")) throw new Error(`modelpath error: expecting json file: ${path}`);
-  return path;
-}
-var now = () => {
-  if (typeof performance !== "undefined") return performance.now();
-  return parseInt((Number(process.hrtime.bigint()) / 1e3 / 1e3).toString());
-};
-function validate(defaults, config3, parent = "config", msgs = []) {
-  for (const key of Object.keys(config3)) {
-    if (typeof config3[key] === "object") {
-      validate(defaults[key], config3[key], key, msgs);
-    } else {
-      const defined = defaults && typeof defaults[key] !== "undefined";
-      if (!defined) msgs.push({ reason: "unknown property", where: `${parent}.${key} = ${config3[key]}` });
-      const same = defaults && typeof defaults[key] === typeof config3[key];
-      if (defined && !same) msgs.push({ reason: "property type mismatch", where: `${parent}.${key} = ${config3[key]}`, expected: typeof defaults[key] });
-    }
-  }
-  if (config3.debug && parent === "config" && msgs.length > 0) log("invalid configuration", msgs);
-  return msgs;
-}
-function mergeDeep(...objects) {
-  const isObject = (obj) => obj && typeof obj === "object";
-  return objects.reduce((prev, obj) => {
-    Object.keys(obj || {}).forEach((key) => {
-      const pVal = prev[key];
-      const oVal = obj[key];
-      if (Array.isArray(pVal) && Array.isArray(oVal)) prev[key] = pVal.concat(...oVal);
-      else if (isObject(pVal) && isObject(oVal)) prev[key] = mergeDeep(pVal, oVal);
-      else prev[key] = oVal;
-    });
-    return prev;
-  }, {});
-}
+// package.json
+var version = "3.3.5";
 
 // src/config.ts
 var config = {
@@ -32004,6 +31962,22 @@ var config = {
   }
 };
 
+// src/draw/draw.ts
+var draw_exports = {};
+__export(draw_exports, {
+  all: () => all,
+  body: () => body,
+  canvas: () => canvas2,
+  face: () => face,
+  gesture: () => gesture,
+  hand: () => hand,
+  init: () => init,
+  object: () => object,
+  options: () => options,
+  person: () => person,
+  tensor: () => tensor
+});
+
 // src/image/imagefxshaders.ts
 var vertexIdentity = `
   precision highp float;
@@ -32104,12 +32078,57 @@ var convolution = `
   }
 `;
 
+// src/util/util.ts
+function log(...msg) {
+  const dt2 = /* @__PURE__ */ new Date();
+  const ts2 = `${dt2.getHours().toString().padStart(2, "0")}:${dt2.getMinutes().toString().padStart(2, "0")}:${dt2.getSeconds().toString().padStart(2, "0")}.${dt2.getMilliseconds().toString().padStart(3, "0")}`;
+  if (msg) console.log(ts2, "Human:", ...msg);
+}
+function join(folder, file) {
+  const separator = folder.endsWith("/") ? "" : "/";
+  const skipJoin = file.startsWith(".") || file.startsWith("/") || file.startsWith("http:") || file.startsWith("https:") || file.startsWith("file:");
+  const path = skipJoin ? `${file}` : `${folder}${separator}${file}`;
+  if (!path.toLocaleLowerCase().includes(".json")) throw new Error(`modelpath error: expecting json file: ${path}`);
+  return path;
+}
+var now = () => {
+  if (typeof performance !== "undefined") return performance.now();
+  return parseInt((Number(process.hrtime.bigint()) / 1e3 / 1e3).toString());
+};
+function validate(defaults, config3, parent = "config", msgs = []) {
+  for (const key of Object.keys(config3)) {
+    if (typeof config3[key] === "object") {
+      validate(defaults[key], config3[key], key, msgs);
+    } else {
+      const defined = defaults && typeof defaults[key] !== "undefined";
+      if (!defined) msgs.push({ reason: "unknown property", where: `${parent}.${key} = ${config3[key]}` });
+      const same = defaults && typeof defaults[key] === typeof config3[key];
+      if (defined && !same) msgs.push({ reason: "property type mismatch", where: `${parent}.${key} = ${config3[key]}`, expected: typeof defaults[key] });
+    }
+  }
+  if (config3.debug && parent === "config" && msgs.length > 0) log("invalid configuration", msgs);
+  return msgs;
+}
+function mergeDeep(...objects) {
+  const isObject = (obj) => obj && typeof obj === "object";
+  return objects.reduce((prev, obj) => {
+    Object.keys(obj || {}).forEach((key) => {
+      const pVal = prev[key];
+      const oVal = obj[key];
+      if (Array.isArray(pVal) && Array.isArray(oVal)) prev[key] = pVal.concat(...oVal);
+      else if (isObject(pVal) && isObject(oVal)) prev[key] = mergeDeep(pVal, oVal);
+      else prev[key] = oVal;
+    });
+    return prev;
+  }, {});
+}
+
 // src/image/imagefx.ts
 var collect = (source, prefix, collection) => {
   const r15 = new RegExp("\\b" + prefix + " \\w+ (\\w+)", "ig");
-  source.replace(r15, (match2, name) => {
+  source.replace(r15, (match, name) => {
     collection[name] = 0;
-    return match2;
+    return match;
   });
 };
 var GLProgram = class {
@@ -33133,906 +33152,6 @@ _canvas = new WeakMap();
 _image = new WeakMap();
 _imageData = new WeakMap();
 var env = new Env();
-
-// src/util/webcam.ts
-var WebCam = class {
-  constructor() {
-    // eslint-disable-line @typescript-eslint/no-extraneous-class
-    /** current webcam configuration */
-    __publicField(this, "config");
-    /** instance of dom element associated with webcam stream */
-    __publicField(this, "element");
-    /** active webcam stream */
-    __publicField(this, "stream");
-    /** enumerated video devices */
-    __publicField(this, "devices", []);
-    __publicField(this, "enumerate", async () => {
-      try {
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        this.devices = devices.filter((device) => device.kind === "videoinput");
-      } catch (e) {
-        this.devices = [];
-      }
-      return this.devices;
-    });
-    /** start method initializizes webcam stream and associates it with a dom video element */
-    __publicField(this, "start", async (webcamConfig) => {
-      var _a, _b;
-      if (webcamConfig == null ? void 0 : webcamConfig.debug) this.config.debug = webcamConfig == null ? void 0 : webcamConfig.debug;
-      if (webcamConfig == null ? void 0 : webcamConfig.crop) this.config.crop = webcamConfig == null ? void 0 : webcamConfig.crop;
-      if (webcamConfig == null ? void 0 : webcamConfig.mode) this.config.mode = webcamConfig == null ? void 0 : webcamConfig.mode;
-      if (webcamConfig == null ? void 0 : webcamConfig.width) this.config.width = webcamConfig == null ? void 0 : webcamConfig.width;
-      if (webcamConfig == null ? void 0 : webcamConfig.height) this.config.height = webcamConfig == null ? void 0 : webcamConfig.height;
-      if (webcamConfig == null ? void 0 : webcamConfig.id) this.config.id = webcamConfig == null ? void 0 : webcamConfig.id;
-      if (webcamConfig == null ? void 0 : webcamConfig.element) {
-        if (typeof webcamConfig.element === "string") {
-          const el2 = document.getElementById(webcamConfig.element);
-          if (el2 && el2 instanceof HTMLVideoElement) {
-            this.element = el2;
-          } else {
-            if (this.config.debug) log("webcam", "cannot get dom element", webcamConfig.element);
-            return `webcam error: cannot get dom element: ${webcamConfig.element}`;
-          }
-        } else if (webcamConfig.element instanceof HTMLVideoElement) {
-          this.element = webcamConfig.element;
-        } else {
-          if (this.config.debug) log("webcam", "unknown dom element", webcamConfig.element);
-          return `webcam error: unknown dom element: ${webcamConfig.element}`;
-        }
-      } else {
-        this.element = document.createElement("video");
-      }
-      const requestedConstraints = {
-        audio: false,
-        video: {
-          facingMode: this.config.mode === "front" ? "user" : "environment",
-          // @ts-ignore // resizeMode is still not defined in tslib
-          resizeMode: this.config.crop ? "crop-and-scale" : "none"
-        }
-      };
-      if (((_a = this.config) == null ? void 0 : _a.width) > 0) requestedConstraints.video.width = { ideal: this.config.width };
-      if (((_b = this.config) == null ? void 0 : _b.height) > 0) requestedConstraints.video.height = { ideal: this.config.height };
-      if (this.config.id) requestedConstraints.video.deviceId = this.config.id;
-      this.element.addEventListener("play", () => {
-        if (this.config.debug) log("webcam", "play");
-      });
-      this.element.addEventListener("pause", () => {
-        if (this.config.debug) log("webcam", "pause");
-      });
-      this.element.addEventListener("click", async () => {
-        if (!this.element || !this.stream) return;
-        if (this.element.paused) await this.element.play();
-        else this.element.pause();
-      });
-      if (!(navigator == null ? void 0 : navigator.mediaDevices)) {
-        if (this.config.debug) log("webcam error", "no devices");
-        return "webcam error: no devices";
-      }
-      try {
-        this.stream = await navigator.mediaDevices.getUserMedia(requestedConstraints);
-      } catch (err) {
-        log("webcam", err);
-        return `webcam error: ${err}`;
-      }
-      if (!this.stream) {
-        if (this.config.debug) log("webcam error", "no stream");
-        return "webcam error no stream";
-      }
-      this.element.srcObject = this.stream;
-      const ready = new Promise((resolve) => {
-        if (!this.element) resolve(false);
-        else this.element.onloadeddata = () => resolve(true);
-      });
-      await ready;
-      await this.element.play();
-      if (this.config.debug) {
-        log("webcam", {
-          width: this.width,
-          height: this.height,
-          label: this.label,
-          stream: this.stream,
-          track: this.track,
-          settings: this.settings,
-          constraints: this.constraints,
-          capabilities: this.capabilities
-        });
-      }
-      return `webcam: ${this.label}`;
-    });
-    /** pause webcam video method */
-    __publicField(this, "pause", () => {
-      if (this.element) this.element.pause();
-    });
-    /** play webcam video method */
-    __publicField(this, "play", async () => {
-      if (this.element) await this.element.play();
-    });
-    /** stop method stops active webcam stream track and disconnects webcam */
-    __publicField(this, "stop", () => {
-      if (this.config.debug) log("webcam", "stop");
-      if (this.track) this.track.stop();
-    });
-    this.config = {
-      element: void 0,
-      debug: true,
-      mode: "front",
-      crop: false,
-      width: 0,
-      height: 0
-    };
-  }
-  /** get active webcam stream track */
-  get track() {
-    if (!this.stream) return void 0;
-    return this.stream.getVideoTracks()[0];
-  }
-  /** get webcam capabilities */
-  get capabilities() {
-    if (!this.track) return void 0;
-    return this.track.getCapabilities ? this.track.getCapabilities() : void 0;
-  }
-  /** get webcam constraints */
-  get constraints() {
-    if (!this.track) return void 0;
-    return this.track.getConstraints ? this.track.getConstraints() : void 0;
-  }
-  /** get webcam settings */
-  get settings() {
-    if (!this.stream) return void 0;
-    const track = this.stream.getVideoTracks()[0];
-    return track.getSettings ? track.getSettings() : void 0;
-  }
-  /** get webcam label */
-  get label() {
-    if (!this.track) return "";
-    return this.track.label;
-  }
-  /** is webcam paused */
-  get paused() {
-    var _a;
-    return ((_a = this.element) == null ? void 0 : _a.paused) || false;
-  }
-  /** webcam current width */
-  get width() {
-    var _a;
-    return ((_a = this.element) == null ? void 0 : _a.videoWidth) || 0;
-  }
-  /** webcam current height */
-  get height() {
-    var _a;
-    return ((_a = this.element) == null ? void 0 : _a.videoHeight) || 0;
-  }
-};
-
-// models/models.json
-var models_exports = {};
-__export(models_exports, {
-  "affectnet-mobilenet": () => affectnet_mobilenet,
-  age: () => age,
-  "anti-spoofing": () => anti_spoofing,
-  antispoof: () => antispoof,
-  blazeface: () => blazeface,
-  "blazeface-back": () => blazeface_back,
-  "blazeface-front": () => blazeface_front,
-  "blazepose-detector": () => blazepose_detector,
-  "blazepose-full": () => blazepose_full,
-  "blazepose-heavy": () => blazepose_heavy,
-  "blazepose-lite": () => blazepose_lite,
-  centernet: () => centernet,
-  default: () => models_default,
-  efficientpose: () => efficientpose,
-  "efficientpose-i-lite": () => efficientpose_i_lite,
-  "efficientpose-ii-lite": () => efficientpose_ii_lite,
-  "efficientpose-iv": () => efficientpose_iv,
-  emotion: () => emotion,
-  faceboxes: () => faceboxes,
-  facemesh: () => facemesh,
-  "facemesh-attention": () => facemesh_attention,
-  "facemesh-attention-pinto": () => facemesh_attention_pinto,
-  "facemesh-detection-full": () => facemesh_detection_full,
-  "facemesh-detection-short": () => facemesh_detection_short,
-  faceres: () => faceres,
-  "faceres-deep": () => faceres_deep,
-  gear: () => gear,
-  "gear-e1": () => gear_e1,
-  "gear-e2": () => gear_e2,
-  gender: () => gender,
-  "gender-ssrnet-imdb": () => gender_ssrnet_imdb,
-  handdetect: () => handdetect,
-  "handlandmark-full": () => handlandmark_full,
-  "handlandmark-lite": () => handlandmark_lite,
-  "handlandmark-sparse": () => handlandmark_sparse,
-  handskeleton: () => handskeleton,
-  handtrack: () => handtrack,
-  "insightface-efficientnet-b0": () => insightface_efficientnet_b0,
-  "insightface-ghostnet-strides1": () => insightface_ghostnet_strides1,
-  "insightface-ghostnet-strides2": () => insightface_ghostnet_strides2,
-  "insightface-mobilenet-emore": () => insightface_mobilenet_emore,
-  "insightface-mobilenet-swish": () => insightface_mobilenet_swish,
-  iris: () => iris,
-  liveness: () => liveness,
-  meet: () => meet,
-  mobileface: () => mobileface,
-  mobilefacenet: () => mobilefacenet,
-  models: () => models,
-  "movenet-lightning": () => movenet_lightning,
-  "movenet-multipose": () => movenet_multipose,
-  "movenet-thunder": () => movenet_thunder,
-  nanodet: () => nanodet,
-  "nanodet-e": () => nanodet_e,
-  "nanodet-g": () => nanodet_g,
-  "nanodet-m": () => nanodet_m,
-  "nanodet-t": () => nanodet_t,
-  posenet: () => posenet,
-  rvm: () => rvm,
-  selfie: () => selfie
-});
-var antispoof = 853098;
-var blazeface = 538928;
-var centernet = 4030290;
-var emotion = 820516;
-var facemesh = 1477958;
-var faceres = 6978814;
-var handlandmark_lite = 2023432;
-var handtrack = 2964837;
-var iris = 2599092;
-var liveness = 592976;
-var models = 0;
-var movenet_lightning = 4650216;
-var affectnet_mobilenet = 6920630;
-var age = 161240;
-var blazeface_back = 538928;
-var blazeface_front = 402048;
-var blazepose_detector = 5928856;
-var blazepose_full = 6339202;
-var blazepose_heavy = 27502466;
-var blazepose_lite = 2726402;
-var efficientpose = 5651240;
-var faceboxes = 2013002;
-var facemesh_attention_pinto = 2387598;
-var facemesh_attention = 2382414;
-var facemesh_detection_full = 1026192;
-var facemesh_detection_short = 201268;
-var faceres_deep = 13957620;
-var gear_e1 = 112438;
-var gear_e2 = 112438;
-var gear = 1498916;
-var gender_ssrnet_imdb = 161236;
-var gender = 201808;
-var handdetect = 3515612;
-var handlandmark_full = 5431368;
-var handlandmark_sparse = 5286322;
-var handskeleton = 5502280;
-var meet = 372228;
-var mobileface = 2183192;
-var mobilefacenet = 5171976;
-var movenet_multipose = 9448838;
-var movenet_thunder = 12477112;
-var nanodet = 7574558;
-var posenet = 5032780;
-var rvm = 3739355;
-var selfie = 212886;
-var anti_spoofing = 853098;
-var efficientpose_i_lite = 2269064;
-var efficientpose_ii_lite = 5651240;
-var efficientpose_iv = 25643252;
-var insightface_efficientnet_b0 = 13013224;
-var insightface_ghostnet_strides1 = 8093408;
-var insightface_ghostnet_strides2 = 8049584;
-var insightface_mobilenet_emore = 6938536;
-var insightface_mobilenet_swish = 12168584;
-var nanodet_e = 12319156;
-var nanodet_g = 7574558;
-var nanodet_m = 1887474;
-var nanodet_t = 5294216;
-var models_default = {
-  antispoof,
-  blazeface,
-  centernet,
-  emotion,
-  facemesh,
-  faceres,
-  "handlandmark-lite": handlandmark_lite,
-  handtrack,
-  iris,
-  liveness,
-  models,
-  "movenet-lightning": movenet_lightning,
-  "affectnet-mobilenet": affectnet_mobilenet,
-  age,
-  "blazeface-back": blazeface_back,
-  "blazeface-front": blazeface_front,
-  "blazepose-detector": blazepose_detector,
-  "blazepose-full": blazepose_full,
-  "blazepose-heavy": blazepose_heavy,
-  "blazepose-lite": blazepose_lite,
-  efficientpose,
-  faceboxes,
-  "facemesh-attention-pinto": facemesh_attention_pinto,
-  "facemesh-attention": facemesh_attention,
-  "facemesh-detection-full": facemesh_detection_full,
-  "facemesh-detection-short": facemesh_detection_short,
-  "faceres-deep": faceres_deep,
-  "gear-e1": gear_e1,
-  "gear-e2": gear_e2,
-  gear,
-  "gender-ssrnet-imdb": gender_ssrnet_imdb,
-  gender,
-  handdetect,
-  "handlandmark-full": handlandmark_full,
-  "handlandmark-sparse": handlandmark_sparse,
-  handskeleton,
-  meet,
-  mobileface,
-  mobilefacenet,
-  "movenet-multipose": movenet_multipose,
-  "movenet-thunder": movenet_thunder,
-  nanodet,
-  posenet,
-  rvm,
-  selfie,
-  "anti-spoofing": anti_spoofing,
-  "efficientpose-i-lite": efficientpose_i_lite,
-  "efficientpose-ii-lite": efficientpose_ii_lite,
-  "efficientpose-iv": efficientpose_iv,
-  "insightface-efficientnet-b0": insightface_efficientnet_b0,
-  "insightface-ghostnet-strides1": insightface_ghostnet_strides1,
-  "insightface-ghostnet-strides2": insightface_ghostnet_strides2,
-  "insightface-mobilenet-emore": insightface_mobilenet_emore,
-  "insightface-mobilenet-swish": insightface_mobilenet_swish,
-  "nanodet-e": nanodet_e,
-  "nanodet-g": nanodet_g,
-  "nanodet-m": nanodet_m,
-  "nanodet-t": nanodet_t
-};
-
-// src/tfjs/load.ts
-var options = {
-  cacheModels: true,
-  cacheSupported: true,
-  verbose: true,
-  debug: false,
-  modelBasePath: ""
-};
-var modelStats = {};
-async function httpHandler(url, init4) {
-  if (options.debug) log("load model fetch:", url, init4);
-  return fetch(url, init4);
-}
-function setModelLoadOptions(config3) {
-  options.cacheModels = config3.cacheModels;
-  options.verbose = config3.debug;
-  options.modelBasePath = config3.modelBasePath;
-}
-async function loadModel(modelPath) {
-  var _a, _b, _c2, _d2, _e, _f2;
-  let modelUrl = join(options.modelBasePath, modelPath || "");
-  if (!modelUrl.toLowerCase().endsWith(".json")) modelUrl += ".json";
-  const modelPathSegments = modelUrl.includes("/") ? modelUrl.split("/") : modelUrl.split("\\");
-  const shortModelName = modelPathSegments[modelPathSegments.length - 1].replace(".json", "");
-  const cachedModelName = "indexeddb://" + shortModelName;
-  modelStats[shortModelName] = {
-    name: shortModelName,
-    loaded: false,
-    sizeFromManifest: 0,
-    sizeLoadedWeights: 0,
-    sizeDesired: models_exports[shortModelName],
-    inCache: false,
-    url: ""
-  };
-  options.cacheSupported = typeof indexedDB !== "undefined";
-  let cachedModels = {};
-  try {
-    cachedModels = options.cacheSupported && options.cacheModels ? await di.listModels() : {};
-  } catch (e) {
-    options.cacheSupported = false;
-  }
-  modelStats[shortModelName].inCache = options.cacheSupported && options.cacheModels && Object.keys(cachedModels).includes(cachedModelName);
-  modelStats[shortModelName].url = modelStats[shortModelName].inCache ? cachedModelName : modelUrl;
-  const tfLoadOptions = typeof fetch === "undefined" ? {} : { fetchFunc: (url, init4) => httpHandler(url, init4) };
-  let model23 = new Bl(modelStats[shortModelName].url, tfLoadOptions);
-  modelStats[shortModelName].loaded = false;
-  try {
-    model23.findIOHandler();
-    if (options.debug) log("model load handler:", model23["handler"]);
-  } catch (err) {
-    log("error finding model i/o handler:", modelUrl, err);
-  }
-  try {
-    const artifacts = await ((_a = model23.handler) == null ? void 0 : _a.load()) || null;
-    modelStats[shortModelName].sizeFromManifest = ((_b = artifacts == null ? void 0 : artifacts.weightData) == null ? void 0 : _b.byteLength) || 0;
-    if (artifacts) model23.loadSync(artifacts);
-    else model23 = await M8(modelStats[shortModelName].inCache ? cachedModelName : modelUrl, tfLoadOptions);
-    modelStats[shortModelName].sizeLoadedWeights = ((_d2 = (_c2 = model23.artifacts) == null ? void 0 : _c2.weightData) == null ? void 0 : _d2.byteLength) || ((_f2 = (_e = model23.artifacts) == null ? void 0 : _e.weightData) == null ? void 0 : _f2[0].byteLength) || 0;
-    if (options.verbose) log("load:", { model: shortModelName, url: model23["modelUrl"], bytes: modelStats[shortModelName].sizeLoadedWeights });
-    modelStats[shortModelName].loaded = true;
-  } catch (err) {
-    log("error loading model:", modelUrl, err);
-  }
-  if (modelStats[shortModelName].loaded && options.cacheModels && options.cacheSupported && !modelStats[shortModelName].inCache) {
-    try {
-      const saveResult = await model23.save(cachedModelName);
-      if (options.debug) log("model saved:", cachedModelName, saveResult);
-    } catch (err) {
-      log("error saving model:", modelUrl, err);
-    }
-  }
-  return model23;
-}
-
-// package.json
-var version = "3.3.5";
-
-// src/tfjs/humangl.ts
-var config2 = {
-  name: "humangl",
-  priority: 999,
-  canvas: null,
-  gl: null,
-  extensions: [],
-  webGLattr: {
-    // https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.2
-    alpha: false,
-    antialias: false,
-    premultipliedAlpha: false,
-    preserveDrawingBuffer: false,
-    depth: false,
-    stencil: false,
-    failIfMajorPerformanceCaveat: false,
-    // default=true
-    desynchronized: true
-    // default=undefined
-  }
-};
-function extensions() {
-  const gl2 = config2.gl;
-  if (!gl2) return;
-  config2.extensions = gl2.getSupportedExtensions();
-}
-function register(instance) {
-  var _a;
-  if (instance.config.backend !== "humangl") return;
-  if (config2.name in ur().registry && !((_a = config2 == null ? void 0 : config2.gl) == null ? void 0 : _a.getParameter(config2.gl.VERSION))) {
-    log("humangl error: backend invalid context");
-    instance.models.reset();
-  }
-  if (!kme(config2.name)) {
-    try {
-      config2.canvas = canvas(100, 100);
-    } catch (err) {
-      log("humangl error: cannot create canvas:", err);
-      return;
-    }
-    try {
-      config2.gl = config2.canvas.getContext("webgl2", config2.webGLattr);
-      if (!config2.gl) {
-        log("humangl error: cannot get webgl context");
-        return;
-      }
-      const glv2 = config2.gl.getParameter(config2.gl.VERSION).includes("2.0");
-      if (!glv2) {
-        log("backend override: using fallback webgl backend as webgl 2.0 is not detected");
-        instance.config.backend = "webgl";
-        return;
-      }
-      if (config2.canvas) {
-        config2.canvas.addEventListener("webglcontextlost", (e) => {
-          log("humangl error:", e.type);
-          log("possible browser memory leak using webgl or conflict with multiple backend registrations");
-          instance.emit("error");
-          throw new Error("backend error: webgl context lost");
-        });
-        config2.canvas.addEventListener("webglcontextrestored", (e) => {
-          log("humangl error: context restored:", e);
-        });
-        config2.canvas.addEventListener("webglcontextcreationerror", (e) => {
-          log("humangl error: context create:", e);
-        });
-      }
-    } catch (err) {
-      log("humangl error: cannot get webgl context:", err);
-      return;
-    }
-    try {
-      NI(2, config2.gl);
-    } catch (err) {
-      log("humangl error: cannot set webgl context:", err);
-      return;
-    }
-    try {
-      const ctx = new bp(config2.gl);
-      tu(config2.name, () => new Lc(ctx), config2.priority);
-    } catch (err) {
-      log("humangl error: cannot register webgl backend:", err);
-      return;
-    }
-    try {
-      const kernels = Ym("webgl");
-      kernels.forEach((kernelConfig) => {
-        const newKernelConfig = { ...kernelConfig, backendName: config2.name };
-        ti(newKernelConfig);
-      });
-    } catch (err) {
-      log("humangl error: cannot update webgl backend registration:", err);
-      return;
-    }
-    try {
-      if (A().flagRegistry.WEBGL_VERSION) A().set("WEBGL_VERSION", 2);
-    } catch (err) {
-      log("humangl error: cannot set WebGL backend flags:", err);
-      return;
-    }
-    extensions();
-    const backend = ak();
-    const current = typeof backend["gpgpu"] !== "undefined" ? backend["getGPGPUContext"]().gl : null;
-    if (current) {
-      if (instance.config.debug) log("humangl backend registered:", { webgl: current.getParameter(current.VERSION), renderer: current.getParameter(current.RENDERER) });
-    } else {
-      log("humangl error: no current gl context:", current, config2.gl);
-    }
-  }
-}
-
-// src/tfjs/constants.ts
-var constants = {
-  tf255: 255,
-  tf1: 1,
-  tf2: 2,
-  tf05: 0.5,
-  tf127: 127.5,
-  rgb: [0.2989, 0.587, 0.114]
-};
-function init() {
-  constants.tf255 = ke(255, "float32");
-  constants.tf1 = ke(1, "float32");
-  constants.tf2 = ke(2, "float32");
-  constants.tf05 = ke(0.5, "float32");
-  constants.tf127 = ke(127.5, "float32");
-  constants.rgb = Jt([0.2989, 0.587, 0.114], "float32");
-}
-
-// src/tfjs/backend.ts
-async function getBestBackend() {
-  var _a;
-  await env.updateBackend();
-  if ((_a = env.tensorflow) == null ? void 0 : _a.version) return "tensorflow";
-  if (env.webgpu.supported && env.webgpu.backend) return "webgpu";
-  if (env.webgl.supported && env.webgl.backend) return "webgl";
-  if (env.wasm.supported && env.wasm.backend) return "wasm";
-  return "cpu";
-}
-function registerCustomOps(config3) {
-  const newKernels = [];
-  if (!env.kernels.includes("mod")) {
-    const kernelMod = {
-      kernelName: "Mod",
-      backendName: sk(),
-      kernelFunc: (op2) => De(() => Te(op2.inputs.a, se(je(op2.inputs.a, op2.inputs.b), op2.inputs.b)))
-    };
-    ti(kernelMod);
-    env.kernels.push("mod");
-    newKernels.push("mod");
-  }
-  if (!env.kernels.includes("floormod")) {
-    const kernelFloorMod = {
-      kernelName: "FloorMod",
-      backendName: sk(),
-      kernelFunc: (op2) => De(() => Ce(se(md(op2.inputs.a, op2.inputs.b), op2.inputs.b), z2(op2.inputs.a, op2.inputs.b)))
-    };
-    ti(kernelFloorMod);
-    env.kernels.push("floormod");
-    newKernels.push("floormod");
-  }
-  if (!env.kernels.includes("rotatewithoffset") && config3.softwareKernels) {
-    const kernelRotateWithOffset = {
-      kernelName: "RotateWithOffset",
-      backendName: sk(),
-      kernelFunc: (op2) => De(() => {
-        const backend = sk();
-        Sme("cpu");
-        const t10 = eX.rotateWithOffset(op2.inputs.image, op2.attrs.radians, op2.attrs.fillValue, op2.attrs.center);
-        Sme(backend);
-        return t10;
-      })
-    };
-    ti(kernelRotateWithOffset);
-    env.kernels.push("rotatewithoffset");
-    newKernels.push("rotatewithoffset");
-  }
-  if (newKernels.length > 0 && config3.debug) log("registered kernels:", newKernels);
-}
-var defaultFlags = {};
-async function check(instance, force = false) {
-  var _a, _b;
-  instance.state = "backend";
-  if (((_a = instance.config.backend) == null ? void 0 : _a.length) === 0) instance.config.backend = await getBestBackend();
-  if (force || env.initial || instance.config.backend && instance.config.backend.length > 0 && sk() !== instance.config.backend) {
-    const timeStamp = now();
-    if (instance.config.backend && instance.config.backend.length > 0) {
-      if (typeof window === "undefined" && typeof WorkerGlobalScope !== "undefined" && instance.config.debug) {
-        if (instance.config.debug) log("running inside web worker");
-      }
-      if (typeof navigator !== "undefined" && ((_b = navigator == null ? void 0 : navigator.userAgent) == null ? void 0 : _b.toLowerCase().includes("electron"))) {
-        if (instance.config.debug) log("running inside electron");
-      }
-      let available = Object.keys(ur().registryFactory);
-      if (instance.config.backend === "humangl" && !available.includes("humangl")) {
-        register(instance);
-        available = Object.keys(ur().registryFactory);
-      }
-      if (instance.config.debug) log("available backends:", available);
-      if (env.browser && !env.node && instance.config.backend === "tensorflow" && available.includes("webgl")) {
-        if (instance.config.debug) log("override: backend set to tensorflow while running in browser");
-        instance.config.backend = "webgl";
-      }
-      if (env.node && !env.browser && (instance.config.backend === "webgl" || instance.config.backend === "humangl") && available.includes("tensorflow")) {
-        if (instance.config.debug) log(`override: backend set to ${instance.config.backend} while running in nodejs`);
-        instance.config.backend = "tensorflow";
-      }
-      if (env.browser && instance.config.backend === "webgpu") {
-        if (typeof navigator === "undefined" || typeof navigator.gpu === "undefined") {
-          log("override: backend set to webgpu but browser does not support webgpu");
-          instance.config.backend = "webgl";
-        } else {
-          const adapter = await navigator.gpu.requestAdapter();
-          if (instance.config.debug) log("enumerated webgpu adapter:", adapter);
-          if (!adapter) {
-            log("override: backend set to webgpu but browser reports no available gpu");
-            instance.config.backend = "webgl";
-          } else {
-            let adapterInfo;
-            if ("requestAdapterInfo" in adapter) adapterInfo = await (adapter == null ? void 0 : adapter.requestAdapterInfo());
-            else adapterInfo = adapter.info;
-            log("webgpu adapter info:", adapterInfo);
-          }
-        }
-      }
-      if (!available.includes(instance.config.backend)) {
-        log(`error: backend ${instance.config.backend} not found in registry`);
-        instance.config.backend = env.node ? "tensorflow" : "webgl";
-        if (instance.config.debug) log(`override: setting backend ${instance.config.backend}`);
-      }
-      if (instance.config.debug) log("setting backend:", [instance.config.backend]);
-      if (instance.config.backend === "wasm") {
-        if (A().flagRegistry.CANVAS2D_WILL_READ_FREQUENTLY) A().set("CANVAS2D_WILL_READ_FREQUENTLY", true);
-        if (instance.config.debug) log("wasm path:", instance.config.wasmPath);
-        if (typeof nae !== "undefined") nae(instance.config.wasmPath, instance.config.wasmPlatformFetch);
-        else throw new Error("backend error: attempting to use wasm backend but wasm path is not set");
-        let mt2 = false;
-        let simd = false;
-        try {
-          mt2 = await A().getAsync("WASM_HAS_MULTITHREAD_SUPPORT");
-          simd = await A().getAsync("WASM_HAS_SIMD_SUPPORT");
-          if (instance.config.debug) log(`wasm execution: ${simd ? "simd" : "no simd"} ${mt2 ? "multithreaded" : "singlethreaded"}`);
-          if (instance.config.debug && !simd) log("warning: wasm simd support is not enabled");
-        } catch (e) {
-          log("wasm detection failed");
-        }
-      }
-      try {
-        await Sme(instance.config.backend);
-        await Ime();
-      } catch (err) {
-        log("error: cannot set backend:", instance.config.backend, err);
-        return false;
-      }
-      if (instance.config.debug) defaultFlags = JSON.parse(JSON.stringify(A().flags));
-    }
-    if (sk() === "humangl" || sk() === "webgl") {
-      if (A().flagRegistry.WEBGL_USE_SHAPES_UNIFORMS) A().set("WEBGL_USE_SHAPES_UNIFORMS", true);
-      if (A().flagRegistry.WEBGL_EXP_CONV) A().set("WEBGL_EXP_CONV", true);
-      if (instance.config.debug && typeof instance.config.deallocate !== "undefined" && instance.config.deallocate) {
-        log("changing webgl: WEBGL_DELETE_TEXTURE_THRESHOLD:", true);
-        A().set("WEBGL_DELETE_TEXTURE_THRESHOLD", 0);
-      }
-    }
-    if (sk() === "webgpu") {
-    }
-    if (instance.config.debug) {
-      const newFlags = A().flags;
-      const updatedFlags = {};
-      for (const key of Object.keys(newFlags)) {
-        if (defaultFlags[key] === newFlags[key]) continue;
-        updatedFlags[key] = newFlags[key];
-      }
-      if (instance.config.debug && Object.keys(updatedFlags).length > 0) log("backend:", sk(), "flags:", updatedFlags);
-    }
-    if (instance.config.flags && Object.keys(instance.config.flags).length > 0) {
-      if (instance.config.debug) log("flags:", instance.config["flags"]);
-      for (const [key, val] of Object.entries(instance.config.flags)) {
-        A().set(key, val);
-      }
-    }
-    hme();
-    init();
-    instance.performance.initBackend = Math.trunc(now() - timeStamp);
-    instance.config.backend = sk();
-    await env.updateBackend();
-    registerCustomOps(instance.config);
-  }
-  return true;
-}
-function fakeOps(kernelNames, config3) {
-  for (const kernelName of kernelNames) {
-    const kernelConfig = {
-      kernelName,
-      backendName: config3.backend,
-      kernelFunc: (param) => {
-        var _a;
-        if (config3.debug) log("kernelFunc", kernelName, config3.backend, param);
-        return (_a = param == null ? void 0 : param.inputs) == null ? void 0 : _a.info;
-      }
-      // setupFunc: () => { if (config.debug) log('kernelFunc', kernelName, config.backend); },
-      // disposeFunc: () => { if (config.debug) log('kernelFunc', kernelName, config.backend); },
-    };
-    ti(kernelConfig);
-  }
-  env.kernels = Ym(sk()).map((kernel) => kernel.kernelName.toLowerCase());
-}
-
-// src/draw/draw.ts
-var draw_exports = {};
-__export(draw_exports, {
-  all: () => all,
-  body: () => body,
-  canvas: () => canvas2,
-  face: () => face,
-  gesture: () => gesture,
-  hand: () => hand,
-  init: () => init2,
-  object: () => object,
-  options: () => options2,
-  person: () => person,
-  tensor: () => tensor
-});
-
-// src/draw/primitives.ts
-var getCanvasContext = (input) => {
-  if (!input) log("draw error: invalid canvas");
-  else if (!input.getContext) log("draw error: canvas context not defined");
-  else {
-    const ctx = input.getContext("2d", { willReadFrequently: true });
-    if (!ctx) log("draw error: cannot get canvas context");
-    else return ctx;
-  }
-  return null;
-};
-var rad2deg = (theta) => Math.round(theta * 180 / Math.PI);
-var replace = (str, source, target) => str.replace(source, typeof target === "number" ? target.toFixed(1) : target);
-var colorDepth = (z, opt) => {
-  if (!opt.useDepth || typeof z === "undefined") return opt.color;
-  const rgb3 = Uint8ClampedArray.from([127 + 2 * z, 127 - 2 * z, 255]);
-  return `rgba(${rgb3[0]}, ${rgb3[1]}, ${rgb3[2]}, ${opt.alpha})`;
-};
-function labels(ctx, str, startX, startY, localOptions2) {
-  const line = str.replace(/\[.*\]/g, "").split("\n").map((l) => l.trim());
-  const x = Math.max(0, startX);
-  for (let i = line.length - 1; i >= 0; i--) {
-    const y8 = i * localOptions2.lineHeight + startY;
-    if (localOptions2.shadowColor && localOptions2.shadowColor !== "") {
-      ctx.fillStyle = localOptions2.shadowColor;
-      ctx.fillText(line[i], x + 5, y8 + 16);
-    }
-    ctx.fillStyle = localOptions2.labelColor;
-    ctx.fillText(line[i], x + 4, y8 + 15);
-  }
-}
-function point(ctx, x, y8, z, localOptions2) {
-  ctx.fillStyle = colorDepth(z, localOptions2);
-  ctx.beginPath();
-  ctx.arc(x, y8, localOptions2.pointSize, 0, 2 * Math.PI);
-  ctx.fill();
-}
-function rect(ctx, x, y8, width, height, localOptions2) {
-  ctx.beginPath();
-  ctx.lineWidth = localOptions2.lineWidth;
-  if (localOptions2.useCurves) {
-    const cx2 = (x + x + width) / 2;
-    const cy2 = (y8 + y8 + height) / 2;
-    ctx.ellipse(cx2, cy2, width / 2, height / 2, 0, 0, 2 * Math.PI);
-  } else {
-    ctx.moveTo(x + localOptions2.roundRect, y8);
-    ctx.lineTo(x + width - localOptions2.roundRect, y8);
-    ctx.quadraticCurveTo(x + width, y8, x + width, y8 + localOptions2.roundRect);
-    ctx.lineTo(x + width, y8 + height - localOptions2.roundRect);
-    ctx.quadraticCurveTo(x + width, y8 + height, x + width - localOptions2.roundRect, y8 + height);
-    ctx.lineTo(x + localOptions2.roundRect, y8 + height);
-    ctx.quadraticCurveTo(x, y8 + height, x, y8 + height - localOptions2.roundRect);
-    ctx.lineTo(x, y8 + localOptions2.roundRect);
-    ctx.quadraticCurveTo(x, y8, x + localOptions2.roundRect, y8);
-    ctx.closePath();
-  }
-  ctx.stroke();
-}
-function lines(ctx, points, localOptions2) {
-  if (points.length < 2) return;
-  ctx.beginPath();
-  ctx.moveTo(points[0][0], points[0][1]);
-  for (const pt2 of points) {
-    ctx.strokeStyle = colorDepth(pt2[2] || 0, localOptions2);
-    ctx.lineTo(Math.trunc(pt2[0]), Math.trunc(pt2[1]));
-  }
-  ctx.stroke();
-  if (localOptions2.fillPolygons) {
-    ctx.closePath();
-    ctx.fill();
-  }
-}
-function curves(ctx, points, localOptions2) {
-  if (points.length < 2) return;
-  ctx.lineWidth = localOptions2.lineWidth;
-  if (!localOptions2.useCurves || points.length <= 2) {
-    lines(ctx, points, localOptions2);
-    return;
-  }
-  ctx.moveTo(points[0][0], points[0][1]);
-  for (let i = 0; i < points.length - 2; i++) {
-    const xc2 = (points[i][0] + points[i + 1][0]) / 2;
-    const yc2 = (points[i][1] + points[i + 1][1]) / 2;
-    ctx.quadraticCurveTo(points[i][0], points[i][1], xc2, yc2);
-  }
-  ctx.quadraticCurveTo(points[points.length - 2][0], points[points.length - 2][1], points[points.length - 1][0], points[points.length - 1][1]);
-  ctx.stroke();
-  if (localOptions2.fillPolygons) {
-    ctx.closePath();
-    ctx.fill();
-  }
-}
-function arrow(ctx, from, to, radius = 5) {
-  let angle;
-  let x;
-  let y8;
-  ctx.beginPath();
-  ctx.moveTo(from[0], from[1]);
-  ctx.lineTo(to[0], to[1]);
-  angle = Math.atan2(to[1] - from[1], to[0] - from[0]);
-  x = radius * Math.cos(angle) + to[0];
-  y8 = radius * Math.sin(angle) + to[1];
-  ctx.moveTo(x, y8);
-  angle += 1 / 3 * (2 * Math.PI);
-  x = radius * Math.cos(angle) + to[0];
-  y8 = radius * Math.sin(angle) + to[1];
-  ctx.lineTo(x, y8);
-  angle += 1 / 3 * (2 * Math.PI);
-  x = radius * Math.cos(angle) + to[0];
-  y8 = radius * Math.sin(angle) + to[1];
-  ctx.lineTo(x, y8);
-  ctx.closePath();
-  ctx.stroke();
-  ctx.fill();
-}
-
-// src/draw/options.ts
-var options2 = {
-  color: "rgba(173, 216, 230, 0.6)",
-  // 'lightblue' with light alpha channel
-  labelColor: "rgba(173, 216, 230, 1)",
-  // 'lightblue' with dark alpha channel
-  shadowColor: "black",
-  alpha: 0.5,
-  font: 'small-caps 16px "Segoe UI"',
-  lineHeight: 18,
-  lineWidth: 4,
-  pointSize: 2,
-  roundRect: 8,
-  drawPoints: false,
-  drawLabels: true,
-  drawBoxes: true,
-  drawAttention: true,
-  drawGestures: true,
-  drawPolygons: true,
-  drawGaze: true,
-  fillPolygons: false,
-  useDepth: true,
-  useCurves: false,
-  faceLabels: "",
-  bodyLabels: "",
-  bodyPartLabels: "",
-  objectLabels: "",
-  handLabels: "",
-  fingerLabels: "",
-  gestureLabels: ""
-};
 
 // src/face/facemeshcoords.ts
 var meshAnnotations = {
@@ -37454,6 +36573,154 @@ var contourKeypoints = {
   faceOval: connectionsToIndices(pairsFaceContour)
 };
 
+// src/draw/primitives.ts
+var getCanvasContext = (input) => {
+  if (!input) log("draw error: invalid canvas");
+  else if (!input.getContext) log("draw error: canvas context not defined");
+  else {
+    const ctx = input.getContext("2d", { willReadFrequently: true });
+    if (!ctx) log("draw error: cannot get canvas context");
+    else return ctx;
+  }
+  return null;
+};
+var rad2deg = (theta) => Math.round(theta * 180 / Math.PI);
+var replace = (str, source, target) => str.replace(source, typeof target === "number" ? target.toFixed(1) : target);
+var colorDepth = (z, opt) => {
+  if (!opt.useDepth || typeof z === "undefined") return opt.color;
+  const rgb3 = Uint8ClampedArray.from([127 + 2 * z, 127 - 2 * z, 255]);
+  return `rgba(${rgb3[0]}, ${rgb3[1]}, ${rgb3[2]}, ${opt.alpha})`;
+};
+function labels(ctx, str, startX, startY, localOptions2) {
+  const line = str.replace(/\[.*\]/g, "").split("\n").map((l) => l.trim());
+  const x = Math.max(0, startX);
+  for (let i = line.length - 1; i >= 0; i--) {
+    const y8 = i * localOptions2.lineHeight + startY;
+    if (localOptions2.shadowColor && localOptions2.shadowColor !== "") {
+      ctx.fillStyle = localOptions2.shadowColor;
+      ctx.fillText(line[i], x + 5, y8 + 16);
+    }
+    ctx.fillStyle = localOptions2.labelColor;
+    ctx.fillText(line[i], x + 4, y8 + 15);
+  }
+}
+function point(ctx, x, y8, z, localOptions2) {
+  ctx.fillStyle = colorDepth(z, localOptions2);
+  ctx.beginPath();
+  ctx.arc(x, y8, localOptions2.pointSize, 0, 2 * Math.PI);
+  ctx.fill();
+}
+function rect(ctx, x, y8, width, height, localOptions2) {
+  ctx.beginPath();
+  ctx.lineWidth = localOptions2.lineWidth;
+  if (localOptions2.useCurves) {
+    const cx2 = (x + x + width) / 2;
+    const cy2 = (y8 + y8 + height) / 2;
+    ctx.ellipse(cx2, cy2, width / 2, height / 2, 0, 0, 2 * Math.PI);
+  } else {
+    ctx.moveTo(x + localOptions2.roundRect, y8);
+    ctx.lineTo(x + width - localOptions2.roundRect, y8);
+    ctx.quadraticCurveTo(x + width, y8, x + width, y8 + localOptions2.roundRect);
+    ctx.lineTo(x + width, y8 + height - localOptions2.roundRect);
+    ctx.quadraticCurveTo(x + width, y8 + height, x + width - localOptions2.roundRect, y8 + height);
+    ctx.lineTo(x + localOptions2.roundRect, y8 + height);
+    ctx.quadraticCurveTo(x, y8 + height, x, y8 + height - localOptions2.roundRect);
+    ctx.lineTo(x, y8 + localOptions2.roundRect);
+    ctx.quadraticCurveTo(x, y8, x + localOptions2.roundRect, y8);
+    ctx.closePath();
+  }
+  ctx.stroke();
+}
+function lines(ctx, points, localOptions2) {
+  if (points.length < 2) return;
+  ctx.beginPath();
+  ctx.moveTo(points[0][0], points[0][1]);
+  for (const pt2 of points) {
+    ctx.strokeStyle = colorDepth(pt2[2] || 0, localOptions2);
+    ctx.lineTo(Math.trunc(pt2[0]), Math.trunc(pt2[1]));
+  }
+  ctx.stroke();
+  if (localOptions2.fillPolygons) {
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+function curves(ctx, points, localOptions2) {
+  if (points.length < 2) return;
+  ctx.lineWidth = localOptions2.lineWidth;
+  if (!localOptions2.useCurves || points.length <= 2) {
+    lines(ctx, points, localOptions2);
+    return;
+  }
+  ctx.moveTo(points[0][0], points[0][1]);
+  for (let i = 0; i < points.length - 2; i++) {
+    const xc2 = (points[i][0] + points[i + 1][0]) / 2;
+    const yc2 = (points[i][1] + points[i + 1][1]) / 2;
+    ctx.quadraticCurveTo(points[i][0], points[i][1], xc2, yc2);
+  }
+  ctx.quadraticCurveTo(points[points.length - 2][0], points[points.length - 2][1], points[points.length - 1][0], points[points.length - 1][1]);
+  ctx.stroke();
+  if (localOptions2.fillPolygons) {
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+function arrow(ctx, from, to, radius = 5) {
+  let angle;
+  let x;
+  let y8;
+  ctx.beginPath();
+  ctx.moveTo(from[0], from[1]);
+  ctx.lineTo(to[0], to[1]);
+  angle = Math.atan2(to[1] - from[1], to[0] - from[0]);
+  x = radius * Math.cos(angle) + to[0];
+  y8 = radius * Math.sin(angle) + to[1];
+  ctx.moveTo(x, y8);
+  angle += 1 / 3 * (2 * Math.PI);
+  x = radius * Math.cos(angle) + to[0];
+  y8 = radius * Math.sin(angle) + to[1];
+  ctx.lineTo(x, y8);
+  angle += 1 / 3 * (2 * Math.PI);
+  x = radius * Math.cos(angle) + to[0];
+  y8 = radius * Math.sin(angle) + to[1];
+  ctx.lineTo(x, y8);
+  ctx.closePath();
+  ctx.stroke();
+  ctx.fill();
+}
+
+// src/draw/options.ts
+var options = {
+  color: "rgba(173, 216, 230, 0.6)",
+  // 'lightblue' with light alpha channel
+  labelColor: "rgba(173, 216, 230, 1)",
+  // 'lightblue' with dark alpha channel
+  shadowColor: "black",
+  alpha: 0.5,
+  font: 'small-caps 16px "Segoe UI"',
+  lineHeight: 18,
+  lineWidth: 4,
+  pointSize: 2,
+  roundRect: 8,
+  drawPoints: false,
+  drawLabels: true,
+  drawBoxes: true,
+  drawAttention: true,
+  drawGestures: true,
+  drawPolygons: true,
+  drawGaze: true,
+  fillPolygons: false,
+  useDepth: true,
+  useCurves: false,
+  faceLabels: "",
+  bodyLabels: "",
+  bodyPartLabels: "",
+  objectLabels: "",
+  handLabels: "",
+  fingerLabels: "",
+  gestureLabels: ""
+};
+
 // src/face/constants.ts
 var LIPS_CONNECTIONS = [
   [61, 146],
@@ -37943,7 +37210,7 @@ function drawFaceBoxes(f, ctx) {
   }
 }
 function face(inCanvas2, result, drawOptions) {
-  localOptions = mergeDeep(options2, drawOptions);
+  localOptions = mergeDeep(options, drawOptions);
   if (!result || !inCanvas2) return;
   const ctx = getCanvasContext(inCanvas2);
   if (!ctx) return;
@@ -37962,10 +37229,30 @@ function face(inCanvas2, result, drawOptions) {
   }
 }
 
+// src/draw/labels.ts
+var defaultLabels = {
+  face: `face
+    confidence: [score]%
+    [gender] [genderScore]%
+    age: [age] years
+    distance: [distance]cm
+    real: [real]%
+    live: [live]%
+    [emotions]
+    roll: [roll]\xB0 yaw:[yaw]\xB0 pitch:[pitch]\xB0
+    gaze: [gaze]\xB0`,
+  body: "body [score]%",
+  bodyPart: "[label] [score]%",
+  object: "[label] [score]%",
+  hand: "[label] [score]%",
+  finger: "[label]",
+  gesture: "[where] [who]: [what]"
+};
+
 // src/draw/body.ts
 function body(inCanvas2, result, drawOptions) {
   var _a, _b;
-  const localOptions2 = mergeDeep(options2, drawOptions);
+  const localOptions2 = mergeDeep(options, drawOptions);
   if (!result || !inCanvas2) return;
   const ctx = getCanvasContext(inCanvas2);
   if (!ctx) return;
@@ -38009,10 +37296,36 @@ function body(inCanvas2, result, drawOptions) {
   }
 }
 
+// src/draw/gesture.ts
+function gesture(inCanvas2, result, drawOptions) {
+  var _a;
+  const localOptions2 = mergeDeep(options, drawOptions);
+  if (!result || !inCanvas2) return;
+  if (localOptions2.drawGestures && ((_a = localOptions2.gestureLabels) == null ? void 0 : _a.length) > 0) {
+    const ctx = getCanvasContext(inCanvas2);
+    if (!ctx) return;
+    ctx.font = localOptions2.font;
+    ctx.fillStyle = localOptions2.color;
+    let i = 1;
+    for (let j = 0; j < result.length; j++) {
+      const [where, what] = Object.entries(result[j]);
+      if (what.length > 1 && what[1].length > 0) {
+        const who = where[1] > 0 ? `#${where[1]}` : "";
+        let l = localOptions2.gestureLabels.slice();
+        l = replace(l, "[where]", where[0]);
+        l = replace(l, "[who]", who);
+        l = replace(l, "[what]", what[1]);
+        labels(ctx, l, 8, 2 + i * localOptions2.lineHeight, localOptions2);
+        i += 1;
+      }
+    }
+  }
+}
+
 // src/draw/hand.ts
 function hand(inCanvas2, result, drawOptions) {
   var _a, _b;
-  const localOptions2 = mergeDeep(options2, drawOptions);
+  const localOptions2 = mergeDeep(options, drawOptions);
   if (!result || !inCanvas2) return;
   const ctx = getCanvasContext(inCanvas2);
   if (!ctx) return;
@@ -38072,7 +37385,7 @@ function hand(inCanvas2, result, drawOptions) {
 // src/draw/object.ts
 function object(inCanvas2, result, drawOptions) {
   var _a;
-  const localOptions2 = mergeDeep(options2, drawOptions);
+  const localOptions2 = mergeDeep(options, drawOptions);
   if (!result || !inCanvas2) return;
   const ctx = getCanvasContext(inCanvas2);
   if (!ctx) return;
@@ -38095,56 +37408,10 @@ function object(inCanvas2, result, drawOptions) {
   }
 }
 
-// src/draw/gesture.ts
-function gesture(inCanvas2, result, drawOptions) {
-  var _a;
-  const localOptions2 = mergeDeep(options2, drawOptions);
-  if (!result || !inCanvas2) return;
-  if (localOptions2.drawGestures && ((_a = localOptions2.gestureLabels) == null ? void 0 : _a.length) > 0) {
-    const ctx = getCanvasContext(inCanvas2);
-    if (!ctx) return;
-    ctx.font = localOptions2.font;
-    ctx.fillStyle = localOptions2.color;
-    let i = 1;
-    for (let j = 0; j < result.length; j++) {
-      const [where, what] = Object.entries(result[j]);
-      if (what.length > 1 && what[1].length > 0) {
-        const who = where[1] > 0 ? `#${where[1]}` : "";
-        let l = localOptions2.gestureLabels.slice();
-        l = replace(l, "[where]", where[0]);
-        l = replace(l, "[who]", who);
-        l = replace(l, "[what]", what[1]);
-        labels(ctx, l, 8, 2 + i * localOptions2.lineHeight, localOptions2);
-        i += 1;
-      }
-    }
-  }
-}
-
-// src/draw/labels.ts
-var defaultLabels = {
-  face: `face
-    confidence: [score]%
-    [gender] [genderScore]%
-    age: [age] years
-    distance: [distance]cm
-    real: [real]%
-    live: [live]%
-    [emotions]
-    roll: [roll]\xB0 yaw:[yaw]\xB0 pitch:[pitch]\xB0
-    gaze: [gaze]\xB0`,
-  body: "body [score]%",
-  bodyPart: "[label] [score]%",
-  object: "[label] [score]%",
-  hand: "[label] [score]%",
-  finger: "[label]",
-  gesture: "[where] [who]: [what]"
-};
-
 // src/draw/draw.ts
 var drawTime = 0;
 function person(inCanvas2, result, drawOptions) {
-  const localOptions2 = mergeDeep(options2, drawOptions);
+  const localOptions2 = mergeDeep(options, drawOptions);
   if (!result || !inCanvas2) return;
   const ctx = getCanvasContext(inCanvas2);
   if (!ctx) return;
@@ -38182,741 +37449,159 @@ async function tensor(input, output) {
 async function all(inCanvas2, result, drawOptions) {
   if (!(result == null ? void 0 : result.performance) || !inCanvas2) return null;
   const timeStamp = now();
-  const localOptions2 = mergeDeep(options2, drawOptions);
+  const localOptions2 = mergeDeep(options, drawOptions);
   const promise = Promise.all([
-    face(inCanvas2, result.face, localOptions2),
-    body(inCanvas2, result.body, localOptions2),
-    hand(inCanvas2, result.hand, localOptions2),
-    object(inCanvas2, result.object, localOptions2),
-    gesture(inCanvas2, result.gesture, localOptions2)
-    // gestures do not have buffering
+    face(inCanvas2, result.face, localOptions2)
     // person(inCanvas, result.persons, localOptions); // already included above
   ]);
   drawTime = env.perfadd ? drawTime + Math.round(now() - timeStamp) : Math.round(now() - timeStamp);
   result.performance.draw = drawTime;
   return promise;
 }
+function init() {
+  options.faceLabels = defaultLabels.face;
+  options.bodyLabels = defaultLabels.body;
+  options.bodyPartLabels = defaultLabels.bodyPart;
+  options.handLabels = defaultLabels.hand;
+  options.fingerLabels = defaultLabels.finger;
+  options.objectLabels = defaultLabels.object;
+  options.gestureLabels = defaultLabels.gesture;
+}
+
+// models/models.json
+var models_exports = {};
+__export(models_exports, {
+  antispoof: () => antispoof,
+  blazeface: () => blazeface,
+  centernet: () => centernet,
+  default: () => models_default,
+  emotion: () => emotion,
+  facemesh: () => facemesh,
+  faceres: () => faceres,
+  "handlandmark-lite": () => handlandmark_lite,
+  handtrack: () => handtrack,
+  iris: () => iris,
+  liveness: () => liveness,
+  models: () => models,
+  "movenet-lightning": () => movenet_lightning
+});
+var antispoof = 853098;
+var blazeface = 538928;
+var centernet = 4030290;
+var emotion = 820516;
+var facemesh = 1477958;
+var faceres = 6978814;
+var handlandmark_lite = 2023432;
+var handtrack = 2964837;
+var iris = 2599092;
+var liveness = 592976;
+var models = 0;
+var movenet_lightning = 4650216;
+var models_default = {
+  antispoof,
+  blazeface,
+  centernet,
+  emotion,
+  facemesh,
+  faceres,
+  "handlandmark-lite": handlandmark_lite,
+  handtrack,
+  iris,
+  liveness,
+  models,
+  "movenet-lightning": movenet_lightning
+};
+
+// src/tfjs/load.ts
+var options2 = {
+  cacheModels: true,
+  cacheSupported: true,
+  verbose: true,
+  debug: false,
+  modelBasePath: ""
+};
+var modelStats = {};
+async function httpHandler(url, init4) {
+  if (options2.debug) log("load model fetch:", url, init4);
+  return fetch(url, init4);
+}
+function setModelLoadOptions(config3) {
+  options2.cacheModels = config3.cacheModels;
+  options2.verbose = config3.debug;
+  options2.modelBasePath = config3.modelBasePath;
+}
+async function loadModel(modelPath) {
+  var _a, _b, _c2, _d2, _e, _f2;
+  let modelUrl = join(options2.modelBasePath, modelPath || "");
+  if (!modelUrl.toLowerCase().endsWith(".json")) modelUrl += ".json";
+  const modelPathSegments = modelUrl.includes("/") ? modelUrl.split("/") : modelUrl.split("\\");
+  const shortModelName = modelPathSegments[modelPathSegments.length - 1].replace(".json", "");
+  const cachedModelName = "indexeddb://" + shortModelName;
+  modelStats[shortModelName] = {
+    name: shortModelName,
+    loaded: false,
+    sizeFromManifest: 0,
+    sizeLoadedWeights: 0,
+    sizeDesired: models_exports[shortModelName],
+    inCache: false,
+    url: ""
+  };
+  options2.cacheSupported = typeof indexedDB !== "undefined";
+  let cachedModels = {};
+  try {
+    cachedModels = options2.cacheSupported && options2.cacheModels ? await di.listModels() : {};
+  } catch (e) {
+    options2.cacheSupported = false;
+  }
+  modelStats[shortModelName].inCache = options2.cacheSupported && options2.cacheModels && Object.keys(cachedModels).includes(cachedModelName);
+  modelStats[shortModelName].url = modelStats[shortModelName].inCache ? cachedModelName : modelUrl;
+  const tfLoadOptions = typeof fetch === "undefined" ? {} : { fetchFunc: (url, init4) => httpHandler(url, init4) };
+  let model23 = new Bl(modelStats[shortModelName].url, tfLoadOptions);
+  modelStats[shortModelName].loaded = false;
+  try {
+    model23.findIOHandler();
+    if (options2.debug) log("model load handler:", model23["handler"]);
+  } catch (err) {
+    log("error finding model i/o handler:", modelUrl, err);
+  }
+  try {
+    const artifacts = await ((_a = model23.handler) == null ? void 0 : _a.load()) || null;
+    modelStats[shortModelName].sizeFromManifest = ((_b = artifacts == null ? void 0 : artifacts.weightData) == null ? void 0 : _b.byteLength) || 0;
+    if (artifacts) model23.loadSync(artifacts);
+    else model23 = await M8(modelStats[shortModelName].inCache ? cachedModelName : modelUrl, tfLoadOptions);
+    modelStats[shortModelName].sizeLoadedWeights = ((_d2 = (_c2 = model23.artifacts) == null ? void 0 : _c2.weightData) == null ? void 0 : _d2.byteLength) || ((_f2 = (_e = model23.artifacts) == null ? void 0 : _e.weightData) == null ? void 0 : _f2[0].byteLength) || 0;
+    if (options2.verbose) log("load:", { model: shortModelName, url: model23["modelUrl"], bytes: modelStats[shortModelName].sizeLoadedWeights });
+    modelStats[shortModelName].loaded = true;
+  } catch (err) {
+    log("error loading model:", modelUrl, err);
+  }
+  if (modelStats[shortModelName].loaded && options2.cacheModels && options2.cacheSupported && !modelStats[shortModelName].inCache) {
+    try {
+      const saveResult = await model23.save(cachedModelName);
+      if (options2.debug) log("model saved:", cachedModelName, saveResult);
+    } catch (err) {
+      log("error saving model:", modelUrl, err);
+    }
+  }
+  return model23;
+}
+
+// src/tfjs/constants.ts
+var constants = {
+  tf255: 255,
+  tf1: 1,
+  tf2: 2,
+  tf05: 0.5,
+  tf127: 127.5,
+  rgb: [0.2989, 0.587, 0.114]
+};
 function init2() {
-  options2.faceLabels = defaultLabels.face;
-  options2.bodyLabels = defaultLabels.body;
-  options2.bodyPartLabels = defaultLabels.bodyPart;
-  options2.handLabels = defaultLabels.hand;
-  options2.fingerLabels = defaultLabels.finger;
-  options2.objectLabels = defaultLabels.object;
-  options2.gestureLabels = defaultLabels.gesture;
-}
-
-// src/body/blazeposecoords.ts
-var blazeposecoords_exports = {};
-__export(blazeposecoords_exports, {
-  connected: () => connected,
-  kpt: () => kpt
-});
-var kpt = [
-  "nose",
-  //  0
-  "leftEyeInside",
-  //  1
-  "leftEye",
-  //  2
-  "leftEyeOutside",
-  //  3
-  "rightEyeInside",
-  //  4
-  "rightEye",
-  //  5
-  "rightEyeOutside",
-  //  6
-  "leftEar",
-  //  7
-  "rightEar",
-  //  8
-  "leftMouth",
-  //  9
-  "rightMouth",
-  // 10
-  "leftShoulder",
-  // 11
-  "rightShoulder",
-  // 12
-  "leftElbow",
-  // 13
-  "rightElbow",
-  // 14
-  "leftWrist",
-  // 15
-  "rightWrist",
-  // 16
-  "leftPinky",
-  // 17
-  "rightPinky",
-  // 18
-  "leftIndex",
-  // 19
-  "rightIndex",
-  // 20
-  "leftThumb",
-  // 21
-  "rightThumb",
-  // 22
-  "leftHip",
-  // 23
-  "rightHip",
-  // 24
-  "leftKnee",
-  // 25
-  "rightKnee",
-  // 26
-  "leftAnkle",
-  // 27
-  "rightAnkle",
-  // 28
-  "leftHeel",
-  // 29
-  "rightHeel",
-  // 30
-  "leftFoot",
-  // 31
-  "rightFoot",
-  // 32
-  "bodyCenter",
-  // 33
-  "bodyTop",
-  // 34
-  "leftPalm",
-  // 35 // z-coord not ok
-  "leftHand",
-  // 36 // similar to wrist but z-coord not ok
-  "rightPalm",
-  // 37 // z-coord not ok
-  "rightHand"
-  // 38 // similar to wrist but z-coord not ok
-];
-var connected = {
-  shoulders: ["leftShoulder", "rightShoulder"],
-  hips: ["rightHip", "leftHip"],
-  mouth: ["leftMouth", "rightMouth"],
-  leftLegUpper: ["leftHip", "leftKnee"],
-  leftLegLower: ["leftKnee", "leftAnkle"],
-  leftFoot: ["leftAnkle", "leftHeel", "leftFoot"],
-  leftTorso: ["leftShoulder", "leftHip"],
-  leftArmUpper: ["leftShoulder", "leftElbow"],
-  leftArmLower: ["leftElbow", "leftWrist"],
-  leftHand: ["leftWrist", "leftPalm"],
-  leftHandPinky: ["leftPalm", "leftPinky"],
-  leftHandIndex: ["leftPalm", "leftIndex"],
-  leftHandThumb: ["leftPalm", "leftThumb"],
-  leftEyeOutline: ["leftEyeInside", "leftEyeOutside"],
-  rightLegUpper: ["rightHip", "rightKnee"],
-  rightLegLower: ["rightKnee", "rightAnkle"],
-  rightFoot: ["rightAnkle", "rightHeel", "rightFoot"],
-  rightTorso: ["rightShoulder", "rightHip"],
-  rightArmUpper: ["rightShoulder", "rightElbow"],
-  rightArmLower: ["rightElbow", "rightWrist"],
-  rightHand: ["rightWrist", "rightPalm"],
-  rightHandPinky: ["rightPalm", "rightPinky"],
-  rightHandIndex: ["rightPalm", "rightIndex"],
-  rightHandThumb: ["rightPalm", "rightThumb"],
-  rightEyeOutline: ["rightEyeInside", "rightEyeOutside"]
-};
-
-// src/body/blazeposedetector.ts
-var model;
-var inputSize = 224;
-var anchorTensor;
-var numLayers = 5;
-var strides = [8, 16, 32, 32, 32];
-function createAnchors() {
-  const anchors3 = [];
-  let layerId = 0;
-  while (layerId < numLayers) {
-    let anchorCount = 0;
-    let lastSameStrideLayer = layerId;
-    while (lastSameStrideLayer < strides.length && strides[lastSameStrideLayer] === strides[layerId]) {
-      anchorCount += 2;
-      lastSameStrideLayer++;
-    }
-    const stride = strides[layerId];
-    const featureMapHeight = Math.ceil(inputSize / stride);
-    const featureMapWidth = Math.ceil(inputSize / stride);
-    for (let y8 = 0; y8 < featureMapHeight; ++y8) {
-      for (let x = 0; x < featureMapWidth; ++x) {
-        for (let anchorId = 0; anchorId < anchorCount; ++anchorId) {
-          anchors3.push({ x: (x + 0.5) / featureMapWidth, y: (y8 + 0.5) / featureMapHeight });
-        }
-      }
-    }
-    layerId = lastSameStrideLayer;
-  }
-  anchorTensor = { x: Jt(anchors3.map((a) => a.x)), y: Jt(anchors3.map((a) => a.y)) };
-}
-async function loadDetector(config3) {
-  if (env.initial) model = null;
-  if (!model && config3.body["detector"] && config3.body["detector"].modelPath || "") {
-    model = await loadModel(config3.body["detector"].modelPath);
-    const inputs = (model == null ? void 0 : model["executor"]) ? Object.values(model.modelSignature["inputs"]) : void 0;
-    inputSize = Array.isArray(inputs) ? parseInt(inputs[0].tensorShape.dim[1].size) : 0;
-  } else if (config3.debug && model) log("cached model:", model["modelUrl"]);
-  createAnchors();
-  return model;
-}
-var cropFactor = [5, 5];
-function decodeBoxes(boxesTensor, anchor) {
-  return De(() => {
-    const split = li(boxesTensor, 12, 1);
-    let xCenter = cc(split[0]);
-    let yCenter = cc(split[1]);
-    let width = cc(split[2]);
-    let height = cc(split[3]);
-    xCenter = Ce(je(xCenter, inputSize), anchor.x);
-    yCenter = Ce(je(yCenter, inputSize), anchor.y);
-    width = se(je(width, inputSize), cropFactor[0]);
-    height = se(je(height, inputSize), cropFactor[1]);
-    const xMin = Te(xCenter, je(width, 2));
-    const yMin = Te(yCenter, je(height, 2));
-    const xMax = Ce(xMin, width);
-    const yMax = Ce(yMin, height);
-    const boxes = vr([xMin, yMin, xMax, yMax], 1);
-    return boxes;
-  });
-}
-async function decodeResults(boxesTensor, logitsTensor, config3, outputSize2) {
-  var _a, _b;
-  const detectedBoxes = [];
-  const t10 = {};
-  t10.boxes = decodeBoxes(boxesTensor, anchorTensor);
-  t10.scores = Ea(logitsTensor);
-  t10.nms = await eX.nonMaxSuppressionAsync(t10.boxes, t10.scores, 1, ((_a = config3.body["detector"]) == null ? void 0 : _a.minConfidence) || 0.1, ((_b = config3.body["detector"]) == null ? void 0 : _b.iouThreshold) || 0.1);
-  const nms = await t10.nms.data();
-  const scores = await t10.scores.data();
-  const boxes = await t10.boxes.array();
-  for (const i of Array.from(nms)) {
-    const score = scores[i];
-    const boxRaw = boxes[i];
-    const box = [Math.round(boxRaw[0] * outputSize2[0]), Math.round(boxRaw[1] * outputSize2[1]), Math.round(boxRaw[2] * outputSize2[0]), Math.round(boxRaw[3] * outputSize2[1])];
-    const detectedBox = { score, boxRaw, box };
-    detectedBoxes.push(detectedBox);
-  }
-  Object.keys(t10).forEach((tensor2) => Ot(t10[tensor2]));
-  return detectedBoxes;
-}
-async function detectBoxes(input, config3, outputSize2) {
-  const t10 = {};
-  t10.res = model == null ? void 0 : model.execute(input, ["Identity"]);
-  t10.logitsRaw = Xe(t10.res, [0, 0, 0], [1, -1, 1]);
-  t10.boxesRaw = Xe(t10.res, [0, 0, 1], [1, -1, -1]);
-  t10.logits = cc(t10.logitsRaw);
-  t10.boxes = cc(t10.boxesRaw);
-  const boxes = await decodeResults(t10.boxes, t10.logits, config3, outputSize2);
-  Object.keys(t10).forEach((tensor2) => Ot(t10[tensor2]));
-  return boxes;
-}
-
-// src/util/box.ts
-function calc(keypoints, outputSize2 = [1, 1]) {
-  const coords = [keypoints.map((pt2) => pt2[0]), keypoints.map((pt2) => pt2[1])];
-  const min = [Math.min(...coords[0]), Math.min(...coords[1])];
-  const max = [Math.max(...coords[0]), Math.max(...coords[1])];
-  const box = [min[0], min[1], max[0] - min[0], max[1] - min[1]];
-  const boxRaw = [box[0] / outputSize2[0], box[1] / outputSize2[1], box[2] / outputSize2[0], box[3] / outputSize2[1]];
-  return { box, boxRaw };
-}
-function square(keypoints, outputSize2 = [1, 1]) {
-  const coords = [keypoints.map((pt2) => pt2[0]), keypoints.map((pt2) => pt2[1])];
-  const min = [Math.min(...coords[0]), Math.min(...coords[1])];
-  const max = [Math.max(...coords[0]), Math.max(...coords[1])];
-  const center = [(min[0] + max[0]) / 2, (min[1] + max[1]) / 2];
-  const dist = Math.max(center[0] - min[0], center[1] - min[1], -center[0] + max[0], -center[1] + max[1]);
-  const box = [Math.trunc(center[0] - dist), Math.trunc(center[1] - dist), Math.trunc(2 * dist), Math.trunc(2 * dist)];
-  const boxRaw = [box[0] / outputSize2[0], box[1] / outputSize2[1], box[2] / outputSize2[0], box[3] / outputSize2[1]];
-  return { box, boxRaw };
-}
-function scale(box, scaleFact) {
-  const dist = [box[2] * scaleFact, box[3] * scaleFact];
-  const newBox = [
-    box[0] - (dist[0] - box[2]) / 2,
-    box[1] - (dist[1] - box[3]) / 2,
-    dist[0],
-    dist[1]
-  ];
-  return newBox;
-}
-
-// src/body/blazepose.ts
-var model2;
-var inputSize2 = 256;
-var skipped = Number.MAX_SAFE_INTEGER;
-var outputNodes = {
-  landmarks: ["ld_3d", "activation_segmentation", "activation_heatmap", "world_3d", "output_poseflag"],
-  detector: []
-};
-var cache = [];
-var padding = [[0, 0], [0, 0], [0, 0], [0, 0]];
-var lastTime = 0;
-var sigmoid = (x) => 1 - 1 / (1 + Math.exp(x));
-var loadDetect = (config3) => loadDetector(config3);
-async function loadPose(config3) {
-  if (env.initial) model2 = null;
-  if (!model2) {
-    model2 = await loadModel(config3.body.modelPath);
-    const inputs = (model2 == null ? void 0 : model2["executor"]) ? Object.values(model2.modelSignature["inputs"]) : void 0;
-    inputSize2 = Array.isArray(inputs) ? parseInt(inputs[0].tensorShape.dim[1].size) : 0;
-  } else if (config3.debug) log("cached model:", model2["modelUrl"]);
-  return model2;
-}
-function prepareImage(input, size2, cropBox) {
-  var _a, _b;
-  const t10 = {};
-  if (!((_a = input == null ? void 0 : input.shape) == null ? void 0 : _a[1]) || !((_b = input == null ? void 0 : input.shape) == null ? void 0 : _b[2])) return input;
-  let final;
-  if (cropBox) {
-    t10.cropped = eX.cropAndResize(input, [cropBox], [0], [input.shape[1], input.shape[2]]);
-  }
-  if (input.shape[1] !== input.shape[2]) {
-    const height = [
-      input.shape[2] > input.shape[1] ? Math.trunc((input.shape[2] - input.shape[1]) / 2) : 0,
-      input.shape[2] > input.shape[1] ? Math.trunc((input.shape[2] - input.shape[1]) / 2) : 0
-    ];
-    const width = [
-      input.shape[1] > input.shape[2] ? Math.trunc((input.shape[1] - input.shape[2]) / 2) : 0,
-      input.shape[1] > input.shape[2] ? Math.trunc((input.shape[1] - input.shape[2]) / 2) : 0
-    ];
-    padding = [
-      [0, 0],
-      // dont touch batch
-      height,
-      // height before&after
-      width,
-      // width before&after
-      [0, 0]
-      // dont touch rbg
-    ];
-    t10.pad = Aa(t10.cropped || input, padding);
-    t10.resize = eX.resizeBilinear(t10.pad, [size2, size2]);
-    final = je(t10.resize, constants.tf255);
-  } else if (input.shape[1] !== size2) {
-    t10.resize = eX.resizeBilinear(t10.cropped || input, [size2, size2]);
-    final = je(t10.resize, constants.tf255);
-  } else {
-    final = je(t10.cropped || input, constants.tf255);
-  }
-  Object.keys(t10).forEach((tensor2) => Ot(t10[tensor2]));
-  return final;
-}
-function rescaleKeypoints(keypoints, outputSize2, cropBox) {
-  for (const kpt4 of keypoints) {
-    kpt4.position = [
-      Math.trunc(kpt4.position[0] * (outputSize2[0] + padding[2][0] + padding[2][1]) / outputSize2[0] - padding[2][0]),
-      Math.trunc(kpt4.position[1] * (outputSize2[1] + padding[1][0] + padding[1][1]) / outputSize2[1] - padding[1][0]),
-      kpt4.position[2]
-    ];
-    kpt4.positionRaw = [kpt4.position[0] / outputSize2[0], kpt4.position[1] / outputSize2[1], 2 * kpt4.position[2] / (outputSize2[0] + outputSize2[1])];
-  }
-  if (cropBox) {
-    const width = cropBox[2] - cropBox[0];
-    const height = cropBox[3] - cropBox[1];
-    for (const kpt4 of keypoints) {
-      kpt4.positionRaw = [
-        kpt4.positionRaw[0] / height + cropBox[1],
-        // correct offset due to crop
-        kpt4.positionRaw[1] / width + cropBox[0],
-        // correct offset due to crop
-        kpt4.positionRaw[2]
-      ];
-      kpt4.position = [
-        Math.trunc(kpt4.positionRaw[0] * outputSize2[0]),
-        Math.trunc(kpt4.positionRaw[1] * outputSize2[1]),
-        kpt4.positionRaw[2]
-      ];
-    }
-  }
-  return keypoints;
-}
-function fixKeypoints(keypoints) {
-  const leftPalm = keypoints.find((k) => k.part === "leftPalm");
-  const leftWrist = keypoints.find((k) => k.part === "leftWrist");
-  const leftIndex = keypoints.find((k) => k.part === "leftIndex");
-  leftPalm.position[2] = ((leftWrist.position[2] || 0) + (leftIndex.position[2] || 0)) / 2;
-  const rightPalm = keypoints.find((k) => k.part === "rightPalm");
-  const rightWrist = keypoints.find((k) => k.part === "rightWrist");
-  const rightIndex = keypoints.find((k) => k.part === "rightIndex");
-  rightPalm.position[2] = ((rightWrist.position[2] || 0) + (rightIndex.position[2] || 0)) / 2;
-}
-async function detectLandmarks(input, config3, outputSize2) {
-  if (!(model2 == null ? void 0 : model2["executor"])) return null;
-  const t10 = {};
-  [
-    t10.ld,
-    t10.segmentation,
-    t10.heatmap,
-    t10.world,
-    t10.poseflag
-    /* 1,1 */
-  ] = model2 == null ? void 0 : model2.execute(input, outputNodes.landmarks);
-  const poseScore = (await t10.poseflag.data())[0];
-  const points = await t10.ld.data();
-  const distances = await t10.world.data();
-  Object.keys(t10).forEach((tensor2) => Ot(t10[tensor2]));
-  const keypointsRelative = [];
-  const depth = 5;
-  for (let i = 0; i < points.length / depth; i++) {
-    const score = sigmoid(points[depth * i + 3]);
-    const presence = sigmoid(points[depth * i + 4]);
-    const adjScore = Math.trunc(100 * score * presence * poseScore) / 100;
-    const positionRaw = [points[depth * i + 0] / inputSize2, points[depth * i + 1] / inputSize2, points[depth * i + 2] + 0];
-    const position = [Math.trunc(outputSize2[0] * positionRaw[0]), Math.trunc(outputSize2[1] * positionRaw[1]), positionRaw[2]];
-    const distance2 = [distances[depth * i + 0], distances[depth * i + 1], distances[depth * i + 2] + 0];
-    keypointsRelative.push({ part: kpt[i], positionRaw, position, distance: distance2, score: adjScore });
-  }
-  if (poseScore < (config3.body.minConfidence || 0)) return null;
-  fixKeypoints(keypointsRelative);
-  const keypoints = rescaleKeypoints(keypointsRelative, outputSize2);
-  const kpts = keypoints.map((k) => k.position);
-  const boxes = calc(kpts, [outputSize2[0], outputSize2[1]]);
-  const annotations2 = {};
-  for (const [name, indexes] of Object.entries(connected)) {
-    const pt2 = [];
-    for (let i = 0; i < indexes.length - 1; i++) {
-      const pt0 = keypoints.find((kpt4) => kpt4.part === indexes[i]);
-      const pt1 = keypoints.find((kpt4) => kpt4.part === indexes[i + 1]);
-      if (pt0 && pt1) pt2.push([pt0.position, pt1.position]);
-    }
-    annotations2[name] = pt2;
-  }
-  const body4 = { id: 0, score: Math.trunc(100 * poseScore) / 100, box: boxes.box, boxRaw: boxes.boxRaw, keypoints, annotations: annotations2 };
-  return body4;
-}
-async function predict(input, config3) {
-  var _a, _b, _c2;
-  const outputSize2 = [input.shape[2] || 0, input.shape[1] || 0];
-  const skipTime = (config3.body.skipTime || 0) > now() - lastTime;
-  const skipFrame = skipped < (config3.body.skipFrames || 0);
-  if (config3.skipAllowed && skipTime && skipFrame && cache !== null) {
-    skipped++;
-  } else {
-    let boxes = [];
-    if ((_b = (_a = config3.body) == null ? void 0 : _a["detector"]) == null ? void 0 : _b["enabled"]) {
-      const preparedImage = prepareImage(input, 224);
-      boxes = await detectBoxes(preparedImage, config3, outputSize2);
-      Ot(preparedImage);
-    } else {
-      boxes = [{ box: [0, 0, 0, 0], boxRaw: [0, 0, 1, 1], score: 0 }];
-    }
-    for (let i = 0; i < boxes.length; i++) {
-      const preparedBox = prepareImage(input, 256, (_c2 = boxes[i]) == null ? void 0 : _c2.boxRaw);
-      cache.length = 0;
-      const bodyResult = await detectLandmarks(preparedBox, config3, outputSize2);
-      Ot(preparedBox);
-      if (!bodyResult) continue;
-      bodyResult.id = i;
-      cache.push(bodyResult);
-    }
-    lastTime = now();
-    skipped = 0;
-  }
-  return cache;
-}
-
-// src/object/labels.ts
-var labels2 = [
-  { class: 1, label: "person" },
-  { class: 2, label: "bicycle" },
-  { class: 3, label: "car" },
-  { class: 4, label: "motorcycle" },
-  { class: 5, label: "airplane" },
-  { class: 6, label: "bus" },
-  { class: 7, label: "train" },
-  { class: 8, label: "truck" },
-  { class: 9, label: "boat" },
-  { class: 10, label: "traffic light" },
-  { class: 11, label: "fire hydrant" },
-  { class: 12, label: "stop sign" },
-  { class: 13, label: "parking meter" },
-  { class: 14, label: "bench" },
-  { class: 15, label: "bird" },
-  { class: 16, label: "cat" },
-  { class: 17, label: "dog" },
-  { class: 18, label: "horse" },
-  { class: 19, label: "sheep" },
-  { class: 20, label: "cow" },
-  { class: 21, label: "elephant" },
-  { class: 22, label: "bear" },
-  { class: 23, label: "zebra" },
-  { class: 24, label: "giraffe" },
-  { class: 25, label: "backpack" },
-  { class: 26, label: "umbrella" },
-  { class: 27, label: "handbag" },
-  { class: 28, label: "tie" },
-  { class: 29, label: "suitcase" },
-  { class: 30, label: "frisbee" },
-  { class: 31, label: "skis" },
-  { class: 32, label: "snowboard" },
-  { class: 33, label: "sports ball" },
-  { class: 34, label: "kite" },
-  { class: 35, label: "baseball bat" },
-  { class: 36, label: "baseball glove" },
-  { class: 37, label: "skateboard" },
-  { class: 38, label: "surfboard" },
-  { class: 39, label: "tennis racket" },
-  { class: 40, label: "bottle" },
-  { class: 41, label: "wine glass" },
-  { class: 42, label: "cup" },
-  { class: 43, label: "fork" },
-  { class: 44, label: "knife" },
-  { class: 45, label: "spoon" },
-  { class: 46, label: "bowl" },
-  { class: 47, label: "banana" },
-  { class: 48, label: "apple" },
-  { class: 49, label: "sandwich" },
-  { class: 50, label: "orange" },
-  { class: 51, label: "broccoli" },
-  { class: 52, label: "carrot" },
-  { class: 53, label: "hot dog" },
-  { class: 54, label: "pizza" },
-  { class: 55, label: "donut" },
-  { class: 56, label: "cake" },
-  { class: 57, label: "chair" },
-  { class: 58, label: "couch" },
-  { class: 59, label: "potted plant" },
-  { class: 60, label: "bed" },
-  { class: 61, label: "dining table" },
-  { class: 62, label: "toilet" },
-  { class: 63, label: "tv" },
-  { class: 64, label: "laptop" },
-  { class: 65, label: "mouse" },
-  { class: 66, label: "remote" },
-  { class: 67, label: "keyboard" },
-  { class: 68, label: "cell phone" },
-  { class: 69, label: "microwave" },
-  { class: 70, label: "oven" },
-  { class: 71, label: "toaster" },
-  { class: 72, label: "sink" },
-  { class: 73, label: "refrigerator" },
-  { class: 74, label: "book" },
-  { class: 75, label: "clock" },
-  { class: 76, label: "vase" },
-  { class: 77, label: "scissors" },
-  { class: 78, label: "teddy bear" },
-  { class: 79, label: "hair drier" },
-  { class: 80, label: "toothbrush" }
-];
-
-// src/object/centernet.ts
-var model3;
-var inputSize3 = 0;
-var last2 = [];
-var lastTime2 = 0;
-var skipped2 = Number.MAX_SAFE_INTEGER;
-async function load(config3) {
-  if (env.initial) model3 = null;
-  if (!model3) {
-    model3 = await loadModel(config3.object.modelPath);
-    const inputs = (model3 == null ? void 0 : model3["executor"]) ? Object.values(model3.modelSignature["inputs"]) : void 0;
-    inputSize3 = Array.isArray(inputs) ? parseInt(inputs[0].tensorShape.dim[2].size) : 0;
-  } else if (config3.debug) log("cached model:", model3["modelUrl"]);
-  return model3;
-}
-async function process3(res, outputShape, config3) {
-  if (!res) return [];
-  const t10 = {};
-  const results = [];
-  const detections = await res.array();
-  t10.squeeze = cc(res);
-  const arr = li(t10.squeeze, 6, 1);
-  t10.stack = vr([arr[1], arr[0], arr[3], arr[2]], 1);
-  t10.boxes = cc(t10.stack);
-  t10.scores = cc(arr[4]);
-  t10.classes = cc(arr[5]);
-  Ot([res, ...arr]);
-  t10.nms = await eX.nonMaxSuppressionAsync(t10.boxes, t10.scores, config3.object.maxDetected || 0, config3.object.iouThreshold, config3.object.minConfidence || 0);
-  const nms = await t10.nms.data();
-  let i = 0;
-  for (const id2 of Array.from(nms)) {
-    const score = Math.trunc(100 * detections[0][id2][4]) / 100;
-    const classVal = detections[0][id2][5];
-    if (Number.isNaN(classVal)) continue;
-    const label = labels2[classVal].label;
-    const [x, y8] = [
-      detections[0][id2][0] / inputSize3,
-      detections[0][id2][1] / inputSize3
-    ];
-    const boxRaw = [
-      x,
-      y8,
-      detections[0][id2][2] / inputSize3 - x,
-      detections[0][id2][3] / inputSize3 - y8
-    ];
-    const box = [
-      Math.trunc(boxRaw[0] * outputShape[0]),
-      Math.trunc(boxRaw[1] * outputShape[1]),
-      Math.trunc(boxRaw[2] * outputShape[0]),
-      Math.trunc(boxRaw[3] * outputShape[1])
-    ];
-    results.push({ id: i++, score, class: classVal, label, box, boxRaw });
-  }
-  Object.keys(t10).forEach((tensor2) => Ot(t10[tensor2]));
-  return results;
-}
-async function predict2(input, config3) {
-  if (!(model3 == null ? void 0 : model3["executor"])) return [];
-  const skipTime = (config3.object.skipTime || 0) > now() - lastTime2;
-  const skipFrame = skipped2 < (config3.object.skipFrames || 0);
-  if (config3.skipAllowed && skipTime && skipFrame && last2.length > 0) {
-    skipped2++;
-    return last2;
-  }
-  skipped2 = 0;
-  return new Promise(async (resolve) => {
-    const outputSize2 = [input.shape[2] || 0, input.shape[1] || 0];
-    const resize = eX.resizeBilinear(input, [inputSize3, inputSize3]);
-    const objectT = config3.object.enabled ? model3 == null ? void 0 : model3.execute(resize, ["tower_0/detections"]) : null;
-    lastTime2 = now();
-    Ot(resize);
-    const obj = await process3(objectT, outputSize2, config3);
-    last2 = obj;
-    resolve(obj);
-  });
-}
-
-// src/body/efficientposecoords.ts
-var efficientposecoords_exports = {};
-__export(efficientposecoords_exports, {
-  connected: () => connected2,
-  kpt: () => kpt2
-});
-var kpt2 = [
-  "head",
-  "neck",
-  "rightShoulder",
-  "rightElbow",
-  "rightWrist",
-  "chest",
-  "leftShoulder",
-  "leftElbow",
-  "leftWrist",
-  "bodyCenter",
-  "rightHip",
-  "rightKnee",
-  "rightAnkle",
-  "leftHip",
-  "leftKnee",
-  "leftAnkle"
-];
-var connected2 = {
-  leftLeg: ["leftHip", "leftKnee", "leftAnkle"],
-  rightLeg: ["rightHip", "rightKnee", "rightAnkle"],
-  torso: ["leftShoulder", "rightShoulder", "rightHip", "leftHip", "leftShoulder"],
-  leftArm: ["leftShoulder", "leftElbow", "leftWrist"],
-  rightArm: ["rightShoulder", "rightElbow", "rightWrist"],
-  head: []
-};
-
-// src/body/efficientpose.ts
-var model4;
-var lastTime3 = 0;
-var cache2 = { id: 0, keypoints: [], box: [0, 0, 0, 0], boxRaw: [0, 0, 0, 0], score: 0, annotations: {} };
-var skipped3 = Number.MAX_SAFE_INTEGER;
-async function load2(config3) {
-  if (env.initial) model4 = null;
-  if (!model4) model4 = await loadModel(config3.body.modelPath);
-  else if (config3.debug) log("cached model:", model4["modelUrl"]);
-  return model4;
-}
-async function max2d(inputs, minScore) {
-  const [width, height] = inputs.shape;
-  const reshaped = W(inputs, [height * width]);
-  const max = Ra(reshaped, 0);
-  const newScore = (await max.data())[0];
-  if (newScore > minScore) {
-    const coordinates = Ok(reshaped, 0);
-    const mod = z2(coordinates, width);
-    const x = (await mod.data())[0];
-    const div = je(coordinates, width);
-    const y8 = (await div.data())[0];
-    Ot([reshaped, max, coordinates, mod, div]);
-    return [x, y8, newScore];
-  }
-  Ot([reshaped, max]);
-  return [0, 0, newScore];
-}
-async function predict3(image, config3) {
-  if (!(model4 == null ? void 0 : model4["executor"]) || !(model4 == null ? void 0 : model4.inputs[0].shape)) return [];
-  const skipTime = (config3.body.skipTime || 0) > now() - lastTime3;
-  const skipFrame = skipped3 < (config3.body.skipFrames || 0);
-  if (config3.skipAllowed && skipTime && skipFrame && Object.keys(cache2.keypoints).length > 0) {
-    skipped3++;
-    return [cache2];
-  }
-  skipped3 = 0;
-  return new Promise(async (resolve) => {
-    const tensor2 = De(() => {
-      var _a, _b;
-      const resize = eX.resizeBilinear(image, [((_a = model4 == null ? void 0 : model4.inputs[0].shape) == null ? void 0 : _a[2]) || 0, ((_b = model4 == null ? void 0 : model4.inputs[0].shape) == null ? void 0 : _b[1]) || 0], false);
-      const enhance2 = se(resize, constants.tf2);
-      const norm = Te(enhance2, constants.tf1);
-      return norm;
-    });
-    let resT;
-    if (config3.body.enabled) resT = model4 == null ? void 0 : model4.execute(tensor2);
-    lastTime3 = now();
-    Ot(tensor2);
-    if (resT) {
-      cache2.keypoints.length = 0;
-      const squeeze = cc(resT);
-      Ot(resT);
-      const stack = fo(squeeze, 2);
-      Ot(squeeze);
-      for (let id2 = 0; id2 < stack.length; id2++) {
-        const [x8, y10, partScore] = await max2d(stack[id2], config3.body.minConfidence);
-        if (partScore > (config3.body.minConfidence || 0)) {
-          cache2.keypoints.push({
-            score: Math.round(100 * partScore) / 100,
-            part: kpt2[id2],
-            positionRaw: [
-              // normalized to 0..1
-              // @ts-ignore model is not undefined here
-              x8 / model4.inputs[0].shape[2],
-              y10 / model4.inputs[0].shape[1]
-            ],
-            position: [
-              // normalized to input image size
-              // @ts-ignore model is not undefined here
-              Math.round(image.shape[2] * x8 / model4.inputs[0].shape[2]),
-              Math.round(image.shape[1] * y10 / model4.inputs[0].shape[1])
-            ]
-          });
-        }
-      }
-      stack.forEach((s) => Ot(s));
-    }
-    cache2.score = cache2.keypoints.reduce((prev, curr) => curr.score > prev ? curr.score : prev, 0);
-    const x = cache2.keypoints.map((a) => a.position[0]);
-    const y8 = cache2.keypoints.map((a) => a.position[1]);
-    cache2.box = [
-      Math.min(...x),
-      Math.min(...y8),
-      Math.max(...x) - Math.min(...x),
-      Math.max(...y8) - Math.min(...y8)
-    ];
-    const xRaw = cache2.keypoints.map((a) => a.positionRaw[0]);
-    const yRaw = cache2.keypoints.map((a) => a.positionRaw[1]);
-    cache2.boxRaw = [
-      Math.min(...xRaw),
-      Math.min(...yRaw),
-      Math.max(...xRaw) - Math.min(...xRaw),
-      Math.max(...yRaw) - Math.min(...yRaw)
-    ];
-    for (const [name, indexes] of Object.entries(connected2)) {
-      const pt2 = [];
-      for (let i = 0; i < indexes.length - 1; i++) {
-        const pt0 = cache2.keypoints.find((kpt4) => kpt4.part === indexes[i]);
-        const pt1 = cache2.keypoints.find((kpt4) => kpt4.part === indexes[i + 1]);
-        if (pt0 && pt1 && pt0.score > (config3.body.minConfidence || 0) && pt1.score > (config3.body.minConfidence || 0)) pt2.push([pt0.position, pt1.position]);
-      }
-      cache2.annotations[name] = pt2;
-    }
-    resolve([cache2]);
-  });
+  constants.tf255 = ke(255, "float32");
+  constants.tf1 = ke(1, "float32");
+  constants.tf2 = ke(2, "float32");
+  constants.tf05 = ke(0.5, "float32");
+  constants.tf127 = ke(127.5, "float32");
+  constants.rgb = Jt([0.2989, 0.587, 0.114], "float32");
 }
 
 // src/face/facemeshutil.ts
@@ -39063,7 +37748,7 @@ function correctFaceRotation(rotate, box, input, inputSize10) {
   const symmetryLine = box.landmarks.length >= meshLandmarks.count ? meshLandmarks.symmetryLine : blazeFaceLandmarks.symmetryLine;
   let angle = 0;
   let rotationMatrix = fixedRotationMatrix;
-  let face4;
+  let face3;
   if (rotate && env.kernels.includes("rotatewithoffset")) {
     angle = computeRotation(box.landmarks[symmetryLine[0]], box.landmarks[symmetryLine[1]]);
     const largeAngle = angle && angle !== 0 && Math.abs(angle) > 0.2;
@@ -39072,15 +37757,15 @@ function correctFaceRotation(rotate, box, input, inputSize10) {
       const centerRaw = [center[0] / input.shape[2], center[1] / input.shape[1]];
       const rotated = eX.rotateWithOffset(input, angle, 0, [centerRaw[0], centerRaw[1]]);
       rotationMatrix = buildRotationMatrix(-angle, center);
-      face4 = cutAndResize(box, rotated, [inputSize10, inputSize10]);
+      face3 = cutAndResize(box, rotated, [inputSize10, inputSize10]);
       Ot(rotated);
     } else {
-      face4 = cutAndResize(box, input, [inputSize10, inputSize10]);
+      face3 = cutAndResize(box, input, [inputSize10, inputSize10]);
     }
   } else {
-    face4 = cutAndResize(box, input, [inputSize10, inputSize10]);
+    face3 = cutAndResize(box, input, [inputSize10, inputSize10]);
   }
-  return [angle, rotationMatrix, face4];
+  return [angle, rotationMatrix, face3];
 }
 var findFaceCenter = (mesh) => {
   const x = mesh.map((m) => m[0]);
@@ -39099,22 +37784,22 @@ var calculateFaceBox = (mesh, previousBox) => {
 
 // src/face/blazeface.ts
 var keypointsCount = 6;
-var model5;
+var model;
 var anchors = null;
-var inputSize4 = 0;
+var inputSize = 0;
 var inputSizeT = null;
-var size = () => inputSize4;
-async function load3(config3) {
+var size = () => inputSize;
+async function load(config3) {
   var _a;
-  if (env.initial) model5 = null;
-  if (!model5) model5 = await loadModel((_a = config3.face.detector) == null ? void 0 : _a.modelPath);
-  else if (config3.debug) log("cached model:", model5["modelUrl"]);
-  inputSize4 = model5["executor"] && model5.inputs[0].shape ? model5.inputs[0].shape[2] : 256;
-  inputSizeT = ke(inputSize4, "int32");
-  anchors = mu(generateAnchors(inputSize4));
-  return model5;
+  if (env.initial) model = null;
+  if (!model) model = await loadModel((_a = config3.face.detector) == null ? void 0 : _a.modelPath);
+  else if (config3.debug) log("cached model:", model["modelUrl"]);
+  inputSize = model["executor"] && model.inputs[0].shape ? model.inputs[0].shape[2] : 256;
+  inputSizeT = ke(inputSize, "int32");
+  anchors = mu(generateAnchors(inputSize));
+  return model;
 }
-function decodeBoxes2(boxOutputs) {
+function decodeBoxes(boxOutputs) {
   if (!anchors || !inputSizeT) return Gr([0, 0]);
   const t10 = {};
   t10.boxStarts = Xe(boxOutputs, [0, 1], [-1, 2]);
@@ -39142,14 +37827,14 @@ async function getBoxes(inputImage, config3) {
     pad = [Math.floor((xy2 - inputImage.shape[2]) / 2), Math.floor((xy2 - inputImage.shape[1]) / 2)];
     t10.padded = Aa(inputImage, [[0, 0], [pad[1], pad[1]], [pad[0], pad[0]], [0, 0]]);
     scale2 = [inputImage.shape[2] / xy2, inputImage.shape[1] / xy2];
-    pad = [pad[0] / inputSize4, pad[1] / inputSize4];
+    pad = [pad[0] / inputSize, pad[1] / inputSize];
   } else {
     t10.padded = inputImage.clone();
   }
-  t10.resized = eX.resizeBilinear(t10.padded, [inputSize4, inputSize4]);
+  t10.resized = eX.resizeBilinear(t10.padded, [inputSize, inputSize]);
   t10.div = je(t10.resized, constants.tf127);
   t10.normalized = Te(t10.div, constants.tf1);
-  const res = model5 == null ? void 0 : model5.execute(t10.normalized);
+  const res = model == null ? void 0 : model.execute(t10.normalized);
   if (Array.isArray(res) && res.length > 2) {
     const sorted = res.sort((a, b) => a.size - b.size);
     t10.concat384 = yt([sorted[0], sorted[2]], 2);
@@ -39162,7 +37847,7 @@ async function getBoxes(inputImage, config3) {
     t10.batch = cc(res);
   }
   Ot(res);
-  t10.boxes = decodeBoxes2(t10.batch);
+  t10.boxes = decodeBoxes(t10.batch);
   t10.logits = Xe(t10.batch, [0, 0], [-1, 1]);
   t10.sigmoid = Ea(t10.logits);
   t10.scores = cc(t10.sigmoid);
@@ -39194,7 +37879,7 @@ async function getBoxes(inputImage, config3) {
       };
       b.anchor = Xe(anchors, [nms[i], 0], [1, 2]);
       const anchor = await b.anchor.data();
-      const scaledBox = scaleBoxCoordinates(rawBox, [(inputImage.shape[2] || 0) / inputSize4, (inputImage.shape[1] || 0) / inputSize4], anchor);
+      const scaledBox = scaleBoxCoordinates(rawBox, [(inputImage.shape[2] || 0) / inputSize, (inputImage.shape[1] || 0) / inputSize], anchor);
       const enlargedBox = enlargeBox(scaledBox, ((_g2 = config3.face.detector) == null ? void 0 : _g2.scale) || 1.4);
       const squaredBox = squarifyBox(enlargedBox);
       if (squaredBox.size[0] > (((_h2 = config3.face.detector) == null ? void 0 : _h2["minSize"]) || 0) && squaredBox.size[1] > (((_i2 = config3.face.detector) == null ? void 0 : _i2["minSize"]) || 0)) boxes.push(squaredBox);
@@ -39206,8 +37891,8 @@ async function getBoxes(inputImage, config3) {
 }
 
 // src/face/iris.ts
-var model6;
-var inputSize5 = 0;
+var model2;
+var inputSize2 = 0;
 var leftOutline = meshAnnotations.leftEyeLower0;
 var rightOutline = meshAnnotations.rightEyeLower0;
 var eyeLandmarks = {
@@ -39220,14 +37905,14 @@ var irisLandmarks = {
   index: 71,
   numCoordinates: 76
 };
-async function load4(config3) {
+async function load2(config3) {
   var _a, _b;
-  if (env.initial) model6 = null;
-  if (!model6) model6 = await loadModel((_a = config3.face.iris) == null ? void 0 : _a.modelPath);
-  else if (config3.debug) log("cached model:", model6["modelUrl"]);
-  inputSize5 = (model6 == null ? void 0 : model6["executor"]) && ((_b = model6.inputs) == null ? void 0 : _b[0].shape) ? model6.inputs[0].shape[2] : 0;
-  if (inputSize5 === -1) inputSize5 = 64;
-  return model6;
+  if (env.initial) model2 = null;
+  if (!model2) model2 = await loadModel((_a = config3.face.iris) == null ? void 0 : _a.modelPath);
+  else if (config3.debug) log("cached model:", model2["modelUrl"]);
+  inputSize2 = (model2 == null ? void 0 : model2["executor"]) && ((_b = model2.inputs) == null ? void 0 : _b[0].shape) ? model2.inputs[0].shape[2] : 0;
+  if (inputSize2 === -1) inputSize2 = 64;
+  return model2;
 }
 function replaceIrisCoords(rawCoords, newCoords, prefix, keys) {
   for (let i = 0; i < irisIndices.length; i++) {
@@ -39250,15 +37935,15 @@ var getLeftToRightEyeDepthDifference = (rawCoords) => {
   const rightEyeZ = rawCoords[eyeLandmarks.rightBounds[0]][2];
   return leftEyeZ - rightEyeZ;
 };
-var getEyeBox = (rawCoords, face4, eyeInnerCornerIndex, eyeOuterCornerIndex, meshSize, flip = false, scale2 = 2.3) => {
+var getEyeBox = (rawCoords, face3, eyeInnerCornerIndex, eyeOuterCornerIndex, meshSize, flip = false, scale2 = 2.3) => {
   const box = squarifyBox(enlargeBox(calculateLandmarksBoundingBox([rawCoords[eyeInnerCornerIndex], rawCoords[eyeOuterCornerIndex]]), scale2));
   const boxSize = getBoxSize(box);
-  let crop = eX.cropAndResize(face4, [[
+  let crop = eX.cropAndResize(face3, [[
     box.startPoint[1] / meshSize,
     box.startPoint[0] / meshSize,
     box.endPoint[1] / meshSize,
     box.endPoint[0] / meshSize
-  ]], [0], [inputSize5, inputSize5]);
+  ]], [0], [inputSize2, inputSize2]);
   if (flip && env.kernels.includes("flipleftright")) {
     const flipped = eX.flipLeftRight(crop);
     Ot(crop);
@@ -39273,8 +37958,8 @@ var getEyeCoords = (eyeData, eyeBox, eyeBoxSize, flip = false) => {
     const y8 = eyeData[i * 3 + 1];
     const z = eyeData[i * 3 + 2];
     eyeRawCoords.push([
-      (flip ? 1 - x / inputSize5 : x / inputSize5) * eyeBoxSize[0] + eyeBox.startPoint[0],
-      y8 / inputSize5 * eyeBoxSize[1] + eyeBox.startPoint[1],
+      (flip ? 1 - x / inputSize2 : x / inputSize2) * eyeBoxSize[0] + eyeBox.startPoint[0],
+      y8 / inputSize2 * eyeBoxSize[1] + eyeBox.startPoint[1],
       z
     ]);
   }
@@ -39294,15 +37979,15 @@ var getAdjustedIrisCoords = (rawCoords, irisCoords, direction) => {
     return [coord[0], coord[1], z];
   });
 };
-async function augmentIris(rawCoords, face4, meshSize, config3) {
+async function augmentIris(rawCoords, face3, meshSize, config3) {
   var _a, _b;
-  if (!(model6 == null ? void 0 : model6["executor"])) return rawCoords;
-  const { box: leftEyeBox, boxSize: leftEyeBoxSize, crop: leftEyeCrop } = getEyeBox(rawCoords, face4, eyeLandmarks.leftBounds[0], eyeLandmarks.leftBounds[1], meshSize, true, ((_a = config3.face.iris) == null ? void 0 : _a.scale) || 2.3);
-  const { box: rightEyeBox, boxSize: rightEyeBoxSize, crop: rightEyeCrop } = getEyeBox(rawCoords, face4, eyeLandmarks.rightBounds[0], eyeLandmarks.rightBounds[1], meshSize, true, ((_b = config3.face.iris) == null ? void 0 : _b.scale) || 2.3);
+  if (!(model2 == null ? void 0 : model2["executor"])) return rawCoords;
+  const { box: leftEyeBox, boxSize: leftEyeBoxSize, crop: leftEyeCrop } = getEyeBox(rawCoords, face3, eyeLandmarks.leftBounds[0], eyeLandmarks.leftBounds[1], meshSize, true, ((_a = config3.face.iris) == null ? void 0 : _a.scale) || 2.3);
+  const { box: rightEyeBox, boxSize: rightEyeBoxSize, crop: rightEyeCrop } = getEyeBox(rawCoords, face3, eyeLandmarks.rightBounds[0], eyeLandmarks.rightBounds[1], meshSize, true, ((_b = config3.face.iris) == null ? void 0 : _b.scale) || 2.3);
   const combined = yt([leftEyeCrop, rightEyeCrop]);
   Ot(leftEyeCrop);
   Ot(rightEyeCrop);
-  const eyePredictions = model6.execute(combined);
+  const eyePredictions = model2.execute(combined);
   Ot(combined);
   const eyePredictionsData = await eyePredictions.data();
   Ot(eyePredictions);
@@ -39357,33 +38042,33 @@ async function augment(rawCoords, results) {
 }
 
 // src/face/facemesh.ts
-var cache3 = {
+var cache = {
   boxes: [],
   skipped: Number.MAX_SAFE_INTEGER,
   timestamp: 0
 };
-var model7 = null;
-var inputSize6 = 0;
-async function predict4(input, config3) {
+var model3 = null;
+var inputSize3 = 0;
+async function predict(input, config3) {
   var _a, _b, _c2, _d2, _e, _f2, _g2, _h2, _i2, _j2;
-  const skipTime = (((_a = config3.face.detector) == null ? void 0 : _a.skipTime) || 0) > now() - cache3.timestamp;
-  const skipFrame = cache3.skipped < (((_b = config3.face.detector) == null ? void 0 : _b.skipFrames) || 0);
-  if (!config3.skipAllowed || !skipTime || !skipFrame || cache3.boxes.length === 0) {
-    cache3.boxes = await getBoxes(input, config3);
-    cache3.timestamp = now();
-    cache3.skipped = 0;
+  const skipTime = (((_a = config3.face.detector) == null ? void 0 : _a.skipTime) || 0) > now() - cache.timestamp;
+  const skipFrame = cache.skipped < (((_b = config3.face.detector) == null ? void 0 : _b.skipFrames) || 0);
+  if (!config3.skipAllowed || !skipTime || !skipFrame || cache.boxes.length === 0) {
+    cache.boxes = await getBoxes(input, config3);
+    cache.timestamp = now();
+    cache.skipped = 0;
   } else {
-    cache3.skipped++;
+    cache.skipped++;
   }
   const faces = [];
   const newCache = [];
   let id2 = 0;
-  const size2 = inputSize6;
-  for (let i = 0; i < cache3.boxes.length; i++) {
-    const box = cache3.boxes[i];
+  const size2 = inputSize3;
+  for (let i = 0; i < cache.boxes.length; i++) {
+    const box = cache.boxes[i];
     let angle = 0;
     let rotationMatrix;
-    const face4 = {
+    const face3 = {
       // init face result
       id: id2++,
       mesh: [],
@@ -39398,44 +38083,44 @@ async function predict4(input, config3) {
       // contours: [],
       annotations: {}
     };
-    [angle, rotationMatrix, face4.tensor] = correctFaceRotation((_c2 = config3.face.detector) == null ? void 0 : _c2.rotation, box, input, ((_d2 = config3.face.mesh) == null ? void 0 : _d2.enabled) ? inputSize6 : size());
+    [angle, rotationMatrix, face3.tensor] = correctFaceRotation((_c2 = config3.face.detector) == null ? void 0 : _c2.rotation, box, input, ((_d2 = config3.face.mesh) == null ? void 0 : _d2.enabled) ? inputSize3 : size());
     if (config3.filter.equalization) {
-      const equilized = face4.tensor ? await histogramEqualization(face4.tensor) : void 0;
-      Ot(face4.tensor);
-      if (equilized) face4.tensor = equilized;
+      const equilized = face3.tensor ? await histogramEqualization(face3.tensor) : void 0;
+      Ot(face3.tensor);
+      if (equilized) face3.tensor = equilized;
     }
-    face4.boxScore = Math.round(100 * box.confidence) / 100;
-    if (!((_e = config3.face.mesh) == null ? void 0 : _e.enabled) || !(model7 == null ? void 0 : model7["executor"])) {
-      face4.box = clampBox(box, input);
-      face4.boxRaw = getRawBox(box, input);
-      face4.score = face4.boxScore;
-      face4.size = box.size;
-      face4.mesh = box.landmarks;
-      face4.meshRaw = face4.mesh.map((pt2) => [pt2[0] / (input.shape[2] || 0), pt2[1] / (input.shape[1] || 0), (pt2[2] || 0) / size2]);
-      for (const key of Object.keys(blazeFaceLandmarks)) face4.annotations[key] = [face4.mesh[blazeFaceLandmarks[key]]];
-    } else if (!model7) {
+    face3.boxScore = Math.round(100 * box.confidence) / 100;
+    if (!((_e = config3.face.mesh) == null ? void 0 : _e.enabled) || !(model3 == null ? void 0 : model3["executor"])) {
+      face3.box = clampBox(box, input);
+      face3.boxRaw = getRawBox(box, input);
+      face3.score = face3.boxScore;
+      face3.size = box.size;
+      face3.mesh = box.landmarks;
+      face3.meshRaw = face3.mesh.map((pt2) => [pt2[0] / (input.shape[2] || 0), pt2[1] / (input.shape[1] || 0), (pt2[2] || 0) / size2]);
+      for (const key of Object.keys(blazeFaceLandmarks)) face3.annotations[key] = [face3.mesh[blazeFaceLandmarks[key]]];
+    } else if (!model3) {
       if (config3.debug) log("face mesh detection requested, but model is not loaded");
     } else {
       if (((_f2 = config3.face.attention) == null ? void 0 : _f2.enabled) && !env.kernels.includes("atan2")) {
         config3.face.attention.enabled = false;
-        Ot(face4.tensor);
+        Ot(face3.tensor);
         return faces;
       }
-      const results = model7.execute(face4.tensor);
+      const results = model3.execute(face3.tensor);
       const confidenceT = results.find((t10) => t10.shape[t10.shape.length - 1] === 1);
       const faceConfidence = await confidenceT.data();
-      face4.faceScore = Math.round(100 * faceConfidence[0]) / 100;
-      if (face4.faceScore < (((_g2 = config3.face.detector) == null ? void 0 : _g2.minConfidence) || 1)) {
-        box.confidence = face4.faceScore;
+      face3.faceScore = Math.round(100 * faceConfidence[0]) / 100;
+      if (face3.faceScore < (((_g2 = config3.face.detector) == null ? void 0 : _g2.minConfidence) || 1)) {
+        box.confidence = face3.faceScore;
         if (config3.face.mesh["keepInvalid"]) {
-          face4.box = clampBox(box, input);
-          face4.boxRaw = getRawBox(box, input);
-          face4.size = box.size;
-          face4.score = face4.boxScore;
-          face4.mesh = box.landmarks;
-          face4.meshRaw = face4.mesh.map((pt2) => [pt2[0] / (input.shape[2] || 1), pt2[1] / (input.shape[1] || 1), (pt2[2] || 0) / size2]);
+          face3.box = clampBox(box, input);
+          face3.boxRaw = getRawBox(box, input);
+          face3.size = box.size;
+          face3.score = face3.boxScore;
+          face3.mesh = box.landmarks;
+          face3.meshRaw = face3.mesh.map((pt2) => [pt2[0] / (input.shape[2] || 1), pt2[1] / (input.shape[1] || 1), (pt2[2] || 0) / size2]);
           for (const key of Object.keys(blazeFaceLandmarks)) {
-            face4.annotations[key] = [face4.mesh[blazeFaceLandmarks[key]]];
+            face3.annotations[key] = [face3.mesh[blazeFaceLandmarks[key]]];
           }
         }
       } else {
@@ -39446,86 +38131,86 @@ async function predict4(input, config3) {
         if ((_h2 = config3.face.attention) == null ? void 0 : _h2.enabled) {
           rawCoords = await augment(rawCoords, results);
         } else if ((_i2 = config3.face.iris) == null ? void 0 : _i2.enabled) {
-          rawCoords = await augmentIris(rawCoords, face4.tensor, inputSize6, config3);
+          rawCoords = await augmentIris(rawCoords, face3.tensor, inputSize3, config3);
         }
-        face4.mesh = transformRawCoords(rawCoords, box, angle, rotationMatrix, inputSize6);
-        face4.meshRaw = face4.mesh.map((pt2) => [pt2[0] / (input.shape[2] || 0), pt2[1] / (input.shape[1] || 0), (pt2[2] || 0) / size2]);
-        for (const key of Object.keys(meshAnnotations)) face4.annotations[key] = meshAnnotations[key].map((index2) => face4.mesh[index2]);
-        face4.score = face4.faceScore;
+        face3.mesh = transformRawCoords(rawCoords, box, angle, rotationMatrix, inputSize3);
+        face3.meshRaw = face3.mesh.map((pt2) => [pt2[0] / (input.shape[2] || 0), pt2[1] / (input.shape[1] || 0), (pt2[2] || 0) / size2]);
+        for (const key of Object.keys(meshAnnotations)) face3.annotations[key] = meshAnnotations[key].map((index2) => face3.mesh[index2]);
+        face3.score = face3.faceScore;
         const calculatedBox = {
-          ...calculateFaceBox(face4.mesh, box),
+          ...calculateFaceBox(face3.mesh, box),
           confidence: box.confidence,
           landmarks: box.landmarks,
           size: box.size
         };
-        face4.box = clampBox(calculatedBox, input);
-        face4.boxRaw = getRawBox(calculatedBox, input);
-        face4.size = calculatedBox.size;
+        face3.box = clampBox(calculatedBox, input);
+        face3.boxRaw = getRawBox(calculatedBox, input);
+        face3.size = calculatedBox.size;
         newCache.push(calculatedBox);
       }
       Ot(results);
     }
-    if (face4.score > (((_j2 = config3.face.detector) == null ? void 0 : _j2.minConfidence) || 1)) faces.push(face4);
-    else Ot(face4.tensor);
+    if (face3.score > (((_j2 = config3.face.detector) == null ? void 0 : _j2.minConfidence) || 1)) faces.push(face3);
+    else Ot(face3.tensor);
   }
-  cache3.boxes = newCache;
+  cache.boxes = newCache;
   return faces;
 }
-async function load5(config3) {
+async function load3(config3) {
   var _a, _b, _c2, _d2, _e, _f2;
-  if (env.initial) model7 = null;
-  if (((_a = config3.face.attention) == null ? void 0 : _a.enabled) && (model7 == null ? void 0 : model7["signature"])) {
-    if (Object.keys(((_b = model7 == null ? void 0 : model7["signature"]) == null ? void 0 : _b.outputs) || {}).length < 6) model7 = null;
+  if (env.initial) model3 = null;
+  if (((_a = config3.face.attention) == null ? void 0 : _a.enabled) && (model3 == null ? void 0 : model3["signature"])) {
+    if (Object.keys(((_b = model3 == null ? void 0 : model3["signature"]) == null ? void 0 : _b.outputs) || {}).length < 6) model3 = null;
   }
-  if (!model7) {
-    if ((_c2 = config3.face.attention) == null ? void 0 : _c2.enabled) model7 = await loadModel(config3.face.attention.modelPath);
-    else model7 = await loadModel((_d2 = config3.face.mesh) == null ? void 0 : _d2.modelPath);
+  if (!model3) {
+    if ((_c2 = config3.face.attention) == null ? void 0 : _c2.enabled) model3 = await loadModel(config3.face.attention.modelPath);
+    else model3 = await loadModel((_d2 = config3.face.mesh) == null ? void 0 : _d2.modelPath);
   } else if (config3.debug) {
-    log("cached model:", model7["modelUrl"]);
+    log("cached model:", model3["modelUrl"]);
   }
-  inputSize6 = model7["executor"] && ((_e = model7 == null ? void 0 : model7.inputs) == null ? void 0 : _e[0].shape) ? (_f2 = model7 == null ? void 0 : model7.inputs) == null ? void 0 : _f2[0].shape[2] : 256;
-  return model7;
+  inputSize3 = model3["executor"] && ((_e = model3 == null ? void 0 : model3.inputs) == null ? void 0 : _e[0].shape) ? (_f2 = model3 == null ? void 0 : model3.inputs) == null ? void 0 : _f2[0].shape[2] : 256;
+  return model3;
 }
 var triangulation = TRI468;
 var uvmap = UV468;
 
 // src/gear/emotion.ts
 var annotations = [];
-var model8;
-var last3 = [];
+var model4;
+var last2 = [];
 var lastCount = 0;
-var lastTime4 = 0;
-var skipped4 = Number.MAX_SAFE_INTEGER;
+var lastTime = 0;
+var skipped = Number.MAX_SAFE_INTEGER;
 var rgb = false;
-async function load6(config3) {
+async function load4(config3) {
   var _a, _b, _c2;
-  if (env.initial) model8 = null;
-  if (!model8) {
-    model8 = await loadModel((_a = config3.face.emotion) == null ? void 0 : _a.modelPath);
-    rgb = ((_c2 = (_b = model8 == null ? void 0 : model8.inputs) == null ? void 0 : _b[0].shape) == null ? void 0 : _c2[3]) === 3;
+  if (env.initial) model4 = null;
+  if (!model4) {
+    model4 = await loadModel((_a = config3.face.emotion) == null ? void 0 : _a.modelPath);
+    rgb = ((_c2 = (_b = model4 == null ? void 0 : model4.inputs) == null ? void 0 : _b[0].shape) == null ? void 0 : _c2[3]) === 3;
     if (!rgb) annotations = ["angry", "disgust", "fear", "happy", "sad", "surprise", "neutral"];
     else annotations = ["angry", "disgust", "fear", "happy", "neutral", "sad", "surprise"];
   } else if (config3.debug) {
-    log("cached model:", model8["modelUrl"]);
+    log("cached model:", model4["modelUrl"]);
   }
-  return model8;
+  return model4;
 }
-async function predict5(image, config3, idx, count2) {
+async function predict2(image, config3, idx, count2) {
   var _a, _b;
-  if (!model8) return [];
-  const skipFrame = skipped4 < (((_a = config3.face.emotion) == null ? void 0 : _a.skipFrames) || 0);
-  const skipTime = (((_b = config3.face.emotion) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime4;
-  if (config3.skipAllowed && skipTime && skipFrame && lastCount === count2 && last3[idx] && last3[idx].length > 0) {
-    skipped4++;
-    return last3[idx];
+  if (!model4) return [];
+  const skipFrame = skipped < (((_a = config3.face.emotion) == null ? void 0 : _a.skipFrames) || 0);
+  const skipTime = (((_b = config3.face.emotion) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime;
+  if (config3.skipAllowed && skipTime && skipFrame && lastCount === count2 && last2[idx] && last2[idx].length > 0) {
+    skipped++;
+    return last2[idx];
   }
-  skipped4 = 0;
+  skipped = 0;
   return new Promise(async (resolve) => {
     var _a2, _b2, _c2;
     const obj = [];
     if ((_a2 = config3.face.emotion) == null ? void 0 : _a2.enabled) {
       const t10 = {};
-      const inputSize10 = (model8 == null ? void 0 : model8.inputs[0].shape) ? model8.inputs[0].shape[2] : 0;
+      const inputSize10 = (model4 == null ? void 0 : model4.inputs[0].shape) ? model4.inputs[0].shape[2] : 0;
       if (((_b2 = config3.face.emotion) == null ? void 0 : _b2["crop"]) > 0) {
         const crop = (_c2 = config3.face.emotion) == null ? void 0 : _c2["crop"];
         const box = [[crop, crop, 1 - crop, 1 - crop]];
@@ -39536,15 +38221,15 @@ async function predict5(image, config3, idx, count2) {
       if (rgb) {
         t10.mul = se(t10.resize, 255);
         t10.normalize = Te(t10.mul, [103.939, 116.779, 123.68]);
-        t10.emotion = model8 == null ? void 0 : model8.execute(t10.normalize);
+        t10.emotion = model4 == null ? void 0 : model4.execute(t10.normalize);
       } else {
         t10.channels = se(t10.resize, constants.rgb);
         t10.grayscale = ot(t10.channels, 3, true);
         t10.grayscaleSub = Te(t10.grayscale, constants.tf05);
         t10.grayscaleMul = se(t10.grayscaleSub, constants.tf2);
-        t10.emotion = model8 == null ? void 0 : model8.execute(t10.grayscaleMul);
+        t10.emotion = model4 == null ? void 0 : model4.execute(t10.grayscaleMul);
       }
-      lastTime4 = now();
+      lastTime = now();
       const data = await t10.emotion.data();
       for (let i = 0; i < data.length; i++) {
         if (data[i] > (config3.face.emotion.minConfidence || 0)) obj.push({ score: Math.min(0.99, Math.trunc(100 * data[i]) / 100), emotion: annotations[i] });
@@ -39552,42 +38237,42 @@ async function predict5(image, config3, idx, count2) {
       obj.sort((a, b) => b.score - a.score);
       Object.keys(t10).forEach((tensor2) => Ot(t10[tensor2]));
     }
-    last3[idx] = obj;
+    last2[idx] = obj;
     lastCount = count2;
     resolve(obj);
   });
 }
 
 // src/face/faceres.ts
-var model9;
-var last4 = [];
-var lastTime5 = 0;
+var model5;
+var last3 = [];
+var lastTime2 = 0;
 var lastCount2 = 0;
-var skipped5 = Number.MAX_SAFE_INTEGER;
-async function load7(config3) {
+var skipped2 = Number.MAX_SAFE_INTEGER;
+async function load5(config3) {
   var _a;
-  if (env.initial) model9 = null;
-  if (!model9) model9 = await loadModel((_a = config3.face.description) == null ? void 0 : _a.modelPath);
-  else if (config3.debug) log("cached model:", model9["modelUrl"]);
-  return model9;
+  if (env.initial) model5 = null;
+  if (!model5) model5 = await loadModel((_a = config3.face.description) == null ? void 0 : _a.modelPath);
+  else if (config3.debug) log("cached model:", model5["modelUrl"]);
+  return model5;
 }
 function enhance(input, config3) {
   var _a, _b;
   const tensor2 = input.image || input.tensor || input;
-  if (!(model9 == null ? void 0 : model9.inputs[0].shape)) return tensor2;
+  if (!(model5 == null ? void 0 : model5.inputs[0].shape)) return tensor2;
   let crop;
   if (((_a = config3.face.description) == null ? void 0 : _a["crop"]) > 0) {
     const cropval = (_b = config3.face.description) == null ? void 0 : _b["crop"];
     const box = [[cropval, cropval, 1 - cropval, 1 - cropval]];
-    crop = eX.cropAndResize(tensor2, box, [0], [model9.inputs[0].shape[2], model9.inputs[0].shape[1]]);
+    crop = eX.cropAndResize(tensor2, box, [0], [model5.inputs[0].shape[2], model5.inputs[0].shape[1]]);
   } else {
-    crop = eX.resizeBilinear(tensor2, [model9.inputs[0].shape[2], model9.inputs[0].shape[1]], false);
+    crop = eX.resizeBilinear(tensor2, [model5.inputs[0].shape[2], model5.inputs[0].shape[1]], false);
   }
   const norm = se(crop, constants.tf255);
   Ot(crop);
   return norm;
 }
-async function predict6(image, config3, idx, count2) {
+async function predict3(image, config3, idx, count2) {
   var _a, _b, _c2, _d2;
   const obj = {
     age: 0,
@@ -39595,26 +38280,26 @@ async function predict6(image, config3, idx, count2) {
     genderScore: 0,
     descriptor: []
   };
-  if (!(model9 == null ? void 0 : model9["executor"])) return obj;
-  const skipFrame = skipped5 < (((_a = config3.face.description) == null ? void 0 : _a.skipFrames) || 0);
-  const skipTime = (((_b = config3.face.description) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime5;
-  if (config3.skipAllowed && skipFrame && skipTime && lastCount2 === count2 && ((_c2 = last4 == null ? void 0 : last4[idx]) == null ? void 0 : _c2.age) > 0 && ((_d2 = last4 == null ? void 0 : last4[idx]) == null ? void 0 : _d2.genderScore) > 0) {
-    skipped5++;
-    return last4[idx];
+  if (!(model5 == null ? void 0 : model5["executor"])) return obj;
+  const skipFrame = skipped2 < (((_a = config3.face.description) == null ? void 0 : _a.skipFrames) || 0);
+  const skipTime = (((_b = config3.face.description) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime2;
+  if (config3.skipAllowed && skipFrame && skipTime && lastCount2 === count2 && ((_c2 = last3 == null ? void 0 : last3[idx]) == null ? void 0 : _c2.age) > 0 && ((_d2 = last3 == null ? void 0 : last3[idx]) == null ? void 0 : _d2.genderScore) > 0) {
+    skipped2++;
+    return last3[idx];
   }
-  skipped5 = 0;
+  skipped2 = 0;
   return new Promise(async (resolve) => {
     var _a2;
     if ((_a2 = config3.face.description) == null ? void 0 : _a2.enabled) {
       const enhanced = enhance(image, config3);
-      const resT = model9 == null ? void 0 : model9.execute(enhanced);
-      lastTime5 = now();
+      const resT = model5 == null ? void 0 : model5.execute(enhanced);
+      lastTime2 = now();
       Ot(enhanced);
       const genderT = resT.find((t10) => t10.shape[1] === 1);
-      const gender2 = await genderT.data();
-      const confidence = Math.trunc(200 * Math.abs(gender2[0] - 0.5)) / 100;
+      const gender = await genderT.data();
+      const confidence = Math.trunc(200 * Math.abs(gender[0] - 0.5)) / 100;
       if (confidence > (config3.face.description.minConfidence || 0)) {
-        obj.gender = gender2[0] <= 0.5 ? "female" : "male";
+        obj.gender = gender[0] <= 0.5 ? "female" : "male";
         obj.genderScore = Math.min(0.99, confidence);
       }
       const argmax = Ok(resT.find((t10) => t10.shape[1] === 100), 1);
@@ -39623,13 +38308,13 @@ async function predict6(image, config3, idx, count2) {
       const ageT = resT.find((t10) => t10.shape[1] === 100);
       const all2 = await ageT.data();
       obj.age = Math.round(all2[ageIdx - 1] > all2[ageIdx + 1] ? 10 * ageIdx - 100 * all2[ageIdx - 1] : 10 * ageIdx + 100 * all2[ageIdx + 1]) / 10;
-      if (Number.isNaN(gender2[0]) || Number.isNaN(all2[0])) log("faceres error:", { model: model9, result: resT });
+      if (Number.isNaN(gender[0]) || Number.isNaN(all2[0])) log("faceres error:", { model: model5, result: resT });
       const desc = resT.find((t10) => t10.shape[1] === 1024);
       const descriptor = desc ? await desc.data() : [];
       obj.descriptor = Array.from(descriptor);
       resT.forEach((t10) => Ot(t10));
     }
-    last4[idx] = obj;
+    last3[idx] = obj;
     lastCount2 = count2;
     resolve(obj);
   });
@@ -39646,14 +38331,14 @@ function insidePoly(x, y8, polygon) {
   }
   return inside;
 }
-async function mask(face4) {
-  if (!face4.tensor) return face4.tensor;
-  if (!face4.mesh || face4.mesh.length < 100) return face4.tensor;
-  const width = face4.tensor.shape[2] || 0;
-  const height = face4.tensor.shape[1] || 0;
-  const buffer = await face4.tensor.buffer();
+async function mask(face3) {
+  if (!face3.tensor) return face3.tensor;
+  if (!face3.mesh || face3.mesh.length < 100) return face3.tensor;
+  const width = face3.tensor.shape[2] || 0;
+  const height = face3.tensor.shape[1] || 0;
+  const buffer = await face3.tensor.buffer();
   let silhouette = [];
-  for (const pt2 of meshAnnotations.silhouette) silhouette.push({ x: (face4.mesh[pt2][0] - face4.box[0]) / face4.box[2], y: (face4.mesh[pt2][1] - face4.box[1]) / face4.box[3] });
+  for (const pt2 of meshAnnotations.silhouette) silhouette.push({ x: (face3.mesh[pt2][0] - face3.box[0]) / face3.box[2], y: (face3.mesh[pt2][1] - face3.box[1]) / face3.box[3] });
   if (expandFact && expandFact > 0) silhouette = silhouette.map((pt2) => ({ x: pt2.x > 0.5 ? pt2.x + expandFact : pt2.x - expandFact, y: pt2.y > 0.5 ? pt2.y + expandFact : pt2.y - expandFact }));
   for (let x = 0; x < width; x++) {
     for (let y8 = 0; y8 < height; y8++) {
@@ -39670,115 +38355,115 @@ async function mask(face4) {
 }
 
 // src/face/antispoof.ts
-var model10;
+var model6;
 var cached = [];
-var skipped6 = Number.MAX_SAFE_INTEGER;
+var skipped3 = Number.MAX_SAFE_INTEGER;
 var lastCount3 = 0;
-var lastTime6 = 0;
-async function load8(config3) {
+var lastTime3 = 0;
+async function load6(config3) {
   var _a;
-  if (env.initial) model10 = null;
-  if (!model10) model10 = await loadModel((_a = config3.face.antispoof) == null ? void 0 : _a.modelPath);
-  else if (config3.debug) log("cached model:", model10["modelUrl"]);
-  return model10;
+  if (env.initial) model6 = null;
+  if (!model6) model6 = await loadModel((_a = config3.face.antispoof) == null ? void 0 : _a.modelPath);
+  else if (config3.debug) log("cached model:", model6["modelUrl"]);
+  return model6;
 }
-async function predict7(image, config3, idx, count2) {
+async function predict4(image, config3, idx, count2) {
   var _a, _b;
-  if (!(model10 == null ? void 0 : model10["executor"])) return 0;
-  const skipTime = (((_a = config3.face.antispoof) == null ? void 0 : _a.skipTime) || 0) > now() - lastTime6;
-  const skipFrame = skipped6 < (((_b = config3.face.antispoof) == null ? void 0 : _b.skipFrames) || 0);
+  if (!(model6 == null ? void 0 : model6["executor"])) return 0;
+  const skipTime = (((_a = config3.face.antispoof) == null ? void 0 : _a.skipTime) || 0) > now() - lastTime3;
+  const skipFrame = skipped3 < (((_b = config3.face.antispoof) == null ? void 0 : _b.skipFrames) || 0);
   if (config3.skipAllowed && skipTime && skipFrame && lastCount3 === count2 && cached[idx]) {
-    skipped6++;
+    skipped3++;
     return cached[idx];
   }
-  skipped6 = 0;
+  skipped3 = 0;
   return new Promise(async (resolve) => {
-    const resize = eX.resizeBilinear(image, [(model10 == null ? void 0 : model10.inputs[0].shape) ? model10.inputs[0].shape[2] : 0, (model10 == null ? void 0 : model10.inputs[0].shape) ? model10.inputs[0].shape[1] : 0], false);
-    const res = model10 == null ? void 0 : model10.execute(resize);
+    const resize = eX.resizeBilinear(image, [(model6 == null ? void 0 : model6.inputs[0].shape) ? model6.inputs[0].shape[2] : 0, (model6 == null ? void 0 : model6.inputs[0].shape) ? model6.inputs[0].shape[1] : 0], false);
+    const res = model6 == null ? void 0 : model6.execute(resize);
     const num = (await res.data())[0];
     cached[idx] = Math.round(100 * num) / 100;
     lastCount3 = count2;
-    lastTime6 = now();
+    lastTime3 = now();
     Ot([resize, res]);
     resolve(cached[idx]);
   });
 }
 
 // src/face/liveness.ts
-var model11;
+var model7;
 var cached2 = [];
-var skipped7 = Number.MAX_SAFE_INTEGER;
+var skipped4 = Number.MAX_SAFE_INTEGER;
 var lastCount4 = 0;
-var lastTime7 = 0;
-async function load9(config3) {
+var lastTime4 = 0;
+async function load7(config3) {
   var _a;
-  if (env.initial) model11 = null;
-  if (!model11) model11 = await loadModel((_a = config3.face.liveness) == null ? void 0 : _a.modelPath);
-  else if (config3.debug) log("cached model:", model11["modelUrl"]);
-  return model11;
+  if (env.initial) model7 = null;
+  if (!model7) model7 = await loadModel((_a = config3.face.liveness) == null ? void 0 : _a.modelPath);
+  else if (config3.debug) log("cached model:", model7["modelUrl"]);
+  return model7;
 }
-async function predict8(image, config3, idx, count2) {
+async function predict5(image, config3, idx, count2) {
   var _a, _b;
-  if (!(model11 == null ? void 0 : model11["executor"])) return 0;
-  const skipTime = (((_a = config3.face.liveness) == null ? void 0 : _a.skipTime) || 0) > now() - lastTime7;
-  const skipFrame = skipped7 < (((_b = config3.face.liveness) == null ? void 0 : _b.skipFrames) || 0);
+  if (!(model7 == null ? void 0 : model7["executor"])) return 0;
+  const skipTime = (((_a = config3.face.liveness) == null ? void 0 : _a.skipTime) || 0) > now() - lastTime4;
+  const skipFrame = skipped4 < (((_b = config3.face.liveness) == null ? void 0 : _b.skipFrames) || 0);
   if (config3.skipAllowed && skipTime && skipFrame && lastCount4 === count2 && cached2[idx]) {
-    skipped7++;
+    skipped4++;
     return cached2[idx];
   }
-  skipped7 = 0;
+  skipped4 = 0;
   return new Promise(async (resolve) => {
-    const resize = eX.resizeBilinear(image, [(model11 == null ? void 0 : model11.inputs[0].shape) ? model11.inputs[0].shape[2] : 0, (model11 == null ? void 0 : model11.inputs[0].shape) ? model11.inputs[0].shape[1] : 0], false);
-    const res = model11 == null ? void 0 : model11.execute(resize);
+    const resize = eX.resizeBilinear(image, [(model7 == null ? void 0 : model7.inputs[0].shape) ? model7.inputs[0].shape[2] : 0, (model7 == null ? void 0 : model7.inputs[0].shape) ? model7.inputs[0].shape[1] : 0], false);
+    const res = model7 == null ? void 0 : model7.execute(resize);
     const num = (await res.data())[0];
     cached2[idx] = Math.round(100 * num) / 100;
     lastCount4 = count2;
-    lastTime7 = now();
+    lastTime4 = now();
     Ot([resize, res]);
     resolve(cached2[idx]);
   });
 }
 
 // src/gear/gear.ts
-var model12;
-var last5 = [];
+var model8;
+var last4 = [];
 var raceNames = ["white", "black", "asian", "indian", "other"];
 var ageWeights = [15, 23, 28, 35.5, 45.5, 55.5, 65];
 var lastCount5 = 0;
-var lastTime8 = 0;
-var skipped8 = Number.MAX_SAFE_INTEGER;
-async function load10(config3) {
+var lastTime5 = 0;
+var skipped5 = Number.MAX_SAFE_INTEGER;
+async function load8(config3) {
   var _a;
-  if (env.initial) model12 = null;
-  if (!model12) model12 = await loadModel((_a = config3.face.gear) == null ? void 0 : _a.modelPath);
-  else if (config3.debug) log("cached model:", model12["modelUrl"]);
-  return model12;
+  if (env.initial) model8 = null;
+  if (!model8) model8 = await loadModel((_a = config3.face.gear) == null ? void 0 : _a.modelPath);
+  else if (config3.debug) log("cached model:", model8["modelUrl"]);
+  return model8;
 }
-async function predict9(image, config3, idx, count2) {
+async function predict6(image, config3, idx, count2) {
   var _a, _b;
-  if (!model12) return { age: 0, gender: "unknown", genderScore: 0, race: [] };
-  const skipFrame = skipped8 < (((_a = config3.face.gear) == null ? void 0 : _a.skipFrames) || 0);
-  const skipTime = (((_b = config3.face.gear) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime8;
-  if (config3.skipAllowed && skipTime && skipFrame && lastCount5 === count2 && last5[idx]) {
-    skipped8++;
-    return last5[idx];
+  if (!model8) return { age: 0, gender: "unknown", genderScore: 0, race: [] };
+  const skipFrame = skipped5 < (((_a = config3.face.gear) == null ? void 0 : _a.skipFrames) || 0);
+  const skipTime = (((_b = config3.face.gear) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime5;
+  if (config3.skipAllowed && skipTime && skipFrame && lastCount5 === count2 && last4[idx]) {
+    skipped5++;
+    return last4[idx];
   }
-  skipped8 = 0;
+  skipped5 = 0;
   return new Promise(async (resolve) => {
     var _a2, _b2, _c2, _d2;
-    if (!(model12 == null ? void 0 : model12.inputs[0].shape)) return;
+    if (!(model8 == null ? void 0 : model8.inputs[0].shape)) return;
     const t10 = {};
     let box = [[0, 0.1, 0.9, 0.9]];
     if (((_a2 = config3.face.gear) == null ? void 0 : _a2["crop"]) > 0) {
       const crop = (_b2 = config3.face.gear) == null ? void 0 : _b2["crop"];
       box = [[crop, crop, 1 - crop, 1 - crop]];
     }
-    t10.resize = eX.cropAndResize(image, box, [0], [model12.inputs[0].shape[2], model12.inputs[0].shape[1]]);
+    t10.resize = eX.cropAndResize(image, box, [0], [model8.inputs[0].shape[2], model8.inputs[0].shape[1]]);
     const obj = { age: 0, gender: "unknown", genderScore: 0, race: [] };
-    if ((_c2 = config3.face.gear) == null ? void 0 : _c2.enabled) [t10.age, t10.gender, t10.race] = model12.execute(t10.resize, ["age_output", "gender_output", "race_output"]);
-    const gender2 = await t10.gender.data();
-    obj.gender = gender2[0] > gender2[1] ? "male" : "female";
-    obj.genderScore = Math.round(100 * (gender2[0] > gender2[1] ? gender2[0] : gender2[1])) / 100;
+    if ((_c2 = config3.face.gear) == null ? void 0 : _c2.enabled) [t10.age, t10.gender, t10.race] = model8.execute(t10.resize, ["age_output", "gender_output", "race_output"]);
+    const gender = await t10.gender.data();
+    obj.gender = gender[0] > gender[1] ? "male" : "female";
+    obj.genderScore = Math.round(100 * (gender[0] > gender[1] ? gender[0] : gender[1])) / 100;
     const race = await t10.race.data();
     for (let i = 0; i < race.length; i++) {
       if (race[i] > (((_d2 = config3.face.gear) == null ? void 0 : _d2.minConfidence) || 0.2)) obj.race.push({ score: Math.round(100 * race[i]) / 100, race: raceNames[i] });
@@ -39786,104 +38471,104 @@ async function predict9(image, config3, idx, count2) {
     obj.race.sort((a, b) => b.score - a.score);
     const ageDistribution = Array.from(await t10.age.data());
     const ageSorted = ageDistribution.map((a, i) => [ageWeights[i], a]).sort((a, b) => b[1] - a[1]);
-    let age2 = ageSorted[0][0];
-    for (let i = 1; i < ageSorted.length; i++) age2 += ageSorted[i][1] * (ageSorted[i][0] - age2);
-    obj.age = Math.round(10 * age2) / 10;
+    let age = ageSorted[0][0];
+    for (let i = 1; i < ageSorted.length; i++) age += ageSorted[i][1] * (ageSorted[i][0] - age);
+    obj.age = Math.round(10 * age) / 10;
     Object.keys(t10).forEach((tensor2) => Ot(t10[tensor2]));
-    last5[idx] = obj;
+    last4[idx] = obj;
     lastCount5 = count2;
-    lastTime8 = now();
+    lastTime5 = now();
     resolve(obj);
   });
 }
 
 // src/gear/ssrnet-age.ts
-var model13;
-var last6 = [];
+var model9;
+var last5 = [];
 var lastCount6 = 0;
-var lastTime9 = 0;
-var skipped9 = Number.MAX_SAFE_INTEGER;
-async function load11(config3) {
-  if (env.initial) model13 = null;
-  if (!model13) model13 = await loadModel(config3.face["ssrnet"].modelPathAge);
-  else if (config3.debug) log("cached model:", model13["modelUrl"]);
-  return model13;
+var lastTime6 = 0;
+var skipped6 = Number.MAX_SAFE_INTEGER;
+async function load9(config3) {
+  if (env.initial) model9 = null;
+  if (!model9) model9 = await loadModel(config3.face["ssrnet"].modelPathAge);
+  else if (config3.debug) log("cached model:", model9["modelUrl"]);
+  return model9;
 }
-async function predict10(image, config3, idx, count2) {
+async function predict7(image, config3, idx, count2) {
   var _a, _b, _c2, _d2;
-  if (!model13) return { age: 0 };
-  const skipFrame = skipped9 < (((_a = config3.face["ssrnet"]) == null ? void 0 : _a.skipFrames) || 0);
-  const skipTime = (((_b = config3.face["ssrnet"]) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime9;
-  if (config3.skipAllowed && skipFrame && skipTime && lastCount6 === count2 && ((_c2 = last6[idx]) == null ? void 0 : _c2.age) && ((_d2 = last6[idx]) == null ? void 0 : _d2.age) > 0) {
-    skipped9++;
-    return last6[idx];
+  if (!model9) return { age: 0 };
+  const skipFrame = skipped6 < (((_a = config3.face["ssrnet"]) == null ? void 0 : _a.skipFrames) || 0);
+  const skipTime = (((_b = config3.face["ssrnet"]) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime6;
+  if (config3.skipAllowed && skipFrame && skipTime && lastCount6 === count2 && ((_c2 = last5[idx]) == null ? void 0 : _c2.age) && ((_d2 = last5[idx]) == null ? void 0 : _d2.age) > 0) {
+    skipped6++;
+    return last5[idx];
   }
-  skipped9 = 0;
+  skipped6 = 0;
   return new Promise(async (resolve) => {
     var _a2, _b2, _c3;
-    if (!(model13 == null ? void 0 : model13.inputs) || !model13.inputs[0] || !model13.inputs[0].shape) return;
+    if (!(model9 == null ? void 0 : model9.inputs) || !model9.inputs[0] || !model9.inputs[0].shape) return;
     const t10 = {};
     if (((_a2 = config3.face["ssrnet"]) == null ? void 0 : _a2["crop"]) > 0) {
       const crop = (_b2 = config3.face["ssrnet"]) == null ? void 0 : _b2["crop"];
       const box = [[crop, crop, 1 - crop, 1 - crop]];
-      t10.resize = eX.cropAndResize(image, box, [0], [model13.inputs[0].shape[2], model13.inputs[0].shape[1]]);
+      t10.resize = eX.cropAndResize(image, box, [0], [model9.inputs[0].shape[2], model9.inputs[0].shape[1]]);
     } else {
-      t10.resize = eX.resizeBilinear(image, [model13.inputs[0].shape[2], model13.inputs[0].shape[1]], false);
+      t10.resize = eX.resizeBilinear(image, [model9.inputs[0].shape[2], model9.inputs[0].shape[1]], false);
     }
     t10.enhance = se(t10.resize, constants.tf255);
     const obj = { age: 0 };
-    if ((_c3 = config3.face["ssrnet"]) == null ? void 0 : _c3.enabled) t10.age = model13.execute(t10.enhance);
+    if ((_c3 = config3.face["ssrnet"]) == null ? void 0 : _c3.enabled) t10.age = model9.execute(t10.enhance);
     if (t10.age) {
       const data = await t10.age.data();
       obj.age = Math.trunc(10 * data[0]) / 10;
     }
     Object.keys(t10).forEach((tensor2) => Ot(t10[tensor2]));
-    last6[idx] = obj;
+    last5[idx] = obj;
     lastCount6 = count2;
-    lastTime9 = now();
+    lastTime6 = now();
     resolve(obj);
   });
 }
 
 // src/gear/ssrnet-gender.ts
-var model14;
-var last7 = [];
+var model10;
+var last6 = [];
 var lastCount7 = 0;
-var lastTime10 = 0;
-var skipped10 = Number.MAX_SAFE_INTEGER;
+var lastTime7 = 0;
+var skipped7 = Number.MAX_SAFE_INTEGER;
 var rgb2 = [0.2989, 0.587, 0.114];
-async function load12(config3) {
+async function load10(config3) {
   var _a;
-  if (env.initial) model14 = null;
-  if (!model14) model14 = await loadModel((_a = config3.face["ssrnet"]) == null ? void 0 : _a.modelPathGender);
-  else if (config3.debug) log("cached model:", model14["modelUrl"]);
-  return model14;
+  if (env.initial) model10 = null;
+  if (!model10) model10 = await loadModel((_a = config3.face["ssrnet"]) == null ? void 0 : _a.modelPathGender);
+  else if (config3.debug) log("cached model:", model10["modelUrl"]);
+  return model10;
 }
-async function predict11(image, config3, idx, count2) {
+async function predict8(image, config3, idx, count2) {
   var _a, _b, _c2, _d2;
-  if (!model14) return { gender: "unknown", genderScore: 0 };
-  const skipFrame = skipped10 < (((_a = config3.face["ssrnet"]) == null ? void 0 : _a.skipFrames) || 0);
-  const skipTime = (((_b = config3.face["ssrnet"]) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime10;
-  if (config3.skipAllowed && skipFrame && skipTime && lastCount7 === count2 && ((_c2 = last7[idx]) == null ? void 0 : _c2.gender) && ((_d2 = last7[idx]) == null ? void 0 : _d2.genderScore) > 0) {
-    skipped10++;
-    return last7[idx];
+  if (!model10) return { gender: "unknown", genderScore: 0 };
+  const skipFrame = skipped7 < (((_a = config3.face["ssrnet"]) == null ? void 0 : _a.skipFrames) || 0);
+  const skipTime = (((_b = config3.face["ssrnet"]) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime7;
+  if (config3.skipAllowed && skipFrame && skipTime && lastCount7 === count2 && ((_c2 = last6[idx]) == null ? void 0 : _c2.gender) && ((_d2 = last6[idx]) == null ? void 0 : _d2.genderScore) > 0) {
+    skipped7++;
+    return last6[idx];
   }
-  skipped10 = 0;
+  skipped7 = 0;
   return new Promise(async (resolve) => {
     var _a2, _b2, _c3;
-    if (!(model14 == null ? void 0 : model14.inputs[0].shape)) return;
+    if (!(model10 == null ? void 0 : model10.inputs[0].shape)) return;
     const t10 = {};
     if (((_a2 = config3.face["ssrnet"]) == null ? void 0 : _a2["crop"]) > 0) {
       const crop = (_b2 = config3.face["ssrnet"]) == null ? void 0 : _b2["crop"];
       const box = [[crop, crop, 1 - crop, 1 - crop]];
-      t10.resize = eX.cropAndResize(image, box, [0], [model14.inputs[0].shape[2], model14.inputs[0].shape[1]]);
+      t10.resize = eX.cropAndResize(image, box, [0], [model10.inputs[0].shape[2], model10.inputs[0].shape[1]]);
     } else {
-      t10.resize = eX.resizeBilinear(image, [model14.inputs[0].shape[2], model14.inputs[0].shape[1]], false);
+      t10.resize = eX.resizeBilinear(image, [model10.inputs[0].shape[2], model10.inputs[0].shape[1]], false);
     }
     t10.enhance = De(() => {
       var _a3, _b3;
       let normalize2;
-      if (((_b3 = (_a3 = model14 == null ? void 0 : model14.inputs) == null ? void 0 : _a3[0].shape) == null ? void 0 : _b3[3]) === 1) {
+      if (((_b3 = (_a3 = model10 == null ? void 0 : model10.inputs) == null ? void 0 : _a3[0].shape) == null ? void 0 : _b3[3]) === 1) {
         const [red, green, blue] = li(t10.resize, 3, 3);
         const redNorm = se(red, rgb2[0]);
         const greenNorm = se(green, rgb2[1]);
@@ -39896,118 +38581,118 @@ async function predict11(image, config3, idx, count2) {
       return normalize2;
     });
     const obj = { gender: "unknown", genderScore: 0 };
-    if ((_c3 = config3.face["ssrnet"]) == null ? void 0 : _c3.enabled) t10.gender = model14.execute(t10.enhance);
+    if ((_c3 = config3.face["ssrnet"]) == null ? void 0 : _c3.enabled) t10.gender = model10.execute(t10.enhance);
     const data = await t10.gender.data();
     obj.gender = data[0] > data[1] ? "female" : "male";
     obj.genderScore = data[0] > data[1] ? Math.trunc(100 * data[0]) / 100 : Math.trunc(100 * data[1]) / 100;
     Object.keys(t10).forEach((tensor2) => Ot(t10[tensor2]));
-    last7[idx] = obj;
+    last6[idx] = obj;
     lastCount7 = count2;
-    lastTime10 = now();
+    lastTime7 = now();
     resolve(obj);
   });
 }
 
 // src/face/mobilefacenet.ts
-var model15;
-var last8 = [];
+var model11;
+var last7 = [];
 var lastCount8 = 0;
-var lastTime11 = 0;
-var skipped11 = Number.MAX_SAFE_INTEGER;
-async function load13(config3) {
+var lastTime8 = 0;
+var skipped8 = Number.MAX_SAFE_INTEGER;
+async function load11(config3) {
   var _a;
-  if (env.initial) model15 = null;
-  if (!model15) model15 = await loadModel((_a = config3.face["mobilefacenet"]) == null ? void 0 : _a.modelPath);
-  else if (config3.debug) log("cached model:", model15["modelUrl"]);
-  return model15;
+  if (env.initial) model11 = null;
+  if (!model11) model11 = await loadModel((_a = config3.face["mobilefacenet"]) == null ? void 0 : _a.modelPath);
+  else if (config3.debug) log("cached model:", model11["modelUrl"]);
+  return model11;
 }
-async function predict12(input, config3, idx, count2) {
+async function predict9(input, config3, idx, count2) {
   var _a, _b;
-  if (!(model15 == null ? void 0 : model15["executor"])) return [];
-  const skipFrame = skipped11 < (((_a = config3.face["mobilefacenet"]) == null ? void 0 : _a.skipFrames) || 0);
-  const skipTime = (((_b = config3.face["mobilefacenet"]) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime11;
-  if (config3.skipAllowed && skipTime && skipFrame && lastCount8 === count2 && last8[idx]) {
-    skipped11++;
-    return last8[idx];
+  if (!(model11 == null ? void 0 : model11["executor"])) return [];
+  const skipFrame = skipped8 < (((_a = config3.face["mobilefacenet"]) == null ? void 0 : _a.skipFrames) || 0);
+  const skipTime = (((_b = config3.face["mobilefacenet"]) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime8;
+  if (config3.skipAllowed && skipTime && skipFrame && lastCount8 === count2 && last7[idx]) {
+    skipped8++;
+    return last7[idx];
   }
   return new Promise(async (resolve) => {
     var _a2;
     let data = [];
-    if (((_a2 = config3.face["mobilefacenet"]) == null ? void 0 : _a2.enabled) && (model15 == null ? void 0 : model15.inputs[0].shape)) {
+    if (((_a2 = config3.face["mobilefacenet"]) == null ? void 0 : _a2.enabled) && (model11 == null ? void 0 : model11.inputs[0].shape)) {
       const t10 = {};
-      t10.crop = eX.resizeBilinear(input, [model15.inputs[0].shape[2], model15.inputs[0].shape[1]], false);
-      t10.data = model15.execute(t10.crop);
+      t10.crop = eX.resizeBilinear(input, [model11.inputs[0].shape[2], model11.inputs[0].shape[1]], false);
+      t10.data = model11.execute(t10.crop);
       const output = await t10.data.data();
       data = Array.from(output);
       Object.keys(t10).forEach((tensor2) => Ot(t10[tensor2]));
     }
-    last8[idx] = data;
+    last7[idx] = data;
     lastCount8 = count2;
-    lastTime11 = now();
+    lastTime8 = now();
     resolve(data);
   });
 }
 
 // src/face/insightface.ts
-var model16;
-var last9 = [];
+var model12;
+var last8 = [];
 var lastCount9 = 0;
-var lastTime12 = 0;
-var skipped12 = Number.MAX_SAFE_INTEGER;
-async function load14(config3) {
-  if (env.initial) model16 = null;
-  if (!model16) model16 = await loadModel(config3.face["insightface"].modelPath);
-  else if (config3.debug) log("cached model:", model16["modelUrl"]);
-  return model16;
+var lastTime9 = 0;
+var skipped9 = Number.MAX_SAFE_INTEGER;
+async function load12(config3) {
+  if (env.initial) model12 = null;
+  if (!model12) model12 = await loadModel(config3.face["insightface"].modelPath);
+  else if (config3.debug) log("cached model:", model12["modelUrl"]);
+  return model12;
 }
-async function predict13(input, config3, idx, count2) {
+async function predict10(input, config3, idx, count2) {
   var _a, _b;
-  if (!(model16 == null ? void 0 : model16["executor"])) return [];
-  const skipFrame = skipped12 < (((_a = config3.face["insightface"]) == null ? void 0 : _a.skipFrames) || 0);
-  const skipTime = (((_b = config3.face["insightface"]) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime12;
-  if (config3.skipAllowed && skipTime && skipFrame && lastCount9 === count2 && last9[idx]) {
-    skipped12++;
-    return last9[idx];
+  if (!(model12 == null ? void 0 : model12["executor"])) return [];
+  const skipFrame = skipped9 < (((_a = config3.face["insightface"]) == null ? void 0 : _a.skipFrames) || 0);
+  const skipTime = (((_b = config3.face["insightface"]) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime9;
+  if (config3.skipAllowed && skipTime && skipFrame && lastCount9 === count2 && last8[idx]) {
+    skipped9++;
+    return last8[idx];
   }
   return new Promise(async (resolve) => {
     var _a2;
     let data = [];
-    if (((_a2 = config3.face["insightface"]) == null ? void 0 : _a2.enabled) && (model16 == null ? void 0 : model16.inputs[0].shape)) {
+    if (((_a2 = config3.face["insightface"]) == null ? void 0 : _a2.enabled) && (model12 == null ? void 0 : model12.inputs[0].shape)) {
       const t10 = {};
-      t10.crop = eX.resizeBilinear(input, [model16.inputs[0].shape[2], model16.inputs[0].shape[1]], false);
-      t10.data = model16.execute(t10.crop);
+      t10.crop = eX.resizeBilinear(input, [model12.inputs[0].shape[2], model12.inputs[0].shape[1]], false);
+      t10.data = model12.execute(t10.crop);
       const output = await t10.data.data();
       data = Array.from(output);
       Object.keys(t10).forEach((tensor2) => Ot(t10[tensor2]));
     }
-    last9[idx] = data;
+    last8[idx] = data;
     lastCount9 = count2;
-    lastTime12 = now();
+    lastTime9 = now();
     resolve(data);
   });
 }
 
 // src/face/angles.ts
-var calculateGaze = (face4) => {
+var calculateGaze = (face3) => {
   const radians = (pt1, pt2) => Math.atan2(pt1[1] - pt2[1], pt1[0] - pt2[0]);
-  if (!face4.annotations.rightEyeIris || !face4.annotations.leftEyeIris) return { bearing: 0, strength: 0 };
+  if (!face3.annotations.rightEyeIris || !face3.annotations.leftEyeIris) return { bearing: 0, strength: 0 };
   const offsetIris = [0, -0.1];
   const eyeRatio = 1;
-  const left = (face4.mesh[33][2] || 0) > (face4.mesh[263][2] || 0);
-  const irisCenter = left ? face4.mesh[473] : face4.mesh[468];
-  const eyeCenter = left ? [(face4.mesh[133][0] + face4.mesh[33][0]) / 2, (face4.mesh[133][1] + face4.mesh[33][1]) / 2] : [(face4.mesh[263][0] + face4.mesh[362][0]) / 2, (face4.mesh[263][1] + face4.mesh[362][1]) / 2];
-  const eyeSize = left ? [face4.mesh[133][0] - face4.mesh[33][0], face4.mesh[23][1] - face4.mesh[27][1]] : [face4.mesh[263][0] - face4.mesh[362][0], face4.mesh[253][1] - face4.mesh[257][1]];
+  const left = (face3.mesh[33][2] || 0) > (face3.mesh[263][2] || 0);
+  const irisCenter = left ? face3.mesh[473] : face3.mesh[468];
+  const eyeCenter = left ? [(face3.mesh[133][0] + face3.mesh[33][0]) / 2, (face3.mesh[133][1] + face3.mesh[33][1]) / 2] : [(face3.mesh[263][0] + face3.mesh[362][0]) / 2, (face3.mesh[263][1] + face3.mesh[362][1]) / 2];
+  const eyeSize = left ? [face3.mesh[133][0] - face3.mesh[33][0], face3.mesh[23][1] - face3.mesh[27][1]] : [face3.mesh[263][0] - face3.mesh[362][0], face3.mesh[253][1] - face3.mesh[257][1]];
   const eyeDiff = [
     // x distance between extreme point and center point normalized with eye size
     (eyeCenter[0] - irisCenter[0]) / eyeSize[0] - offsetIris[0],
     eyeRatio * (irisCenter[1] - eyeCenter[1]) / eyeSize[1] - offsetIris[1]
   ];
   let strength = Math.sqrt(eyeDiff[0] * eyeDiff[0] + eyeDiff[1] * eyeDiff[1]);
-  strength = Math.min(strength, face4.boxRaw[2] / 2, face4.boxRaw[3] / 2);
+  strength = Math.min(strength, face3.boxRaw[2] / 2, face3.boxRaw[3] / 2);
   const bearing = (radians([0, 0], eyeDiff) + Math.PI / 2) % Math.PI;
   return { bearing, strength };
 };
-var calculateFaceAngle = (face4, imageSize) => {
+var calculateFaceAngle = (face3, imageSize) => {
   const normalize2 = (v8) => {
     const length = Math.sqrt(v8[0] * v8[0] + v8[1] * v8[1] + v8[2] * v8[2]);
     v8[0] /= length;
@@ -40053,9 +38738,9 @@ var calculateFaceAngle = (face4, imageSize) => {
     if (Number.isNaN(thetaZ)) thetaZ = 0;
     return { pitch: -thetaX, yaw: -thetaY, roll: -thetaZ };
   };
-  const mesh = face4.meshRaw;
+  const mesh = face3.meshRaw;
   if (!mesh || mesh.length < 300) return { angle: { pitch: 0, yaw: 0, roll: 0 }, matrix: [1, 0, 0, 0, 1, 0, 0, 0, 1], gaze: { bearing: 0, strength: 0 } };
-  const size2 = Math.max(face4.boxRaw[2] * imageSize[0], face4.boxRaw[3] * imageSize[1]) / 1.5;
+  const size2 = Math.max(face3.boxRaw[2] * imageSize[0], face3.boxRaw[3] * imageSize[1]) / 1.5;
   const pts = [mesh[10], mesh[152], mesh[234], mesh[454]].map((pt2) => [pt2[0] * imageSize[0] / size2, pt2[1] * imageSize[1] / size2, pt2[2]]);
   const yAxis = normalize2(subVectors(pts[1], pts[0]));
   let xAxis = normalize2(subVectors(pts[3], pts[2]));
@@ -40073,13 +38758,13 @@ var calculateFaceAngle = (face4, imageSize) => {
     zAxis[2]
   ];
   const angle = rotationMatrixToEulerAngle(matrix);
-  const gaze = mesh.length === 478 ? calculateGaze(face4) : { bearing: 0, strength: 0 };
+  const gaze = mesh.length === 478 ? calculateGaze(face3) : { bearing: 0, strength: 0 };
   return { angle, matrix, gaze };
 };
 
 // src/face/anthropometry.ts
-function calculateCameraDistance(face4, width) {
-  const f = face4 == null ? void 0 : face4.annotations;
+function calculateCameraDistance(face3, width) {
+  const f = face3 == null ? void 0 : face3.annotations;
   if (!(f == null ? void 0 : f.leftEyeIris) || !(f == null ? void 0 : f.rightEyeIris)) return 0;
   const irisSize = Math.max(Math.abs(f.leftEyeIris[3][0] - f.leftEyeIris[1][0]), Math.abs(f.rightEyeIris[3][0] - f.rightEyeIris[1][0])) / width;
   const cameraDistance = Math.round(1.17 / irisSize) / 100;
@@ -40101,7 +38786,7 @@ var detectFace = async (instance, input) => {
   let descRes;
   const faceRes = [];
   instance.state = "run:face";
-  const faces = await predict4(input, instance.config);
+  const faces = await predict(input, instance.config);
   instance.performance.face = env.perfadd ? (instance.performance.face || 0) + Math.trunc(now() - timeStamp) : Math.trunc(now() - timeStamp);
   if (!input.shape || input.shape.length !== 4) return [];
   if (!faces) return [];
@@ -40119,83 +38804,83 @@ var detectFace = async (instance, input) => {
     const rotation = faces[i].mesh && faces[i].mesh.length > 200 ? calculateFaceAngle(faces[i], [input.shape[2], input.shape[1]]) : null;
     instance.analyze("Start Emotion:");
     if (instance.config.async) {
-      emotionRes = ((_b = instance.config.face.emotion) == null ? void 0 : _b.enabled) ? predict5(faces[i].tensor || ar([]), instance.config, i, faces.length) : [];
+      emotionRes = ((_b = instance.config.face.emotion) == null ? void 0 : _b.enabled) ? predict2(faces[i].tensor || ar([]), instance.config, i, faces.length) : [];
     } else {
       instance.state = "run:emotion";
       timeStamp = now();
-      emotionRes = ((_c2 = instance.config.face.emotion) == null ? void 0 : _c2.enabled) ? await predict5(faces[i].tensor || ar([]), instance.config, i, faces.length) : [];
+      emotionRes = ((_c2 = instance.config.face.emotion) == null ? void 0 : _c2.enabled) ? await predict2(faces[i].tensor || ar([]), instance.config, i, faces.length) : [];
       instance.performance.emotion = env.perfadd ? (instance.performance.emotion || 0) + Math.trunc(now() - timeStamp) : Math.trunc(now() - timeStamp);
     }
     instance.analyze("End Emotion:");
     instance.analyze("Start AntiSpoof:");
     if (instance.config.async) {
-      antispoofRes = ((_d2 = instance.config.face.antispoof) == null ? void 0 : _d2.enabled) ? predict7(faces[i].tensor || ar([]), instance.config, i, faces.length) : 0;
+      antispoofRes = ((_d2 = instance.config.face.antispoof) == null ? void 0 : _d2.enabled) ? predict4(faces[i].tensor || ar([]), instance.config, i, faces.length) : 0;
     } else {
       instance.state = "run:antispoof";
       timeStamp = now();
-      antispoofRes = ((_e = instance.config.face.antispoof) == null ? void 0 : _e.enabled) ? await predict7(faces[i].tensor || ar([]), instance.config, i, faces.length) : 0;
+      antispoofRes = ((_e = instance.config.face.antispoof) == null ? void 0 : _e.enabled) ? await predict4(faces[i].tensor || ar([]), instance.config, i, faces.length) : 0;
       instance.performance.antispoof = env.perfadd ? (instance.performance.antispoof || 0) + Math.trunc(now() - timeStamp) : Math.trunc(now() - timeStamp);
     }
     instance.analyze("End AntiSpoof:");
     instance.analyze("Start Liveness:");
     if (instance.config.async) {
-      livenessRes = ((_f2 = instance.config.face.liveness) == null ? void 0 : _f2.enabled) ? predict8(faces[i].tensor || ar([]), instance.config, i, faces.length) : 0;
+      livenessRes = ((_f2 = instance.config.face.liveness) == null ? void 0 : _f2.enabled) ? predict5(faces[i].tensor || ar([]), instance.config, i, faces.length) : 0;
     } else {
       instance.state = "run:liveness";
       timeStamp = now();
-      livenessRes = ((_g2 = instance.config.face.liveness) == null ? void 0 : _g2.enabled) ? await predict8(faces[i].tensor || ar([]), instance.config, i, faces.length) : 0;
+      livenessRes = ((_g2 = instance.config.face.liveness) == null ? void 0 : _g2.enabled) ? await predict5(faces[i].tensor || ar([]), instance.config, i, faces.length) : 0;
       instance.performance.liveness = env.perfadd ? (instance.performance.antispoof || 0) + Math.trunc(now() - timeStamp) : Math.trunc(now() - timeStamp);
     }
     instance.analyze("End Liveness:");
     instance.analyze("Start GEAR:");
     if (instance.config.async) {
-      gearRes = ((_h2 = instance.config.face.gear) == null ? void 0 : _h2.enabled) ? predict9(faces[i].tensor || ar([]), instance.config, i, faces.length) : null;
+      gearRes = ((_h2 = instance.config.face.gear) == null ? void 0 : _h2.enabled) ? predict6(faces[i].tensor || ar([]), instance.config, i, faces.length) : null;
     } else {
       instance.state = "run:gear";
       timeStamp = now();
-      gearRes = ((_i2 = instance.config.face.gear) == null ? void 0 : _i2.enabled) ? await predict9(faces[i].tensor || ar([]), instance.config, i, faces.length) : null;
+      gearRes = ((_i2 = instance.config.face.gear) == null ? void 0 : _i2.enabled) ? await predict6(faces[i].tensor || ar([]), instance.config, i, faces.length) : null;
       instance.performance.gear = Math.trunc(now() - timeStamp);
     }
     instance.analyze("End GEAR:");
     instance.analyze("Start SSRNet:");
     if (instance.config.async) {
-      ageRes = ((_j2 = instance.config.face["ssrnet"]) == null ? void 0 : _j2.enabled) ? predict10(faces[i].tensor || ar([]), instance.config, i, faces.length) : null;
-      genderRes = ((_k2 = instance.config.face["ssrnet"]) == null ? void 0 : _k2.enabled) ? predict11(faces[i].tensor || ar([]), instance.config, i, faces.length) : null;
+      ageRes = ((_j2 = instance.config.face["ssrnet"]) == null ? void 0 : _j2.enabled) ? predict7(faces[i].tensor || ar([]), instance.config, i, faces.length) : null;
+      genderRes = ((_k2 = instance.config.face["ssrnet"]) == null ? void 0 : _k2.enabled) ? predict8(faces[i].tensor || ar([]), instance.config, i, faces.length) : null;
     } else {
       instance.state = "run:ssrnet";
       timeStamp = now();
-      ageRes = ((_l2 = instance.config.face["ssrnet"]) == null ? void 0 : _l2.enabled) ? await predict10(faces[i].tensor || ar([]), instance.config, i, faces.length) : null;
-      genderRes = ((_m = instance.config.face["ssrnet"]) == null ? void 0 : _m.enabled) ? await predict11(faces[i].tensor || ar([]), instance.config, i, faces.length) : null;
+      ageRes = ((_l2 = instance.config.face["ssrnet"]) == null ? void 0 : _l2.enabled) ? await predict7(faces[i].tensor || ar([]), instance.config, i, faces.length) : null;
+      genderRes = ((_m = instance.config.face["ssrnet"]) == null ? void 0 : _m.enabled) ? await predict8(faces[i].tensor || ar([]), instance.config, i, faces.length) : null;
       instance.performance.ssrnet = Math.trunc(now() - timeStamp);
     }
     instance.analyze("End SSRNet:");
     instance.analyze("Start MobileFaceNet:");
     if (instance.config.async) {
-      mobilefacenetRes = ((_n2 = instance.config.face["mobilefacenet"]) == null ? void 0 : _n2.enabled) ? predict12(faces[i].tensor || ar([]), instance.config, i, faces.length) : null;
+      mobilefacenetRes = ((_n2 = instance.config.face["mobilefacenet"]) == null ? void 0 : _n2.enabled) ? predict9(faces[i].tensor || ar([]), instance.config, i, faces.length) : null;
     } else {
       instance.state = "run:mobilefacenet";
       timeStamp = now();
-      mobilefacenetRes = ((_o2 = instance.config.face["mobilefacenet"]) == null ? void 0 : _o2.enabled) ? await predict12(faces[i].tensor || ar([]), instance.config, i, faces.length) : null;
+      mobilefacenetRes = ((_o2 = instance.config.face["mobilefacenet"]) == null ? void 0 : _o2.enabled) ? await predict9(faces[i].tensor || ar([]), instance.config, i, faces.length) : null;
       instance.performance.mobilefacenet = Math.trunc(now() - timeStamp);
     }
     instance.analyze("End MobileFaceNet:");
     instance.analyze("Start InsightFace:");
     if (instance.config.async) {
-      insightfaceRes = ((_p2 = instance.config.face["insightface"]) == null ? void 0 : _p2.enabled) ? predict13(faces[i].tensor || ar([]), instance.config, i, faces.length) : null;
+      insightfaceRes = ((_p2 = instance.config.face["insightface"]) == null ? void 0 : _p2.enabled) ? predict10(faces[i].tensor || ar([]), instance.config, i, faces.length) : null;
     } else {
       instance.state = "run:mobilefacenet";
       timeStamp = now();
-      insightfaceRes = ((_q2 = instance.config.face["insightface"]) == null ? void 0 : _q2.enabled) ? await predict13(faces[i].tensor || ar([]), instance.config, i, faces.length) : null;
+      insightfaceRes = ((_q2 = instance.config.face["insightface"]) == null ? void 0 : _q2.enabled) ? await predict10(faces[i].tensor || ar([]), instance.config, i, faces.length) : null;
       instance.performance.mobilefacenet = Math.trunc(now() - timeStamp);
     }
     instance.analyze("End InsightFace:");
     instance.analyze("Start Description:");
     if (instance.config.async) {
-      descRes = predict6(faces[i].tensor || ar([]), instance.config, i, faces.length);
+      descRes = predict3(faces[i].tensor || ar([]), instance.config, i, faces.length);
     } else {
       instance.state = "run:description";
       timeStamp = now();
-      descRes = await predict6(faces[i].tensor || ar([]), instance.config, i, faces.length);
+      descRes = await predict3(faces[i].tensor || ar([]), instance.config, i, faces.length);
       instance.performance.description = env.perfadd ? (instance.performance.description || 0) + Math.trunc(now() - timeStamp) : Math.trunc(now() - timeStamp);
     }
     instance.analyze("End Description:");
@@ -40257,6 +38942,139 @@ var detectFace = async (instance, input) => {
   }
   return faceRes;
 };
+
+// src/face/match.ts
+var match_exports = {};
+__export(match_exports, {
+  distance: () => distance,
+  find: () => find,
+  similarity: () => similarity
+});
+function distance(descriptor1, descriptor2, options3 = { order: 2, multiplier: 25 }) {
+  if (!descriptor1 || !descriptor1) return Number.MAX_SAFE_INTEGER;
+  let sum = 0;
+  for (let i = 0; i < descriptor1.length; i++) {
+    const diff = !options3.order || options3.order === 2 ? descriptor1[i] - descriptor2[i] : Math.abs(descriptor1[i] - descriptor2[i]);
+    sum += !options3.order || options3.order === 2 ? diff * diff : diff ** options3.order;
+  }
+  const dist = Math.round(100 * (options3.multiplier || 20) * sum) / 100;
+  return dist;
+}
+var normalizeDistance = (dist, order, min, max) => {
+  if (dist === 0) return 1;
+  const root = order === 2 ? Math.sqrt(dist) : dist ** (1 / order);
+  const norm = (1 - root / 100 - min) / (max - min);
+  const clamp2 = Math.round(100 * Math.max(Math.min(norm, 1), 0)) / 100;
+  return clamp2;
+};
+function similarity(descriptor1, descriptor2, options3 = { order: 2, multiplier: 25, min: 0.2, max: 0.8 }) {
+  const dist = distance(descriptor1, descriptor2, options3);
+  return normalizeDistance(dist, options3.order || 2, options3.min || 0, options3.max || 1);
+}
+function find(descriptor, descriptors, options3 = { order: 2, multiplier: 25, threshold: 0, min: 0.2, max: 0.8 }) {
+  if (!Array.isArray(descriptor) || !Array.isArray(descriptors) || descriptor.length < 64 || descriptors.length === 0) {
+    return { index: -1, distance: Number.POSITIVE_INFINITY, similarity: 0 };
+  }
+  let lowestDistance = Number.MAX_SAFE_INTEGER;
+  let index2 = -1;
+  for (let i = 0; i < descriptors.length; i++) {
+    const res = descriptors[i].length === descriptor.length ? distance(descriptor, descriptors[i], options3) : Number.MAX_SAFE_INTEGER;
+    if (res < lowestDistance) {
+      lowestDistance = res;
+      index2 = i;
+    }
+    if (lowestDistance < (options3.threshold || 0)) break;
+  }
+  const normalizedSimilarity = normalizeDistance(lowestDistance, options3.order || 2, options3.min || 0, options3.max || 1);
+  return { index: index2, distance: lowestDistance, similarity: normalizedSimilarity };
+}
+
+// src/models.ts
+var models_exports2 = {};
+__export(models_exports2, {
+  Models: () => Models,
+  validateModel: () => validateModel
+});
+
+// src/body/blazeposedetector.ts
+var model13;
+var inputSize4 = 224;
+var anchorTensor;
+var numLayers = 5;
+var strides = [8, 16, 32, 32, 32];
+function createAnchors() {
+  const anchors3 = [];
+  let layerId = 0;
+  while (layerId < numLayers) {
+    let anchorCount = 0;
+    let lastSameStrideLayer = layerId;
+    while (lastSameStrideLayer < strides.length && strides[lastSameStrideLayer] === strides[layerId]) {
+      anchorCount += 2;
+      lastSameStrideLayer++;
+    }
+    const stride = strides[layerId];
+    const featureMapHeight = Math.ceil(inputSize4 / stride);
+    const featureMapWidth = Math.ceil(inputSize4 / stride);
+    for (let y8 = 0; y8 < featureMapHeight; ++y8) {
+      for (let x = 0; x < featureMapWidth; ++x) {
+        for (let anchorId = 0; anchorId < anchorCount; ++anchorId) {
+          anchors3.push({ x: (x + 0.5) / featureMapWidth, y: (y8 + 0.5) / featureMapHeight });
+        }
+      }
+    }
+    layerId = lastSameStrideLayer;
+  }
+  anchorTensor = { x: Jt(anchors3.map((a) => a.x)), y: Jt(anchors3.map((a) => a.y)) };
+}
+async function loadDetector(config3) {
+  if (env.initial) model13 = null;
+  if (!model13 && config3.body["detector"] && config3.body["detector"].modelPath || "") {
+    model13 = await loadModel(config3.body["detector"].modelPath);
+    const inputs = (model13 == null ? void 0 : model13["executor"]) ? Object.values(model13.modelSignature["inputs"]) : void 0;
+    inputSize4 = Array.isArray(inputs) ? parseInt(inputs[0].tensorShape.dim[1].size) : 0;
+  } else if (config3.debug && model13) log("cached model:", model13["modelUrl"]);
+  createAnchors();
+  return model13;
+}
+
+// src/body/blazepose.ts
+var model14;
+var inputSize5 = 256;
+var skipped10 = Number.MAX_SAFE_INTEGER;
+var loadDetect = (config3) => loadDetector(config3);
+async function loadPose(config3) {
+  if (env.initial) model14 = null;
+  if (!model14) {
+    model14 = await loadModel(config3.body.modelPath);
+    const inputs = (model14 == null ? void 0 : model14["executor"]) ? Object.values(model14.modelSignature["inputs"]) : void 0;
+    inputSize5 = Array.isArray(inputs) ? parseInt(inputs[0].tensorShape.dim[1].size) : 0;
+  } else if (config3.debug) log("cached model:", model14["modelUrl"]);
+  return model14;
+}
+
+// src/object/centernet.ts
+var model15;
+var inputSize6 = 0;
+var skipped11 = Number.MAX_SAFE_INTEGER;
+async function load13(config3) {
+  if (env.initial) model15 = null;
+  if (!model15) {
+    model15 = await loadModel(config3.object.modelPath);
+    const inputs = (model15 == null ? void 0 : model15["executor"]) ? Object.values(model15.modelSignature["inputs"]) : void 0;
+    inputSize6 = Array.isArray(inputs) ? parseInt(inputs[0].tensorShape.dim[2].size) : 0;
+  } else if (config3.debug) log("cached model:", model15["modelUrl"]);
+  return model15;
+}
+
+// src/body/efficientpose.ts
+var model16;
+var skipped12 = Number.MAX_SAFE_INTEGER;
+async function load14(config3) {
+  if (env.initial) model16 = null;
+  if (!model16) model16 = await loadModel(config3.body.modelPath);
+  else if (config3.debug) log("cached model:", model16["modelUrl"]);
+  return model16;
+}
 
 // src/hand/fingerdef.ts
 var Finger = {
@@ -40421,3671 +39239,10 @@ OpenPalm.curl(index, none, 0.75);
 OpenPalm.curl(middle, none, 0.75);
 OpenPalm.curl(ring, none, 0.75);
 OpenPalm.curl(pinky, none, 0.75);
-var fingergesture_default = [ThumbsUp, Victory, Point, MiddleFinger, OpenPalm];
-
-// src/hand/fingerpose.ts
-var minConfidence = 0.7;
-var options3 = {
-  // curl estimation
-  HALF_CURL_START_LIMIT: 60,
-  NO_CURL_START_LIMIT: 130,
-  // direction estimation
-  DISTANCE_VOTE_POWER: 1.1,
-  SINGLE_ANGLE_VOTE_POWER: 0.9,
-  TOTAL_ANGLE_VOTE_POWER: 1.6
-};
-function calculateSlope(point1x, point1y, point2x, point2y) {
-  const value = (point1y - point2y) / (point1x - point2x);
-  let slope = Math.atan(value) * 180 / Math.PI;
-  if (slope <= 0) slope = -slope;
-  else if (slope > 0) slope = 180 - slope;
-  return slope;
-}
-function getSlopes(point1, point2) {
-  if (!point1 || !point2) return [0, 0];
-  const slopeXY = calculateSlope(point1[0], point1[1], point2[0], point2[1]);
-  if (point1.length === 2) return slopeXY;
-  const slopeYZ = calculateSlope(point1[1], point1[2], point2[1], point2[2]);
-  return [slopeXY, slopeYZ];
-}
-function angleOrientationAt(angle, weightageAt = 1) {
-  let isVertical = 0;
-  let isDiagonal = 0;
-  let isHorizontal = 0;
-  if (angle >= 75 && angle <= 105) isVertical = 1 * weightageAt;
-  else if (angle >= 25 && angle <= 155) isDiagonal = 1 * weightageAt;
-  else isHorizontal = 1 * weightageAt;
-  return [isVertical, isDiagonal, isHorizontal];
-}
-function estimateFingerCurl(startPoint, midPoint, endPoint) {
-  const start_mid_x_dist = startPoint[0] - midPoint[0];
-  const start_end_x_dist = startPoint[0] - endPoint[0];
-  const mid_end_x_dist = midPoint[0] - endPoint[0];
-  const start_mid_y_dist = startPoint[1] - midPoint[1];
-  const start_end_y_dist = startPoint[1] - endPoint[1];
-  const mid_end_y_dist = midPoint[1] - endPoint[1];
-  const start_mid_z_dist = startPoint[2] - midPoint[2];
-  const start_end_z_dist = startPoint[2] - endPoint[2];
-  const mid_end_z_dist = midPoint[2] - endPoint[2];
-  const start_mid_dist = Math.sqrt(start_mid_x_dist * start_mid_x_dist + start_mid_y_dist * start_mid_y_dist + start_mid_z_dist * start_mid_z_dist);
-  const start_end_dist = Math.sqrt(start_end_x_dist * start_end_x_dist + start_end_y_dist * start_end_y_dist + start_end_z_dist * start_end_z_dist);
-  const mid_end_dist = Math.sqrt(mid_end_x_dist * mid_end_x_dist + mid_end_y_dist * mid_end_y_dist + mid_end_z_dist * mid_end_z_dist);
-  let cos_in = (mid_end_dist * mid_end_dist + start_mid_dist * start_mid_dist - start_end_dist * start_end_dist) / (2 * mid_end_dist * start_mid_dist);
-  if (cos_in > 1) cos_in = 1;
-  else if (cos_in < -1) cos_in = -1;
-  let angleOfCurve = Math.acos(cos_in);
-  angleOfCurve = 57.2958 * angleOfCurve % 180;
-  let fingerCurl;
-  if (angleOfCurve > options3.NO_CURL_START_LIMIT) fingerCurl = FingerCurl.none;
-  else if (angleOfCurve > options3.HALF_CURL_START_LIMIT) fingerCurl = FingerCurl.half;
-  else fingerCurl = FingerCurl.full;
-  return fingerCurl;
-}
-function estimateHorizontalDirection(start_end_x_dist, start_mid_x_dist, mid_end_x_dist, max_dist_x) {
-  let estimatedDirection;
-  if (max_dist_x === Math.abs(start_end_x_dist)) {
-    if (start_end_x_dist > 0) estimatedDirection = FingerDirection.horizontalLeft;
-    else estimatedDirection = FingerDirection.horizontalRight;
-  } else if (max_dist_x === Math.abs(start_mid_x_dist)) {
-    if (start_mid_x_dist > 0) estimatedDirection = FingerDirection.horizontalLeft;
-    else estimatedDirection = FingerDirection.horizontalRight;
-  } else {
-    if (mid_end_x_dist > 0) estimatedDirection = FingerDirection.horizontalLeft;
-    else estimatedDirection = FingerDirection.horizontalRight;
-  }
-  return estimatedDirection;
-}
-function estimateVerticalDirection(start_end_y_dist, start_mid_y_dist, mid_end_y_dist, max_dist_y) {
-  let estimatedDirection;
-  if (max_dist_y === Math.abs(start_end_y_dist)) {
-    if (start_end_y_dist < 0) estimatedDirection = FingerDirection.verticalDown;
-    else estimatedDirection = FingerDirection.verticalUp;
-  } else if (max_dist_y === Math.abs(start_mid_y_dist)) {
-    if (start_mid_y_dist < 0) estimatedDirection = FingerDirection.verticalDown;
-    else estimatedDirection = FingerDirection.verticalUp;
-  } else {
-    if (mid_end_y_dist < 0) estimatedDirection = FingerDirection.verticalDown;
-    else estimatedDirection = FingerDirection.verticalUp;
-  }
-  return estimatedDirection;
-}
-function estimateDiagonalDirection(start_end_y_dist, start_mid_y_dist, mid_end_y_dist, max_dist_y, start_end_x_dist, start_mid_x_dist, mid_end_x_dist, max_dist_x) {
-  let estimatedDirection;
-  const reqd_vertical_direction = estimateVerticalDirection(start_end_y_dist, start_mid_y_dist, mid_end_y_dist, max_dist_y);
-  const reqd_horizontal_direction = estimateHorizontalDirection(start_end_x_dist, start_mid_x_dist, mid_end_x_dist, max_dist_x);
-  if (reqd_vertical_direction === FingerDirection.verticalUp) {
-    if (reqd_horizontal_direction === FingerDirection.horizontalLeft) estimatedDirection = FingerDirection.diagonalUpLeft;
-    else estimatedDirection = FingerDirection.diagonalUpRight;
-  } else {
-    if (reqd_horizontal_direction === FingerDirection.horizontalLeft) estimatedDirection = FingerDirection.diagonalDownLeft;
-    else estimatedDirection = FingerDirection.diagonalDownRight;
-  }
-  return estimatedDirection;
-}
-function calculateFingerDirection(startPoint, midPoint, endPoint, fingerSlopes) {
-  const start_mid_x_dist = startPoint[0] - midPoint[0];
-  const start_end_x_dist = startPoint[0] - endPoint[0];
-  const mid_end_x_dist = midPoint[0] - endPoint[0];
-  const start_mid_y_dist = startPoint[1] - midPoint[1];
-  const start_end_y_dist = startPoint[1] - endPoint[1];
-  const mid_end_y_dist = midPoint[1] - endPoint[1];
-  const max_dist_x = Math.max(Math.abs(start_mid_x_dist), Math.abs(start_end_x_dist), Math.abs(mid_end_x_dist));
-  const max_dist_y = Math.max(Math.abs(start_mid_y_dist), Math.abs(start_end_y_dist), Math.abs(mid_end_y_dist));
-  let voteVertical = 0;
-  let voteDiagonal = 0;
-  let voteHorizontal = 0;
-  const start_end_x_y_dist_ratio = max_dist_y / (max_dist_x + 1e-5);
-  if (start_end_x_y_dist_ratio > 1.5) voteVertical += options3.DISTANCE_VOTE_POWER;
-  else if (start_end_x_y_dist_ratio > 0.66) voteDiagonal += options3.DISTANCE_VOTE_POWER;
-  else voteHorizontal += options3.DISTANCE_VOTE_POWER;
-  const start_mid_dist = Math.sqrt(start_mid_x_dist * start_mid_x_dist + start_mid_y_dist * start_mid_y_dist);
-  const start_end_dist = Math.sqrt(start_end_x_dist * start_end_x_dist + start_end_y_dist * start_end_y_dist);
-  const mid_end_dist = Math.sqrt(mid_end_x_dist * mid_end_x_dist + mid_end_y_dist * mid_end_y_dist);
-  const max_dist = Math.max(start_mid_dist, start_end_dist, mid_end_dist);
-  let calc_start_point_x = startPoint[0];
-  let calc_start_point_y = startPoint[1];
-  let calc_end_point_x = endPoint[0];
-  let calc_end_point_y = endPoint[1];
-  if (max_dist === start_mid_dist) {
-    calc_end_point_x = endPoint[0];
-    calc_end_point_y = endPoint[1];
-  } else if (max_dist === mid_end_dist) {
-    calc_start_point_x = midPoint[0];
-    calc_start_point_y = midPoint[1];
-  }
-  const calcStartPoint = [calc_start_point_x, calc_start_point_y];
-  const calcEndPoint = [calc_end_point_x, calc_end_point_y];
-  const totalAngle = getSlopes(calcStartPoint, calcEndPoint);
-  const votes = angleOrientationAt(totalAngle, options3.TOTAL_ANGLE_VOTE_POWER);
-  voteVertical += votes[0];
-  voteDiagonal += votes[1];
-  voteHorizontal += votes[2];
-  for (const fingerSlope of fingerSlopes) {
-    const fingerVotes = angleOrientationAt(fingerSlope, options3.SINGLE_ANGLE_VOTE_POWER);
-    voteVertical += fingerVotes[0];
-    voteDiagonal += fingerVotes[1];
-    voteHorizontal += fingerVotes[2];
-  }
-  let estimatedDirection;
-  if (voteVertical === Math.max(voteVertical, voteDiagonal, voteHorizontal)) {
-    estimatedDirection = estimateVerticalDirection(start_end_y_dist, start_mid_y_dist, mid_end_y_dist, max_dist_y);
-  } else if (voteHorizontal === Math.max(voteDiagonal, voteHorizontal)) {
-    estimatedDirection = estimateHorizontalDirection(start_end_x_dist, start_mid_x_dist, mid_end_x_dist, max_dist_x);
-  } else {
-    estimatedDirection = estimateDiagonalDirection(start_end_y_dist, start_mid_y_dist, mid_end_y_dist, max_dist_y, start_end_x_dist, start_mid_x_dist, mid_end_x_dist, max_dist_x);
-  }
-  return estimatedDirection;
-}
-function estimate(landmarks) {
-  const slopesXY = [];
-  const slopesYZ = [];
-  const fingerCurls = [];
-  const fingerDirections = [];
-  if (!landmarks) return { curls: fingerCurls, directions: fingerDirections };
-  for (const finger of Finger.all) {
-    const points = Finger.getPoints(finger);
-    const slopeAtXY = [];
-    const slopeAtYZ = [];
-    for (const point2 of points) {
-      const point1 = landmarks[point2[0]];
-      const point22 = landmarks[point2[1]];
-      const slopes = getSlopes(point1, point22);
-      const slopeXY = slopes[0];
-      const slopeYZ = slopes[1];
-      slopeAtXY.push(slopeXY);
-      slopeAtYZ.push(slopeYZ);
-    }
-    slopesXY.push(slopeAtXY);
-    slopesYZ.push(slopeAtYZ);
-  }
-  for (const finger of Finger.all) {
-    const pointIndexAt = finger === Finger.thumb ? 1 : 0;
-    const fingerPointsAt = Finger.getPoints(finger);
-    const startPoint = landmarks[fingerPointsAt[pointIndexAt][0]];
-    const midPoint = landmarks[fingerPointsAt[pointIndexAt + 1][1]];
-    const endPoint = landmarks[fingerPointsAt[3][1]];
-    const fingerCurled = estimateFingerCurl(startPoint, midPoint, endPoint);
-    const fingerPosition = calculateFingerDirection(startPoint, midPoint, endPoint, slopesXY[finger].slice(pointIndexAt));
-    fingerCurls[finger] = fingerCurled;
-    fingerDirections[finger] = fingerPosition;
-  }
-  return { curls: fingerCurls, directions: fingerDirections };
-}
-function analyze(keypoints) {
-  if (!keypoints || keypoints.length === 0) return null;
-  const estimatorRes = estimate(keypoints);
-  const landmarks = {};
-  for (const fingerIdx of Finger.all) {
-    landmarks[Finger.getName(fingerIdx)] = {
-      curl: FingerCurl.getName(estimatorRes.curls[fingerIdx]),
-      direction: FingerDirection.getName(estimatorRes.directions[fingerIdx])
-    };
-  }
-  return landmarks;
-}
-function match(keypoints) {
-  const poses = [];
-  if (!keypoints || keypoints.length === 0) return poses;
-  const estimatorRes = estimate(keypoints);
-  for (const gesture2 of fingergesture_default) {
-    const confidence = gesture2.matchAgainst(estimatorRes.curls, estimatorRes.directions);
-    if (confidence >= minConfidence) poses.push({ name: gesture2.name, confidence });
-  }
-  return poses;
-}
-
-// src/gesture/gesture.ts
-var body2 = (res) => {
-  if (!res) return [];
-  const gestures = [];
-  for (let i = 0; i < res.length; i++) {
-    const leftWrist = res[i].keypoints.find((a) => a.part === "leftWrist");
-    const rightWrist = res[i].keypoints.find((a) => a.part === "rightWrist");
-    const nose = res[i].keypoints.find((a) => a.part === "nose");
-    if (nose && leftWrist && rightWrist && leftWrist.position[1] < nose.position[1] && rightWrist.position[1] < nose.position[1]) gestures.push({ body: i, gesture: "i give up" });
-    else if (nose && leftWrist && leftWrist.position[1] < nose.position[1]) gestures.push({ body: i, gesture: "raise left hand" });
-    else if (nose && rightWrist && rightWrist.position[1] < nose.position[1]) gestures.push({ body: i, gesture: "raise right hand" });
-    const leftShoulder = res[i].keypoints.find((a) => a.part === "leftShoulder");
-    const rightShoulder = res[i].keypoints.find((a) => a.part === "rightShoulder");
-    if (leftShoulder && rightShoulder && Math.abs(leftShoulder.positionRaw[1] - rightShoulder.positionRaw[1]) > 0.1) {
-      gestures.push({ body: i, gesture: `leaning ${leftShoulder.position[1] > rightShoulder.position[1] ? "left" : "right"}` });
-    }
-  }
-  return gestures;
-};
-var face2 = (res) => {
-  if (!res) return [];
-  const gestures = [];
-  for (let i = 0; i < res.length; i++) {
-    if (res[i].mesh && res[i].mesh.length > 450) {
-      const zDiff = (res[i].mesh[33][2] || 0) - (res[i].mesh[263][2] || 0);
-      const xDiff = res[i].mesh[33][0] - res[i].mesh[263][0];
-      if (Math.abs(zDiff / xDiff) <= 0.15) gestures.push({ face: i, gesture: "facing center" });
-      else gestures.push({ face: i, gesture: `facing ${zDiff < 0 ? "left" : "right"}` });
-      const openLeft = Math.abs(res[i].mesh[374][1] - res[i].mesh[386][1]) / Math.abs(res[i].mesh[443][1] - res[i].mesh[450][1]);
-      if (openLeft < 0.2) gestures.push({ face: i, gesture: "blink left eye" });
-      const openRight = Math.abs(res[i].mesh[145][1] - res[i].mesh[159][1]) / Math.abs(res[i].mesh[223][1] - res[i].mesh[230][1]);
-      if (openRight < 0.2) gestures.push({ face: i, gesture: "blink right eye" });
-      const mouthOpen = Math.min(100, 500 * Math.abs(res[i].mesh[13][1] - res[i].mesh[14][1]) / Math.abs(res[i].mesh[10][1] - res[i].mesh[152][1]));
-      if (mouthOpen > 10) gestures.push({ face: i, gesture: `mouth ${Math.trunc(mouthOpen)}% open` });
-      const chinDepth = res[i].mesh[152][2] || 0;
-      if (Math.abs(chinDepth) > 10) gestures.push({ face: i, gesture: `head ${chinDepth < 0 ? "up" : "down"}` });
-    }
-  }
-  return gestures;
-};
-var iris2 = (res) => {
-  var _a, _b, _c2, _d2;
-  if (!res) return [];
-  const gestures = [];
-  for (let i = 0; i < res.length; i++) {
-    if (!((_b = (_a = res[i].annotations) == null ? void 0 : _a.leftEyeIris) == null ? void 0 : _b[0]) || !((_d2 = (_c2 = res[i].annotations) == null ? void 0 : _c2.rightEyeIris) == null ? void 0 : _d2[0])) continue;
-    const sizeXLeft = res[i].annotations.leftEyeIris[3][0] - res[i].annotations.leftEyeIris[1][0];
-    const sizeYLeft = res[i].annotations.leftEyeIris[4][1] - res[i].annotations.leftEyeIris[2][1];
-    const areaLeft = Math.abs(sizeXLeft * sizeYLeft);
-    const sizeXRight = res[i].annotations.rightEyeIris[3][0] - res[i].annotations.rightEyeIris[1][0];
-    const sizeYRight = res[i].annotations.rightEyeIris[4][1] - res[i].annotations.rightEyeIris[2][1];
-    const areaRight = Math.abs(sizeXRight * sizeYRight);
-    let center = false;
-    const difference = Math.abs(areaLeft - areaRight) / Math.max(areaLeft, areaRight);
-    if (difference < 0.25) {
-      center = true;
-      gestures.push({ iris: i, gesture: "facing center" });
-    }
-    const leftIrisCenterX = Math.abs(res[i].mesh[263][0] - res[i].annotations.leftEyeIris[0][0]) / res[i].box[2];
-    const rightIrisCenterX = Math.abs(res[i].mesh[33][0] - res[i].annotations.rightEyeIris[0][0]) / res[i].box[2];
-    if (leftIrisCenterX > 0.06 || rightIrisCenterX > 0.06) center = false;
-    if (leftIrisCenterX > rightIrisCenterX) {
-      if (rightIrisCenterX > 0.04) gestures.push({ iris: i, gesture: "looking right" });
-    } else {
-      if (leftIrisCenterX > 0.04) gestures.push({ iris: i, gesture: "looking left" });
-    }
-    const rightIrisCenterY = Math.abs(res[i].mesh[145][1] - res[i].annotations.rightEyeIris[0][1]) / res[i].box[3];
-    const leftIrisCenterY = Math.abs(res[i].mesh[374][1] - res[i].annotations.leftEyeIris[0][1]) / res[i].box[3];
-    if (leftIrisCenterY < 0.01 || rightIrisCenterY < 0.01 || leftIrisCenterY > 0.022 || rightIrisCenterY > 0.022) center = false;
-    if (leftIrisCenterY < 0.01 || rightIrisCenterY < 0.01) gestures.push({ iris: i, gesture: "looking down" });
-    if (leftIrisCenterY > 0.022 || rightIrisCenterY > 0.022) gestures.push({ iris: i, gesture: "looking up" });
-    if (center) gestures.push({ iris: i, gesture: "looking center" });
-  }
-  return gestures;
-};
-var hand2 = (res) => {
-  if (!res) return [];
-  const gestures = [];
-  for (let i = 0; i < res.length; i++) {
-    const fingers = [];
-    if (res[i].annotations) {
-      for (const [finger, pos] of Object.entries(res[i].annotations)) {
-        if (finger !== "palmBase" && Array.isArray(pos) && pos[0]) fingers.push({ name: finger.toLowerCase(), position: pos[0] });
-      }
-    }
-    if (fingers && fingers.length > 0) {
-      const closest = fingers.reduce((best, a) => (best.position[2] || 0) < (a.position[2] || 0) ? best : a);
-      gestures.push({ hand: i, gesture: `${closest.name} forward` });
-      const highest = fingers.reduce((best, a) => best.position[1] < a.position[1] ? best : a);
-      gestures.push({ hand: i, gesture: `${highest.name} up` });
-    }
-    if (res[i].keypoints) {
-      const poses = match(res[i].keypoints);
-      for (const pose of poses) gestures.push({ hand: i, gesture: pose.name });
-    }
-  }
-  return gestures;
-};
-
-// src/hand/handposeutil.ts
-function getBoxSize2(box) {
-  return [
-    Math.abs(box.endPoint[0] - box.startPoint[0]),
-    Math.abs(box.endPoint[1] - box.startPoint[1])
-  ];
-}
-function getBoxCenter2(box) {
-  return [
-    box.startPoint[0] + (box.endPoint[0] - box.startPoint[0]) / 2,
-    box.startPoint[1] + (box.endPoint[1] - box.startPoint[1]) / 2
-  ];
-}
-function cutBoxFromImageAndResize(box, image, cropSize) {
-  const h = image.shape[1];
-  const w8 = image.shape[2];
-  const boxes = [[
-    box.startPoint[1] / h,
-    box.startPoint[0] / w8,
-    box.endPoint[1] / h,
-    box.endPoint[0] / w8
-  ]];
-  return eX.cropAndResize(image, boxes, [0], cropSize);
-}
-function scaleBoxCoordinates2(box, factor) {
-  const startPoint = [box.startPoint[0] * factor[0], box.startPoint[1] * factor[1]];
-  const endPoint = [box.endPoint[0] * factor[0], box.endPoint[1] * factor[1]];
-  const palmLandmarks = box.palmLandmarks.map((coord) => {
-    const scaledCoord = [coord[0] * factor[0], coord[1] * factor[1]];
-    return scaledCoord;
-  });
-  return { startPoint, endPoint, palmLandmarks, confidence: box.confidence };
-}
-function enlargeBox2(box, factor = 1.5) {
-  const center = getBoxCenter2(box);
-  const size2 = getBoxSize2(box);
-  const newHalfSize = [factor * size2[0] / 2, factor * size2[1] / 2];
-  const startPoint = [center[0] - newHalfSize[0], center[1] - newHalfSize[1]];
-  const endPoint = [center[0] + newHalfSize[0], center[1] + newHalfSize[1]];
-  return { startPoint, endPoint, palmLandmarks: box.palmLandmarks };
-}
-function squarifyBox2(box) {
-  const centers = getBoxCenter2(box);
-  const size2 = getBoxSize2(box);
-  const maxEdge = Math.max(...size2);
-  const halfSize = maxEdge / 2;
-  const startPoint = [centers[0] - halfSize, centers[1] - halfSize];
-  const endPoint = [centers[0] + halfSize, centers[1] + halfSize];
-  return { startPoint, endPoint, palmLandmarks: box.palmLandmarks };
-}
-function normalizeRadians2(angle) {
-  return angle - 2 * Math.PI * Math.floor((angle + Math.PI) / (2 * Math.PI));
-}
-function computeRotation2(point1, point2) {
-  const radians = Math.PI / 2 - Math.atan2(-(point2[1] - point1[1]), point2[0] - point1[0]);
-  return normalizeRadians2(radians);
-}
-var buildTranslationMatrix2 = (x, y8) => [[1, 0, x], [0, 1, y8], [0, 0, 1]];
-function dot2(v12, v22) {
-  let product = 0;
-  for (let i = 0; i < v12.length; i++) {
-    product += v12[i] * v22[i];
-  }
-  return product;
-}
-function getColumnFrom2DArr2(arr, columnIndex) {
-  const column = [];
-  for (let i = 0; i < arr.length; i++) {
-    column.push(arr[i][columnIndex]);
-  }
-  return column;
-}
-function multiplyTransformMatrices2(mat1, mat2) {
-  const product = [];
-  const size2 = mat1.length;
-  for (let row = 0; row < size2; row++) {
-    product.push([]);
-    for (let col = 0; col < size2; col++) {
-      product[row].push(dot2(mat1[row], getColumnFrom2DArr2(mat2, col)));
-    }
-  }
-  return product;
-}
-function buildRotationMatrix2(rotation, center) {
-  const cosA = Math.cos(rotation);
-  const sinA = Math.sin(rotation);
-  const rotationMatrix = [[cosA, -sinA, 0], [sinA, cosA, 0], [0, 0, 1]];
-  const translationMatrix = buildTranslationMatrix2(center[0], center[1]);
-  const translationTimesRotation = multiplyTransformMatrices2(translationMatrix, rotationMatrix);
-  const negativeTranslationMatrix = buildTranslationMatrix2(-center[0], -center[1]);
-  return multiplyTransformMatrices2(translationTimesRotation, negativeTranslationMatrix);
-}
-function invertTransformMatrix2(matrix) {
-  const rotationComponent = [[matrix[0][0], matrix[1][0]], [matrix[0][1], matrix[1][1]]];
-  const translationComponent = [matrix[0][2], matrix[1][2]];
-  const invertedTranslation = [
-    -dot2(rotationComponent[0], translationComponent),
-    -dot2(rotationComponent[1], translationComponent)
-  ];
-  return [
-    rotationComponent[0].concat(invertedTranslation[0]),
-    rotationComponent[1].concat(invertedTranslation[1]),
-    [0, 0, 1]
-  ];
-}
-function rotatePoint2(homogeneousCoordinate, rotationMatrix) {
-  return [
-    dot2(homogeneousCoordinate, rotationMatrix[0]),
-    dot2(homogeneousCoordinate, rotationMatrix[1])
-  ];
-}
-
-// src/hand/handposeanchors.ts
-var anchors2 = [
-  { x: 0.015625, y: 0.015625 },
-  { x: 0.015625, y: 0.015625 },
-  { x: 0.046875, y: 0.015625 },
-  { x: 0.046875, y: 0.015625 },
-  { x: 0.078125, y: 0.015625 },
-  { x: 0.078125, y: 0.015625 },
-  { x: 0.109375, y: 0.015625 },
-  { x: 0.109375, y: 0.015625 },
-  { x: 0.140625, y: 0.015625 },
-  { x: 0.140625, y: 0.015625 },
-  { x: 0.171875, y: 0.015625 },
-  { x: 0.171875, y: 0.015625 },
-  { x: 0.203125, y: 0.015625 },
-  { x: 0.203125, y: 0.015625 },
-  { x: 0.234375, y: 0.015625 },
-  { x: 0.234375, y: 0.015625 },
-  { x: 0.265625, y: 0.015625 },
-  { x: 0.265625, y: 0.015625 },
-  { x: 0.296875, y: 0.015625 },
-  { x: 0.296875, y: 0.015625 },
-  { x: 0.328125, y: 0.015625 },
-  { x: 0.328125, y: 0.015625 },
-  { x: 0.359375, y: 0.015625 },
-  { x: 0.359375, y: 0.015625 },
-  { x: 0.390625, y: 0.015625 },
-  { x: 0.390625, y: 0.015625 },
-  { x: 0.421875, y: 0.015625 },
-  { x: 0.421875, y: 0.015625 },
-  { x: 0.453125, y: 0.015625 },
-  { x: 0.453125, y: 0.015625 },
-  { x: 0.484375, y: 0.015625 },
-  { x: 0.484375, y: 0.015625 },
-  { x: 0.515625, y: 0.015625 },
-  { x: 0.515625, y: 0.015625 },
-  { x: 0.546875, y: 0.015625 },
-  { x: 0.546875, y: 0.015625 },
-  { x: 0.578125, y: 0.015625 },
-  { x: 0.578125, y: 0.015625 },
-  { x: 0.609375, y: 0.015625 },
-  { x: 0.609375, y: 0.015625 },
-  { x: 0.640625, y: 0.015625 },
-  { x: 0.640625, y: 0.015625 },
-  { x: 0.671875, y: 0.015625 },
-  { x: 0.671875, y: 0.015625 },
-  { x: 0.703125, y: 0.015625 },
-  { x: 0.703125, y: 0.015625 },
-  { x: 0.734375, y: 0.015625 },
-  { x: 0.734375, y: 0.015625 },
-  { x: 0.765625, y: 0.015625 },
-  { x: 0.765625, y: 0.015625 },
-  { x: 0.796875, y: 0.015625 },
-  { x: 0.796875, y: 0.015625 },
-  { x: 0.828125, y: 0.015625 },
-  { x: 0.828125, y: 0.015625 },
-  { x: 0.859375, y: 0.015625 },
-  { x: 0.859375, y: 0.015625 },
-  { x: 0.890625, y: 0.015625 },
-  { x: 0.890625, y: 0.015625 },
-  { x: 0.921875, y: 0.015625 },
-  { x: 0.921875, y: 0.015625 },
-  { x: 0.953125, y: 0.015625 },
-  { x: 0.953125, y: 0.015625 },
-  { x: 0.984375, y: 0.015625 },
-  { x: 0.984375, y: 0.015625 },
-  { x: 0.015625, y: 0.046875 },
-  { x: 0.015625, y: 0.046875 },
-  { x: 0.046875, y: 0.046875 },
-  { x: 0.046875, y: 0.046875 },
-  { x: 0.078125, y: 0.046875 },
-  { x: 0.078125, y: 0.046875 },
-  { x: 0.109375, y: 0.046875 },
-  { x: 0.109375, y: 0.046875 },
-  { x: 0.140625, y: 0.046875 },
-  { x: 0.140625, y: 0.046875 },
-  { x: 0.171875, y: 0.046875 },
-  { x: 0.171875, y: 0.046875 },
-  { x: 0.203125, y: 0.046875 },
-  { x: 0.203125, y: 0.046875 },
-  { x: 0.234375, y: 0.046875 },
-  { x: 0.234375, y: 0.046875 },
-  { x: 0.265625, y: 0.046875 },
-  { x: 0.265625, y: 0.046875 },
-  { x: 0.296875, y: 0.046875 },
-  { x: 0.296875, y: 0.046875 },
-  { x: 0.328125, y: 0.046875 },
-  { x: 0.328125, y: 0.046875 },
-  { x: 0.359375, y: 0.046875 },
-  { x: 0.359375, y: 0.046875 },
-  { x: 0.390625, y: 0.046875 },
-  { x: 0.390625, y: 0.046875 },
-  { x: 0.421875, y: 0.046875 },
-  { x: 0.421875, y: 0.046875 },
-  { x: 0.453125, y: 0.046875 },
-  { x: 0.453125, y: 0.046875 },
-  { x: 0.484375, y: 0.046875 },
-  { x: 0.484375, y: 0.046875 },
-  { x: 0.515625, y: 0.046875 },
-  { x: 0.515625, y: 0.046875 },
-  { x: 0.546875, y: 0.046875 },
-  { x: 0.546875, y: 0.046875 },
-  { x: 0.578125, y: 0.046875 },
-  { x: 0.578125, y: 0.046875 },
-  { x: 0.609375, y: 0.046875 },
-  { x: 0.609375, y: 0.046875 },
-  { x: 0.640625, y: 0.046875 },
-  { x: 0.640625, y: 0.046875 },
-  { x: 0.671875, y: 0.046875 },
-  { x: 0.671875, y: 0.046875 },
-  { x: 0.703125, y: 0.046875 },
-  { x: 0.703125, y: 0.046875 },
-  { x: 0.734375, y: 0.046875 },
-  { x: 0.734375, y: 0.046875 },
-  { x: 0.765625, y: 0.046875 },
-  { x: 0.765625, y: 0.046875 },
-  { x: 0.796875, y: 0.046875 },
-  { x: 0.796875, y: 0.046875 },
-  { x: 0.828125, y: 0.046875 },
-  { x: 0.828125, y: 0.046875 },
-  { x: 0.859375, y: 0.046875 },
-  { x: 0.859375, y: 0.046875 },
-  { x: 0.890625, y: 0.046875 },
-  { x: 0.890625, y: 0.046875 },
-  { x: 0.921875, y: 0.046875 },
-  { x: 0.921875, y: 0.046875 },
-  { x: 0.953125, y: 0.046875 },
-  { x: 0.953125, y: 0.046875 },
-  { x: 0.984375, y: 0.046875 },
-  { x: 0.984375, y: 0.046875 },
-  { x: 0.015625, y: 0.078125 },
-  { x: 0.015625, y: 0.078125 },
-  { x: 0.046875, y: 0.078125 },
-  { x: 0.046875, y: 0.078125 },
-  { x: 0.078125, y: 0.078125 },
-  { x: 0.078125, y: 0.078125 },
-  { x: 0.109375, y: 0.078125 },
-  { x: 0.109375, y: 0.078125 },
-  { x: 0.140625, y: 0.078125 },
-  { x: 0.140625, y: 0.078125 },
-  { x: 0.171875, y: 0.078125 },
-  { x: 0.171875, y: 0.078125 },
-  { x: 0.203125, y: 0.078125 },
-  { x: 0.203125, y: 0.078125 },
-  { x: 0.234375, y: 0.078125 },
-  { x: 0.234375, y: 0.078125 },
-  { x: 0.265625, y: 0.078125 },
-  { x: 0.265625, y: 0.078125 },
-  { x: 0.296875, y: 0.078125 },
-  { x: 0.296875, y: 0.078125 },
-  { x: 0.328125, y: 0.078125 },
-  { x: 0.328125, y: 0.078125 },
-  { x: 0.359375, y: 0.078125 },
-  { x: 0.359375, y: 0.078125 },
-  { x: 0.390625, y: 0.078125 },
-  { x: 0.390625, y: 0.078125 },
-  { x: 0.421875, y: 0.078125 },
-  { x: 0.421875, y: 0.078125 },
-  { x: 0.453125, y: 0.078125 },
-  { x: 0.453125, y: 0.078125 },
-  { x: 0.484375, y: 0.078125 },
-  { x: 0.484375, y: 0.078125 },
-  { x: 0.515625, y: 0.078125 },
-  { x: 0.515625, y: 0.078125 },
-  { x: 0.546875, y: 0.078125 },
-  { x: 0.546875, y: 0.078125 },
-  { x: 0.578125, y: 0.078125 },
-  { x: 0.578125, y: 0.078125 },
-  { x: 0.609375, y: 0.078125 },
-  { x: 0.609375, y: 0.078125 },
-  { x: 0.640625, y: 0.078125 },
-  { x: 0.640625, y: 0.078125 },
-  { x: 0.671875, y: 0.078125 },
-  { x: 0.671875, y: 0.078125 },
-  { x: 0.703125, y: 0.078125 },
-  { x: 0.703125, y: 0.078125 },
-  { x: 0.734375, y: 0.078125 },
-  { x: 0.734375, y: 0.078125 },
-  { x: 0.765625, y: 0.078125 },
-  { x: 0.765625, y: 0.078125 },
-  { x: 0.796875, y: 0.078125 },
-  { x: 0.796875, y: 0.078125 },
-  { x: 0.828125, y: 0.078125 },
-  { x: 0.828125, y: 0.078125 },
-  { x: 0.859375, y: 0.078125 },
-  { x: 0.859375, y: 0.078125 },
-  { x: 0.890625, y: 0.078125 },
-  { x: 0.890625, y: 0.078125 },
-  { x: 0.921875, y: 0.078125 },
-  { x: 0.921875, y: 0.078125 },
-  { x: 0.953125, y: 0.078125 },
-  { x: 0.953125, y: 0.078125 },
-  { x: 0.984375, y: 0.078125 },
-  { x: 0.984375, y: 0.078125 },
-  { x: 0.015625, y: 0.109375 },
-  { x: 0.015625, y: 0.109375 },
-  { x: 0.046875, y: 0.109375 },
-  { x: 0.046875, y: 0.109375 },
-  { x: 0.078125, y: 0.109375 },
-  { x: 0.078125, y: 0.109375 },
-  { x: 0.109375, y: 0.109375 },
-  { x: 0.109375, y: 0.109375 },
-  { x: 0.140625, y: 0.109375 },
-  { x: 0.140625, y: 0.109375 },
-  { x: 0.171875, y: 0.109375 },
-  { x: 0.171875, y: 0.109375 },
-  { x: 0.203125, y: 0.109375 },
-  { x: 0.203125, y: 0.109375 },
-  { x: 0.234375, y: 0.109375 },
-  { x: 0.234375, y: 0.109375 },
-  { x: 0.265625, y: 0.109375 },
-  { x: 0.265625, y: 0.109375 },
-  { x: 0.296875, y: 0.109375 },
-  { x: 0.296875, y: 0.109375 },
-  { x: 0.328125, y: 0.109375 },
-  { x: 0.328125, y: 0.109375 },
-  { x: 0.359375, y: 0.109375 },
-  { x: 0.359375, y: 0.109375 },
-  { x: 0.390625, y: 0.109375 },
-  { x: 0.390625, y: 0.109375 },
-  { x: 0.421875, y: 0.109375 },
-  { x: 0.421875, y: 0.109375 },
-  { x: 0.453125, y: 0.109375 },
-  { x: 0.453125, y: 0.109375 },
-  { x: 0.484375, y: 0.109375 },
-  { x: 0.484375, y: 0.109375 },
-  { x: 0.515625, y: 0.109375 },
-  { x: 0.515625, y: 0.109375 },
-  { x: 0.546875, y: 0.109375 },
-  { x: 0.546875, y: 0.109375 },
-  { x: 0.578125, y: 0.109375 },
-  { x: 0.578125, y: 0.109375 },
-  { x: 0.609375, y: 0.109375 },
-  { x: 0.609375, y: 0.109375 },
-  { x: 0.640625, y: 0.109375 },
-  { x: 0.640625, y: 0.109375 },
-  { x: 0.671875, y: 0.109375 },
-  { x: 0.671875, y: 0.109375 },
-  { x: 0.703125, y: 0.109375 },
-  { x: 0.703125, y: 0.109375 },
-  { x: 0.734375, y: 0.109375 },
-  { x: 0.734375, y: 0.109375 },
-  { x: 0.765625, y: 0.109375 },
-  { x: 0.765625, y: 0.109375 },
-  { x: 0.796875, y: 0.109375 },
-  { x: 0.796875, y: 0.109375 },
-  { x: 0.828125, y: 0.109375 },
-  { x: 0.828125, y: 0.109375 },
-  { x: 0.859375, y: 0.109375 },
-  { x: 0.859375, y: 0.109375 },
-  { x: 0.890625, y: 0.109375 },
-  { x: 0.890625, y: 0.109375 },
-  { x: 0.921875, y: 0.109375 },
-  { x: 0.921875, y: 0.109375 },
-  { x: 0.953125, y: 0.109375 },
-  { x: 0.953125, y: 0.109375 },
-  { x: 0.984375, y: 0.109375 },
-  { x: 0.984375, y: 0.109375 },
-  { x: 0.015625, y: 0.140625 },
-  { x: 0.015625, y: 0.140625 },
-  { x: 0.046875, y: 0.140625 },
-  { x: 0.046875, y: 0.140625 },
-  { x: 0.078125, y: 0.140625 },
-  { x: 0.078125, y: 0.140625 },
-  { x: 0.109375, y: 0.140625 },
-  { x: 0.109375, y: 0.140625 },
-  { x: 0.140625, y: 0.140625 },
-  { x: 0.140625, y: 0.140625 },
-  { x: 0.171875, y: 0.140625 },
-  { x: 0.171875, y: 0.140625 },
-  { x: 0.203125, y: 0.140625 },
-  { x: 0.203125, y: 0.140625 },
-  { x: 0.234375, y: 0.140625 },
-  { x: 0.234375, y: 0.140625 },
-  { x: 0.265625, y: 0.140625 },
-  { x: 0.265625, y: 0.140625 },
-  { x: 0.296875, y: 0.140625 },
-  { x: 0.296875, y: 0.140625 },
-  { x: 0.328125, y: 0.140625 },
-  { x: 0.328125, y: 0.140625 },
-  { x: 0.359375, y: 0.140625 },
-  { x: 0.359375, y: 0.140625 },
-  { x: 0.390625, y: 0.140625 },
-  { x: 0.390625, y: 0.140625 },
-  { x: 0.421875, y: 0.140625 },
-  { x: 0.421875, y: 0.140625 },
-  { x: 0.453125, y: 0.140625 },
-  { x: 0.453125, y: 0.140625 },
-  { x: 0.484375, y: 0.140625 },
-  { x: 0.484375, y: 0.140625 },
-  { x: 0.515625, y: 0.140625 },
-  { x: 0.515625, y: 0.140625 },
-  { x: 0.546875, y: 0.140625 },
-  { x: 0.546875, y: 0.140625 },
-  { x: 0.578125, y: 0.140625 },
-  { x: 0.578125, y: 0.140625 },
-  { x: 0.609375, y: 0.140625 },
-  { x: 0.609375, y: 0.140625 },
-  { x: 0.640625, y: 0.140625 },
-  { x: 0.640625, y: 0.140625 },
-  { x: 0.671875, y: 0.140625 },
-  { x: 0.671875, y: 0.140625 },
-  { x: 0.703125, y: 0.140625 },
-  { x: 0.703125, y: 0.140625 },
-  { x: 0.734375, y: 0.140625 },
-  { x: 0.734375, y: 0.140625 },
-  { x: 0.765625, y: 0.140625 },
-  { x: 0.765625, y: 0.140625 },
-  { x: 0.796875, y: 0.140625 },
-  { x: 0.796875, y: 0.140625 },
-  { x: 0.828125, y: 0.140625 },
-  { x: 0.828125, y: 0.140625 },
-  { x: 0.859375, y: 0.140625 },
-  { x: 0.859375, y: 0.140625 },
-  { x: 0.890625, y: 0.140625 },
-  { x: 0.890625, y: 0.140625 },
-  { x: 0.921875, y: 0.140625 },
-  { x: 0.921875, y: 0.140625 },
-  { x: 0.953125, y: 0.140625 },
-  { x: 0.953125, y: 0.140625 },
-  { x: 0.984375, y: 0.140625 },
-  { x: 0.984375, y: 0.140625 },
-  { x: 0.015625, y: 0.171875 },
-  { x: 0.015625, y: 0.171875 },
-  { x: 0.046875, y: 0.171875 },
-  { x: 0.046875, y: 0.171875 },
-  { x: 0.078125, y: 0.171875 },
-  { x: 0.078125, y: 0.171875 },
-  { x: 0.109375, y: 0.171875 },
-  { x: 0.109375, y: 0.171875 },
-  { x: 0.140625, y: 0.171875 },
-  { x: 0.140625, y: 0.171875 },
-  { x: 0.171875, y: 0.171875 },
-  { x: 0.171875, y: 0.171875 },
-  { x: 0.203125, y: 0.171875 },
-  { x: 0.203125, y: 0.171875 },
-  { x: 0.234375, y: 0.171875 },
-  { x: 0.234375, y: 0.171875 },
-  { x: 0.265625, y: 0.171875 },
-  { x: 0.265625, y: 0.171875 },
-  { x: 0.296875, y: 0.171875 },
-  { x: 0.296875, y: 0.171875 },
-  { x: 0.328125, y: 0.171875 },
-  { x: 0.328125, y: 0.171875 },
-  { x: 0.359375, y: 0.171875 },
-  { x: 0.359375, y: 0.171875 },
-  { x: 0.390625, y: 0.171875 },
-  { x: 0.390625, y: 0.171875 },
-  { x: 0.421875, y: 0.171875 },
-  { x: 0.421875, y: 0.171875 },
-  { x: 0.453125, y: 0.171875 },
-  { x: 0.453125, y: 0.171875 },
-  { x: 0.484375, y: 0.171875 },
-  { x: 0.484375, y: 0.171875 },
-  { x: 0.515625, y: 0.171875 },
-  { x: 0.515625, y: 0.171875 },
-  { x: 0.546875, y: 0.171875 },
-  { x: 0.546875, y: 0.171875 },
-  { x: 0.578125, y: 0.171875 },
-  { x: 0.578125, y: 0.171875 },
-  { x: 0.609375, y: 0.171875 },
-  { x: 0.609375, y: 0.171875 },
-  { x: 0.640625, y: 0.171875 },
-  { x: 0.640625, y: 0.171875 },
-  { x: 0.671875, y: 0.171875 },
-  { x: 0.671875, y: 0.171875 },
-  { x: 0.703125, y: 0.171875 },
-  { x: 0.703125, y: 0.171875 },
-  { x: 0.734375, y: 0.171875 },
-  { x: 0.734375, y: 0.171875 },
-  { x: 0.765625, y: 0.171875 },
-  { x: 0.765625, y: 0.171875 },
-  { x: 0.796875, y: 0.171875 },
-  { x: 0.796875, y: 0.171875 },
-  { x: 0.828125, y: 0.171875 },
-  { x: 0.828125, y: 0.171875 },
-  { x: 0.859375, y: 0.171875 },
-  { x: 0.859375, y: 0.171875 },
-  { x: 0.890625, y: 0.171875 },
-  { x: 0.890625, y: 0.171875 },
-  { x: 0.921875, y: 0.171875 },
-  { x: 0.921875, y: 0.171875 },
-  { x: 0.953125, y: 0.171875 },
-  { x: 0.953125, y: 0.171875 },
-  { x: 0.984375, y: 0.171875 },
-  { x: 0.984375, y: 0.171875 },
-  { x: 0.015625, y: 0.203125 },
-  { x: 0.015625, y: 0.203125 },
-  { x: 0.046875, y: 0.203125 },
-  { x: 0.046875, y: 0.203125 },
-  { x: 0.078125, y: 0.203125 },
-  { x: 0.078125, y: 0.203125 },
-  { x: 0.109375, y: 0.203125 },
-  { x: 0.109375, y: 0.203125 },
-  { x: 0.140625, y: 0.203125 },
-  { x: 0.140625, y: 0.203125 },
-  { x: 0.171875, y: 0.203125 },
-  { x: 0.171875, y: 0.203125 },
-  { x: 0.203125, y: 0.203125 },
-  { x: 0.203125, y: 0.203125 },
-  { x: 0.234375, y: 0.203125 },
-  { x: 0.234375, y: 0.203125 },
-  { x: 0.265625, y: 0.203125 },
-  { x: 0.265625, y: 0.203125 },
-  { x: 0.296875, y: 0.203125 },
-  { x: 0.296875, y: 0.203125 },
-  { x: 0.328125, y: 0.203125 },
-  { x: 0.328125, y: 0.203125 },
-  { x: 0.359375, y: 0.203125 },
-  { x: 0.359375, y: 0.203125 },
-  { x: 0.390625, y: 0.203125 },
-  { x: 0.390625, y: 0.203125 },
-  { x: 0.421875, y: 0.203125 },
-  { x: 0.421875, y: 0.203125 },
-  { x: 0.453125, y: 0.203125 },
-  { x: 0.453125, y: 0.203125 },
-  { x: 0.484375, y: 0.203125 },
-  { x: 0.484375, y: 0.203125 },
-  { x: 0.515625, y: 0.203125 },
-  { x: 0.515625, y: 0.203125 },
-  { x: 0.546875, y: 0.203125 },
-  { x: 0.546875, y: 0.203125 },
-  { x: 0.578125, y: 0.203125 },
-  { x: 0.578125, y: 0.203125 },
-  { x: 0.609375, y: 0.203125 },
-  { x: 0.609375, y: 0.203125 },
-  { x: 0.640625, y: 0.203125 },
-  { x: 0.640625, y: 0.203125 },
-  { x: 0.671875, y: 0.203125 },
-  { x: 0.671875, y: 0.203125 },
-  { x: 0.703125, y: 0.203125 },
-  { x: 0.703125, y: 0.203125 },
-  { x: 0.734375, y: 0.203125 },
-  { x: 0.734375, y: 0.203125 },
-  { x: 0.765625, y: 0.203125 },
-  { x: 0.765625, y: 0.203125 },
-  { x: 0.796875, y: 0.203125 },
-  { x: 0.796875, y: 0.203125 },
-  { x: 0.828125, y: 0.203125 },
-  { x: 0.828125, y: 0.203125 },
-  { x: 0.859375, y: 0.203125 },
-  { x: 0.859375, y: 0.203125 },
-  { x: 0.890625, y: 0.203125 },
-  { x: 0.890625, y: 0.203125 },
-  { x: 0.921875, y: 0.203125 },
-  { x: 0.921875, y: 0.203125 },
-  { x: 0.953125, y: 0.203125 },
-  { x: 0.953125, y: 0.203125 },
-  { x: 0.984375, y: 0.203125 },
-  { x: 0.984375, y: 0.203125 },
-  { x: 0.015625, y: 0.234375 },
-  { x: 0.015625, y: 0.234375 },
-  { x: 0.046875, y: 0.234375 },
-  { x: 0.046875, y: 0.234375 },
-  { x: 0.078125, y: 0.234375 },
-  { x: 0.078125, y: 0.234375 },
-  { x: 0.109375, y: 0.234375 },
-  { x: 0.109375, y: 0.234375 },
-  { x: 0.140625, y: 0.234375 },
-  { x: 0.140625, y: 0.234375 },
-  { x: 0.171875, y: 0.234375 },
-  { x: 0.171875, y: 0.234375 },
-  { x: 0.203125, y: 0.234375 },
-  { x: 0.203125, y: 0.234375 },
-  { x: 0.234375, y: 0.234375 },
-  { x: 0.234375, y: 0.234375 },
-  { x: 0.265625, y: 0.234375 },
-  { x: 0.265625, y: 0.234375 },
-  { x: 0.296875, y: 0.234375 },
-  { x: 0.296875, y: 0.234375 },
-  { x: 0.328125, y: 0.234375 },
-  { x: 0.328125, y: 0.234375 },
-  { x: 0.359375, y: 0.234375 },
-  { x: 0.359375, y: 0.234375 },
-  { x: 0.390625, y: 0.234375 },
-  { x: 0.390625, y: 0.234375 },
-  { x: 0.421875, y: 0.234375 },
-  { x: 0.421875, y: 0.234375 },
-  { x: 0.453125, y: 0.234375 },
-  { x: 0.453125, y: 0.234375 },
-  { x: 0.484375, y: 0.234375 },
-  { x: 0.484375, y: 0.234375 },
-  { x: 0.515625, y: 0.234375 },
-  { x: 0.515625, y: 0.234375 },
-  { x: 0.546875, y: 0.234375 },
-  { x: 0.546875, y: 0.234375 },
-  { x: 0.578125, y: 0.234375 },
-  { x: 0.578125, y: 0.234375 },
-  { x: 0.609375, y: 0.234375 },
-  { x: 0.609375, y: 0.234375 },
-  { x: 0.640625, y: 0.234375 },
-  { x: 0.640625, y: 0.234375 },
-  { x: 0.671875, y: 0.234375 },
-  { x: 0.671875, y: 0.234375 },
-  { x: 0.703125, y: 0.234375 },
-  { x: 0.703125, y: 0.234375 },
-  { x: 0.734375, y: 0.234375 },
-  { x: 0.734375, y: 0.234375 },
-  { x: 0.765625, y: 0.234375 },
-  { x: 0.765625, y: 0.234375 },
-  { x: 0.796875, y: 0.234375 },
-  { x: 0.796875, y: 0.234375 },
-  { x: 0.828125, y: 0.234375 },
-  { x: 0.828125, y: 0.234375 },
-  { x: 0.859375, y: 0.234375 },
-  { x: 0.859375, y: 0.234375 },
-  { x: 0.890625, y: 0.234375 },
-  { x: 0.890625, y: 0.234375 },
-  { x: 0.921875, y: 0.234375 },
-  { x: 0.921875, y: 0.234375 },
-  { x: 0.953125, y: 0.234375 },
-  { x: 0.953125, y: 0.234375 },
-  { x: 0.984375, y: 0.234375 },
-  { x: 0.984375, y: 0.234375 },
-  { x: 0.015625, y: 0.265625 },
-  { x: 0.015625, y: 0.265625 },
-  { x: 0.046875, y: 0.265625 },
-  { x: 0.046875, y: 0.265625 },
-  { x: 0.078125, y: 0.265625 },
-  { x: 0.078125, y: 0.265625 },
-  { x: 0.109375, y: 0.265625 },
-  { x: 0.109375, y: 0.265625 },
-  { x: 0.140625, y: 0.265625 },
-  { x: 0.140625, y: 0.265625 },
-  { x: 0.171875, y: 0.265625 },
-  { x: 0.171875, y: 0.265625 },
-  { x: 0.203125, y: 0.265625 },
-  { x: 0.203125, y: 0.265625 },
-  { x: 0.234375, y: 0.265625 },
-  { x: 0.234375, y: 0.265625 },
-  { x: 0.265625, y: 0.265625 },
-  { x: 0.265625, y: 0.265625 },
-  { x: 0.296875, y: 0.265625 },
-  { x: 0.296875, y: 0.265625 },
-  { x: 0.328125, y: 0.265625 },
-  { x: 0.328125, y: 0.265625 },
-  { x: 0.359375, y: 0.265625 },
-  { x: 0.359375, y: 0.265625 },
-  { x: 0.390625, y: 0.265625 },
-  { x: 0.390625, y: 0.265625 },
-  { x: 0.421875, y: 0.265625 },
-  { x: 0.421875, y: 0.265625 },
-  { x: 0.453125, y: 0.265625 },
-  { x: 0.453125, y: 0.265625 },
-  { x: 0.484375, y: 0.265625 },
-  { x: 0.484375, y: 0.265625 },
-  { x: 0.515625, y: 0.265625 },
-  { x: 0.515625, y: 0.265625 },
-  { x: 0.546875, y: 0.265625 },
-  { x: 0.546875, y: 0.265625 },
-  { x: 0.578125, y: 0.265625 },
-  { x: 0.578125, y: 0.265625 },
-  { x: 0.609375, y: 0.265625 },
-  { x: 0.609375, y: 0.265625 },
-  { x: 0.640625, y: 0.265625 },
-  { x: 0.640625, y: 0.265625 },
-  { x: 0.671875, y: 0.265625 },
-  { x: 0.671875, y: 0.265625 },
-  { x: 0.703125, y: 0.265625 },
-  { x: 0.703125, y: 0.265625 },
-  { x: 0.734375, y: 0.265625 },
-  { x: 0.734375, y: 0.265625 },
-  { x: 0.765625, y: 0.265625 },
-  { x: 0.765625, y: 0.265625 },
-  { x: 0.796875, y: 0.265625 },
-  { x: 0.796875, y: 0.265625 },
-  { x: 0.828125, y: 0.265625 },
-  { x: 0.828125, y: 0.265625 },
-  { x: 0.859375, y: 0.265625 },
-  { x: 0.859375, y: 0.265625 },
-  { x: 0.890625, y: 0.265625 },
-  { x: 0.890625, y: 0.265625 },
-  { x: 0.921875, y: 0.265625 },
-  { x: 0.921875, y: 0.265625 },
-  { x: 0.953125, y: 0.265625 },
-  { x: 0.953125, y: 0.265625 },
-  { x: 0.984375, y: 0.265625 },
-  { x: 0.984375, y: 0.265625 },
-  { x: 0.015625, y: 0.296875 },
-  { x: 0.015625, y: 0.296875 },
-  { x: 0.046875, y: 0.296875 },
-  { x: 0.046875, y: 0.296875 },
-  { x: 0.078125, y: 0.296875 },
-  { x: 0.078125, y: 0.296875 },
-  { x: 0.109375, y: 0.296875 },
-  { x: 0.109375, y: 0.296875 },
-  { x: 0.140625, y: 0.296875 },
-  { x: 0.140625, y: 0.296875 },
-  { x: 0.171875, y: 0.296875 },
-  { x: 0.171875, y: 0.296875 },
-  { x: 0.203125, y: 0.296875 },
-  { x: 0.203125, y: 0.296875 },
-  { x: 0.234375, y: 0.296875 },
-  { x: 0.234375, y: 0.296875 },
-  { x: 0.265625, y: 0.296875 },
-  { x: 0.265625, y: 0.296875 },
-  { x: 0.296875, y: 0.296875 },
-  { x: 0.296875, y: 0.296875 },
-  { x: 0.328125, y: 0.296875 },
-  { x: 0.328125, y: 0.296875 },
-  { x: 0.359375, y: 0.296875 },
-  { x: 0.359375, y: 0.296875 },
-  { x: 0.390625, y: 0.296875 },
-  { x: 0.390625, y: 0.296875 },
-  { x: 0.421875, y: 0.296875 },
-  { x: 0.421875, y: 0.296875 },
-  { x: 0.453125, y: 0.296875 },
-  { x: 0.453125, y: 0.296875 },
-  { x: 0.484375, y: 0.296875 },
-  { x: 0.484375, y: 0.296875 },
-  { x: 0.515625, y: 0.296875 },
-  { x: 0.515625, y: 0.296875 },
-  { x: 0.546875, y: 0.296875 },
-  { x: 0.546875, y: 0.296875 },
-  { x: 0.578125, y: 0.296875 },
-  { x: 0.578125, y: 0.296875 },
-  { x: 0.609375, y: 0.296875 },
-  { x: 0.609375, y: 0.296875 },
-  { x: 0.640625, y: 0.296875 },
-  { x: 0.640625, y: 0.296875 },
-  { x: 0.671875, y: 0.296875 },
-  { x: 0.671875, y: 0.296875 },
-  { x: 0.703125, y: 0.296875 },
-  { x: 0.703125, y: 0.296875 },
-  { x: 0.734375, y: 0.296875 },
-  { x: 0.734375, y: 0.296875 },
-  { x: 0.765625, y: 0.296875 },
-  { x: 0.765625, y: 0.296875 },
-  { x: 0.796875, y: 0.296875 },
-  { x: 0.796875, y: 0.296875 },
-  { x: 0.828125, y: 0.296875 },
-  { x: 0.828125, y: 0.296875 },
-  { x: 0.859375, y: 0.296875 },
-  { x: 0.859375, y: 0.296875 },
-  { x: 0.890625, y: 0.296875 },
-  { x: 0.890625, y: 0.296875 },
-  { x: 0.921875, y: 0.296875 },
-  { x: 0.921875, y: 0.296875 },
-  { x: 0.953125, y: 0.296875 },
-  { x: 0.953125, y: 0.296875 },
-  { x: 0.984375, y: 0.296875 },
-  { x: 0.984375, y: 0.296875 },
-  { x: 0.015625, y: 0.328125 },
-  { x: 0.015625, y: 0.328125 },
-  { x: 0.046875, y: 0.328125 },
-  { x: 0.046875, y: 0.328125 },
-  { x: 0.078125, y: 0.328125 },
-  { x: 0.078125, y: 0.328125 },
-  { x: 0.109375, y: 0.328125 },
-  { x: 0.109375, y: 0.328125 },
-  { x: 0.140625, y: 0.328125 },
-  { x: 0.140625, y: 0.328125 },
-  { x: 0.171875, y: 0.328125 },
-  { x: 0.171875, y: 0.328125 },
-  { x: 0.203125, y: 0.328125 },
-  { x: 0.203125, y: 0.328125 },
-  { x: 0.234375, y: 0.328125 },
-  { x: 0.234375, y: 0.328125 },
-  { x: 0.265625, y: 0.328125 },
-  { x: 0.265625, y: 0.328125 },
-  { x: 0.296875, y: 0.328125 },
-  { x: 0.296875, y: 0.328125 },
-  { x: 0.328125, y: 0.328125 },
-  { x: 0.328125, y: 0.328125 },
-  { x: 0.359375, y: 0.328125 },
-  { x: 0.359375, y: 0.328125 },
-  { x: 0.390625, y: 0.328125 },
-  { x: 0.390625, y: 0.328125 },
-  { x: 0.421875, y: 0.328125 },
-  { x: 0.421875, y: 0.328125 },
-  { x: 0.453125, y: 0.328125 },
-  { x: 0.453125, y: 0.328125 },
-  { x: 0.484375, y: 0.328125 },
-  { x: 0.484375, y: 0.328125 },
-  { x: 0.515625, y: 0.328125 },
-  { x: 0.515625, y: 0.328125 },
-  { x: 0.546875, y: 0.328125 },
-  { x: 0.546875, y: 0.328125 },
-  { x: 0.578125, y: 0.328125 },
-  { x: 0.578125, y: 0.328125 },
-  { x: 0.609375, y: 0.328125 },
-  { x: 0.609375, y: 0.328125 },
-  { x: 0.640625, y: 0.328125 },
-  { x: 0.640625, y: 0.328125 },
-  { x: 0.671875, y: 0.328125 },
-  { x: 0.671875, y: 0.328125 },
-  { x: 0.703125, y: 0.328125 },
-  { x: 0.703125, y: 0.328125 },
-  { x: 0.734375, y: 0.328125 },
-  { x: 0.734375, y: 0.328125 },
-  { x: 0.765625, y: 0.328125 },
-  { x: 0.765625, y: 0.328125 },
-  { x: 0.796875, y: 0.328125 },
-  { x: 0.796875, y: 0.328125 },
-  { x: 0.828125, y: 0.328125 },
-  { x: 0.828125, y: 0.328125 },
-  { x: 0.859375, y: 0.328125 },
-  { x: 0.859375, y: 0.328125 },
-  { x: 0.890625, y: 0.328125 },
-  { x: 0.890625, y: 0.328125 },
-  { x: 0.921875, y: 0.328125 },
-  { x: 0.921875, y: 0.328125 },
-  { x: 0.953125, y: 0.328125 },
-  { x: 0.953125, y: 0.328125 },
-  { x: 0.984375, y: 0.328125 },
-  { x: 0.984375, y: 0.328125 },
-  { x: 0.015625, y: 0.359375 },
-  { x: 0.015625, y: 0.359375 },
-  { x: 0.046875, y: 0.359375 },
-  { x: 0.046875, y: 0.359375 },
-  { x: 0.078125, y: 0.359375 },
-  { x: 0.078125, y: 0.359375 },
-  { x: 0.109375, y: 0.359375 },
-  { x: 0.109375, y: 0.359375 },
-  { x: 0.140625, y: 0.359375 },
-  { x: 0.140625, y: 0.359375 },
-  { x: 0.171875, y: 0.359375 },
-  { x: 0.171875, y: 0.359375 },
-  { x: 0.203125, y: 0.359375 },
-  { x: 0.203125, y: 0.359375 },
-  { x: 0.234375, y: 0.359375 },
-  { x: 0.234375, y: 0.359375 },
-  { x: 0.265625, y: 0.359375 },
-  { x: 0.265625, y: 0.359375 },
-  { x: 0.296875, y: 0.359375 },
-  { x: 0.296875, y: 0.359375 },
-  { x: 0.328125, y: 0.359375 },
-  { x: 0.328125, y: 0.359375 },
-  { x: 0.359375, y: 0.359375 },
-  { x: 0.359375, y: 0.359375 },
-  { x: 0.390625, y: 0.359375 },
-  { x: 0.390625, y: 0.359375 },
-  { x: 0.421875, y: 0.359375 },
-  { x: 0.421875, y: 0.359375 },
-  { x: 0.453125, y: 0.359375 },
-  { x: 0.453125, y: 0.359375 },
-  { x: 0.484375, y: 0.359375 },
-  { x: 0.484375, y: 0.359375 },
-  { x: 0.515625, y: 0.359375 },
-  { x: 0.515625, y: 0.359375 },
-  { x: 0.546875, y: 0.359375 },
-  { x: 0.546875, y: 0.359375 },
-  { x: 0.578125, y: 0.359375 },
-  { x: 0.578125, y: 0.359375 },
-  { x: 0.609375, y: 0.359375 },
-  { x: 0.609375, y: 0.359375 },
-  { x: 0.640625, y: 0.359375 },
-  { x: 0.640625, y: 0.359375 },
-  { x: 0.671875, y: 0.359375 },
-  { x: 0.671875, y: 0.359375 },
-  { x: 0.703125, y: 0.359375 },
-  { x: 0.703125, y: 0.359375 },
-  { x: 0.734375, y: 0.359375 },
-  { x: 0.734375, y: 0.359375 },
-  { x: 0.765625, y: 0.359375 },
-  { x: 0.765625, y: 0.359375 },
-  { x: 0.796875, y: 0.359375 },
-  { x: 0.796875, y: 0.359375 },
-  { x: 0.828125, y: 0.359375 },
-  { x: 0.828125, y: 0.359375 },
-  { x: 0.859375, y: 0.359375 },
-  { x: 0.859375, y: 0.359375 },
-  { x: 0.890625, y: 0.359375 },
-  { x: 0.890625, y: 0.359375 },
-  { x: 0.921875, y: 0.359375 },
-  { x: 0.921875, y: 0.359375 },
-  { x: 0.953125, y: 0.359375 },
-  { x: 0.953125, y: 0.359375 },
-  { x: 0.984375, y: 0.359375 },
-  { x: 0.984375, y: 0.359375 },
-  { x: 0.015625, y: 0.390625 },
-  { x: 0.015625, y: 0.390625 },
-  { x: 0.046875, y: 0.390625 },
-  { x: 0.046875, y: 0.390625 },
-  { x: 0.078125, y: 0.390625 },
-  { x: 0.078125, y: 0.390625 },
-  { x: 0.109375, y: 0.390625 },
-  { x: 0.109375, y: 0.390625 },
-  { x: 0.140625, y: 0.390625 },
-  { x: 0.140625, y: 0.390625 },
-  { x: 0.171875, y: 0.390625 },
-  { x: 0.171875, y: 0.390625 },
-  { x: 0.203125, y: 0.390625 },
-  { x: 0.203125, y: 0.390625 },
-  { x: 0.234375, y: 0.390625 },
-  { x: 0.234375, y: 0.390625 },
-  { x: 0.265625, y: 0.390625 },
-  { x: 0.265625, y: 0.390625 },
-  { x: 0.296875, y: 0.390625 },
-  { x: 0.296875, y: 0.390625 },
-  { x: 0.328125, y: 0.390625 },
-  { x: 0.328125, y: 0.390625 },
-  { x: 0.359375, y: 0.390625 },
-  { x: 0.359375, y: 0.390625 },
-  { x: 0.390625, y: 0.390625 },
-  { x: 0.390625, y: 0.390625 },
-  { x: 0.421875, y: 0.390625 },
-  { x: 0.421875, y: 0.390625 },
-  { x: 0.453125, y: 0.390625 },
-  { x: 0.453125, y: 0.390625 },
-  { x: 0.484375, y: 0.390625 },
-  { x: 0.484375, y: 0.390625 },
-  { x: 0.515625, y: 0.390625 },
-  { x: 0.515625, y: 0.390625 },
-  { x: 0.546875, y: 0.390625 },
-  { x: 0.546875, y: 0.390625 },
-  { x: 0.578125, y: 0.390625 },
-  { x: 0.578125, y: 0.390625 },
-  { x: 0.609375, y: 0.390625 },
-  { x: 0.609375, y: 0.390625 },
-  { x: 0.640625, y: 0.390625 },
-  { x: 0.640625, y: 0.390625 },
-  { x: 0.671875, y: 0.390625 },
-  { x: 0.671875, y: 0.390625 },
-  { x: 0.703125, y: 0.390625 },
-  { x: 0.703125, y: 0.390625 },
-  { x: 0.734375, y: 0.390625 },
-  { x: 0.734375, y: 0.390625 },
-  { x: 0.765625, y: 0.390625 },
-  { x: 0.765625, y: 0.390625 },
-  { x: 0.796875, y: 0.390625 },
-  { x: 0.796875, y: 0.390625 },
-  { x: 0.828125, y: 0.390625 },
-  { x: 0.828125, y: 0.390625 },
-  { x: 0.859375, y: 0.390625 },
-  { x: 0.859375, y: 0.390625 },
-  { x: 0.890625, y: 0.390625 },
-  { x: 0.890625, y: 0.390625 },
-  { x: 0.921875, y: 0.390625 },
-  { x: 0.921875, y: 0.390625 },
-  { x: 0.953125, y: 0.390625 },
-  { x: 0.953125, y: 0.390625 },
-  { x: 0.984375, y: 0.390625 },
-  { x: 0.984375, y: 0.390625 },
-  { x: 0.015625, y: 0.421875 },
-  { x: 0.015625, y: 0.421875 },
-  { x: 0.046875, y: 0.421875 },
-  { x: 0.046875, y: 0.421875 },
-  { x: 0.078125, y: 0.421875 },
-  { x: 0.078125, y: 0.421875 },
-  { x: 0.109375, y: 0.421875 },
-  { x: 0.109375, y: 0.421875 },
-  { x: 0.140625, y: 0.421875 },
-  { x: 0.140625, y: 0.421875 },
-  { x: 0.171875, y: 0.421875 },
-  { x: 0.171875, y: 0.421875 },
-  { x: 0.203125, y: 0.421875 },
-  { x: 0.203125, y: 0.421875 },
-  { x: 0.234375, y: 0.421875 },
-  { x: 0.234375, y: 0.421875 },
-  { x: 0.265625, y: 0.421875 },
-  { x: 0.265625, y: 0.421875 },
-  { x: 0.296875, y: 0.421875 },
-  { x: 0.296875, y: 0.421875 },
-  { x: 0.328125, y: 0.421875 },
-  { x: 0.328125, y: 0.421875 },
-  { x: 0.359375, y: 0.421875 },
-  { x: 0.359375, y: 0.421875 },
-  { x: 0.390625, y: 0.421875 },
-  { x: 0.390625, y: 0.421875 },
-  { x: 0.421875, y: 0.421875 },
-  { x: 0.421875, y: 0.421875 },
-  { x: 0.453125, y: 0.421875 },
-  { x: 0.453125, y: 0.421875 },
-  { x: 0.484375, y: 0.421875 },
-  { x: 0.484375, y: 0.421875 },
-  { x: 0.515625, y: 0.421875 },
-  { x: 0.515625, y: 0.421875 },
-  { x: 0.546875, y: 0.421875 },
-  { x: 0.546875, y: 0.421875 },
-  { x: 0.578125, y: 0.421875 },
-  { x: 0.578125, y: 0.421875 },
-  { x: 0.609375, y: 0.421875 },
-  { x: 0.609375, y: 0.421875 },
-  { x: 0.640625, y: 0.421875 },
-  { x: 0.640625, y: 0.421875 },
-  { x: 0.671875, y: 0.421875 },
-  { x: 0.671875, y: 0.421875 },
-  { x: 0.703125, y: 0.421875 },
-  { x: 0.703125, y: 0.421875 },
-  { x: 0.734375, y: 0.421875 },
-  { x: 0.734375, y: 0.421875 },
-  { x: 0.765625, y: 0.421875 },
-  { x: 0.765625, y: 0.421875 },
-  { x: 0.796875, y: 0.421875 },
-  { x: 0.796875, y: 0.421875 },
-  { x: 0.828125, y: 0.421875 },
-  { x: 0.828125, y: 0.421875 },
-  { x: 0.859375, y: 0.421875 },
-  { x: 0.859375, y: 0.421875 },
-  { x: 0.890625, y: 0.421875 },
-  { x: 0.890625, y: 0.421875 },
-  { x: 0.921875, y: 0.421875 },
-  { x: 0.921875, y: 0.421875 },
-  { x: 0.953125, y: 0.421875 },
-  { x: 0.953125, y: 0.421875 },
-  { x: 0.984375, y: 0.421875 },
-  { x: 0.984375, y: 0.421875 },
-  { x: 0.015625, y: 0.453125 },
-  { x: 0.015625, y: 0.453125 },
-  { x: 0.046875, y: 0.453125 },
-  { x: 0.046875, y: 0.453125 },
-  { x: 0.078125, y: 0.453125 },
-  { x: 0.078125, y: 0.453125 },
-  { x: 0.109375, y: 0.453125 },
-  { x: 0.109375, y: 0.453125 },
-  { x: 0.140625, y: 0.453125 },
-  { x: 0.140625, y: 0.453125 },
-  { x: 0.171875, y: 0.453125 },
-  { x: 0.171875, y: 0.453125 },
-  { x: 0.203125, y: 0.453125 },
-  { x: 0.203125, y: 0.453125 },
-  { x: 0.234375, y: 0.453125 },
-  { x: 0.234375, y: 0.453125 },
-  { x: 0.265625, y: 0.453125 },
-  { x: 0.265625, y: 0.453125 },
-  { x: 0.296875, y: 0.453125 },
-  { x: 0.296875, y: 0.453125 },
-  { x: 0.328125, y: 0.453125 },
-  { x: 0.328125, y: 0.453125 },
-  { x: 0.359375, y: 0.453125 },
-  { x: 0.359375, y: 0.453125 },
-  { x: 0.390625, y: 0.453125 },
-  { x: 0.390625, y: 0.453125 },
-  { x: 0.421875, y: 0.453125 },
-  { x: 0.421875, y: 0.453125 },
-  { x: 0.453125, y: 0.453125 },
-  { x: 0.453125, y: 0.453125 },
-  { x: 0.484375, y: 0.453125 },
-  { x: 0.484375, y: 0.453125 },
-  { x: 0.515625, y: 0.453125 },
-  { x: 0.515625, y: 0.453125 },
-  { x: 0.546875, y: 0.453125 },
-  { x: 0.546875, y: 0.453125 },
-  { x: 0.578125, y: 0.453125 },
-  { x: 0.578125, y: 0.453125 },
-  { x: 0.609375, y: 0.453125 },
-  { x: 0.609375, y: 0.453125 },
-  { x: 0.640625, y: 0.453125 },
-  { x: 0.640625, y: 0.453125 },
-  { x: 0.671875, y: 0.453125 },
-  { x: 0.671875, y: 0.453125 },
-  { x: 0.703125, y: 0.453125 },
-  { x: 0.703125, y: 0.453125 },
-  { x: 0.734375, y: 0.453125 },
-  { x: 0.734375, y: 0.453125 },
-  { x: 0.765625, y: 0.453125 },
-  { x: 0.765625, y: 0.453125 },
-  { x: 0.796875, y: 0.453125 },
-  { x: 0.796875, y: 0.453125 },
-  { x: 0.828125, y: 0.453125 },
-  { x: 0.828125, y: 0.453125 },
-  { x: 0.859375, y: 0.453125 },
-  { x: 0.859375, y: 0.453125 },
-  { x: 0.890625, y: 0.453125 },
-  { x: 0.890625, y: 0.453125 },
-  { x: 0.921875, y: 0.453125 },
-  { x: 0.921875, y: 0.453125 },
-  { x: 0.953125, y: 0.453125 },
-  { x: 0.953125, y: 0.453125 },
-  { x: 0.984375, y: 0.453125 },
-  { x: 0.984375, y: 0.453125 },
-  { x: 0.015625, y: 0.484375 },
-  { x: 0.015625, y: 0.484375 },
-  { x: 0.046875, y: 0.484375 },
-  { x: 0.046875, y: 0.484375 },
-  { x: 0.078125, y: 0.484375 },
-  { x: 0.078125, y: 0.484375 },
-  { x: 0.109375, y: 0.484375 },
-  { x: 0.109375, y: 0.484375 },
-  { x: 0.140625, y: 0.484375 },
-  { x: 0.140625, y: 0.484375 },
-  { x: 0.171875, y: 0.484375 },
-  { x: 0.171875, y: 0.484375 },
-  { x: 0.203125, y: 0.484375 },
-  { x: 0.203125, y: 0.484375 },
-  { x: 0.234375, y: 0.484375 },
-  { x: 0.234375, y: 0.484375 },
-  { x: 0.265625, y: 0.484375 },
-  { x: 0.265625, y: 0.484375 },
-  { x: 0.296875, y: 0.484375 },
-  { x: 0.296875, y: 0.484375 },
-  { x: 0.328125, y: 0.484375 },
-  { x: 0.328125, y: 0.484375 },
-  { x: 0.359375, y: 0.484375 },
-  { x: 0.359375, y: 0.484375 },
-  { x: 0.390625, y: 0.484375 },
-  { x: 0.390625, y: 0.484375 },
-  { x: 0.421875, y: 0.484375 },
-  { x: 0.421875, y: 0.484375 },
-  { x: 0.453125, y: 0.484375 },
-  { x: 0.453125, y: 0.484375 },
-  { x: 0.484375, y: 0.484375 },
-  { x: 0.484375, y: 0.484375 },
-  { x: 0.515625, y: 0.484375 },
-  { x: 0.515625, y: 0.484375 },
-  { x: 0.546875, y: 0.484375 },
-  { x: 0.546875, y: 0.484375 },
-  { x: 0.578125, y: 0.484375 },
-  { x: 0.578125, y: 0.484375 },
-  { x: 0.609375, y: 0.484375 },
-  { x: 0.609375, y: 0.484375 },
-  { x: 0.640625, y: 0.484375 },
-  { x: 0.640625, y: 0.484375 },
-  { x: 0.671875, y: 0.484375 },
-  { x: 0.671875, y: 0.484375 },
-  { x: 0.703125, y: 0.484375 },
-  { x: 0.703125, y: 0.484375 },
-  { x: 0.734375, y: 0.484375 },
-  { x: 0.734375, y: 0.484375 },
-  { x: 0.765625, y: 0.484375 },
-  { x: 0.765625, y: 0.484375 },
-  { x: 0.796875, y: 0.484375 },
-  { x: 0.796875, y: 0.484375 },
-  { x: 0.828125, y: 0.484375 },
-  { x: 0.828125, y: 0.484375 },
-  { x: 0.859375, y: 0.484375 },
-  { x: 0.859375, y: 0.484375 },
-  { x: 0.890625, y: 0.484375 },
-  { x: 0.890625, y: 0.484375 },
-  { x: 0.921875, y: 0.484375 },
-  { x: 0.921875, y: 0.484375 },
-  { x: 0.953125, y: 0.484375 },
-  { x: 0.953125, y: 0.484375 },
-  { x: 0.984375, y: 0.484375 },
-  { x: 0.984375, y: 0.484375 },
-  { x: 0.015625, y: 0.515625 },
-  { x: 0.015625, y: 0.515625 },
-  { x: 0.046875, y: 0.515625 },
-  { x: 0.046875, y: 0.515625 },
-  { x: 0.078125, y: 0.515625 },
-  { x: 0.078125, y: 0.515625 },
-  { x: 0.109375, y: 0.515625 },
-  { x: 0.109375, y: 0.515625 },
-  { x: 0.140625, y: 0.515625 },
-  { x: 0.140625, y: 0.515625 },
-  { x: 0.171875, y: 0.515625 },
-  { x: 0.171875, y: 0.515625 },
-  { x: 0.203125, y: 0.515625 },
-  { x: 0.203125, y: 0.515625 },
-  { x: 0.234375, y: 0.515625 },
-  { x: 0.234375, y: 0.515625 },
-  { x: 0.265625, y: 0.515625 },
-  { x: 0.265625, y: 0.515625 },
-  { x: 0.296875, y: 0.515625 },
-  { x: 0.296875, y: 0.515625 },
-  { x: 0.328125, y: 0.515625 },
-  { x: 0.328125, y: 0.515625 },
-  { x: 0.359375, y: 0.515625 },
-  { x: 0.359375, y: 0.515625 },
-  { x: 0.390625, y: 0.515625 },
-  { x: 0.390625, y: 0.515625 },
-  { x: 0.421875, y: 0.515625 },
-  { x: 0.421875, y: 0.515625 },
-  { x: 0.453125, y: 0.515625 },
-  { x: 0.453125, y: 0.515625 },
-  { x: 0.484375, y: 0.515625 },
-  { x: 0.484375, y: 0.515625 },
-  { x: 0.515625, y: 0.515625 },
-  { x: 0.515625, y: 0.515625 },
-  { x: 0.546875, y: 0.515625 },
-  { x: 0.546875, y: 0.515625 },
-  { x: 0.578125, y: 0.515625 },
-  { x: 0.578125, y: 0.515625 },
-  { x: 0.609375, y: 0.515625 },
-  { x: 0.609375, y: 0.515625 },
-  { x: 0.640625, y: 0.515625 },
-  { x: 0.640625, y: 0.515625 },
-  { x: 0.671875, y: 0.515625 },
-  { x: 0.671875, y: 0.515625 },
-  { x: 0.703125, y: 0.515625 },
-  { x: 0.703125, y: 0.515625 },
-  { x: 0.734375, y: 0.515625 },
-  { x: 0.734375, y: 0.515625 },
-  { x: 0.765625, y: 0.515625 },
-  { x: 0.765625, y: 0.515625 },
-  { x: 0.796875, y: 0.515625 },
-  { x: 0.796875, y: 0.515625 },
-  { x: 0.828125, y: 0.515625 },
-  { x: 0.828125, y: 0.515625 },
-  { x: 0.859375, y: 0.515625 },
-  { x: 0.859375, y: 0.515625 },
-  { x: 0.890625, y: 0.515625 },
-  { x: 0.890625, y: 0.515625 },
-  { x: 0.921875, y: 0.515625 },
-  { x: 0.921875, y: 0.515625 },
-  { x: 0.953125, y: 0.515625 },
-  { x: 0.953125, y: 0.515625 },
-  { x: 0.984375, y: 0.515625 },
-  { x: 0.984375, y: 0.515625 },
-  { x: 0.015625, y: 0.546875 },
-  { x: 0.015625, y: 0.546875 },
-  { x: 0.046875, y: 0.546875 },
-  { x: 0.046875, y: 0.546875 },
-  { x: 0.078125, y: 0.546875 },
-  { x: 0.078125, y: 0.546875 },
-  { x: 0.109375, y: 0.546875 },
-  { x: 0.109375, y: 0.546875 },
-  { x: 0.140625, y: 0.546875 },
-  { x: 0.140625, y: 0.546875 },
-  { x: 0.171875, y: 0.546875 },
-  { x: 0.171875, y: 0.546875 },
-  { x: 0.203125, y: 0.546875 },
-  { x: 0.203125, y: 0.546875 },
-  { x: 0.234375, y: 0.546875 },
-  { x: 0.234375, y: 0.546875 },
-  { x: 0.265625, y: 0.546875 },
-  { x: 0.265625, y: 0.546875 },
-  { x: 0.296875, y: 0.546875 },
-  { x: 0.296875, y: 0.546875 },
-  { x: 0.328125, y: 0.546875 },
-  { x: 0.328125, y: 0.546875 },
-  { x: 0.359375, y: 0.546875 },
-  { x: 0.359375, y: 0.546875 },
-  { x: 0.390625, y: 0.546875 },
-  { x: 0.390625, y: 0.546875 },
-  { x: 0.421875, y: 0.546875 },
-  { x: 0.421875, y: 0.546875 },
-  { x: 0.453125, y: 0.546875 },
-  { x: 0.453125, y: 0.546875 },
-  { x: 0.484375, y: 0.546875 },
-  { x: 0.484375, y: 0.546875 },
-  { x: 0.515625, y: 0.546875 },
-  { x: 0.515625, y: 0.546875 },
-  { x: 0.546875, y: 0.546875 },
-  { x: 0.546875, y: 0.546875 },
-  { x: 0.578125, y: 0.546875 },
-  { x: 0.578125, y: 0.546875 },
-  { x: 0.609375, y: 0.546875 },
-  { x: 0.609375, y: 0.546875 },
-  { x: 0.640625, y: 0.546875 },
-  { x: 0.640625, y: 0.546875 },
-  { x: 0.671875, y: 0.546875 },
-  { x: 0.671875, y: 0.546875 },
-  { x: 0.703125, y: 0.546875 },
-  { x: 0.703125, y: 0.546875 },
-  { x: 0.734375, y: 0.546875 },
-  { x: 0.734375, y: 0.546875 },
-  { x: 0.765625, y: 0.546875 },
-  { x: 0.765625, y: 0.546875 },
-  { x: 0.796875, y: 0.546875 },
-  { x: 0.796875, y: 0.546875 },
-  { x: 0.828125, y: 0.546875 },
-  { x: 0.828125, y: 0.546875 },
-  { x: 0.859375, y: 0.546875 },
-  { x: 0.859375, y: 0.546875 },
-  { x: 0.890625, y: 0.546875 },
-  { x: 0.890625, y: 0.546875 },
-  { x: 0.921875, y: 0.546875 },
-  { x: 0.921875, y: 0.546875 },
-  { x: 0.953125, y: 0.546875 },
-  { x: 0.953125, y: 0.546875 },
-  { x: 0.984375, y: 0.546875 },
-  { x: 0.984375, y: 0.546875 },
-  { x: 0.015625, y: 0.578125 },
-  { x: 0.015625, y: 0.578125 },
-  { x: 0.046875, y: 0.578125 },
-  { x: 0.046875, y: 0.578125 },
-  { x: 0.078125, y: 0.578125 },
-  { x: 0.078125, y: 0.578125 },
-  { x: 0.109375, y: 0.578125 },
-  { x: 0.109375, y: 0.578125 },
-  { x: 0.140625, y: 0.578125 },
-  { x: 0.140625, y: 0.578125 },
-  { x: 0.171875, y: 0.578125 },
-  { x: 0.171875, y: 0.578125 },
-  { x: 0.203125, y: 0.578125 },
-  { x: 0.203125, y: 0.578125 },
-  { x: 0.234375, y: 0.578125 },
-  { x: 0.234375, y: 0.578125 },
-  { x: 0.265625, y: 0.578125 },
-  { x: 0.265625, y: 0.578125 },
-  { x: 0.296875, y: 0.578125 },
-  { x: 0.296875, y: 0.578125 },
-  { x: 0.328125, y: 0.578125 },
-  { x: 0.328125, y: 0.578125 },
-  { x: 0.359375, y: 0.578125 },
-  { x: 0.359375, y: 0.578125 },
-  { x: 0.390625, y: 0.578125 },
-  { x: 0.390625, y: 0.578125 },
-  { x: 0.421875, y: 0.578125 },
-  { x: 0.421875, y: 0.578125 },
-  { x: 0.453125, y: 0.578125 },
-  { x: 0.453125, y: 0.578125 },
-  { x: 0.484375, y: 0.578125 },
-  { x: 0.484375, y: 0.578125 },
-  { x: 0.515625, y: 0.578125 },
-  { x: 0.515625, y: 0.578125 },
-  { x: 0.546875, y: 0.578125 },
-  { x: 0.546875, y: 0.578125 },
-  { x: 0.578125, y: 0.578125 },
-  { x: 0.578125, y: 0.578125 },
-  { x: 0.609375, y: 0.578125 },
-  { x: 0.609375, y: 0.578125 },
-  { x: 0.640625, y: 0.578125 },
-  { x: 0.640625, y: 0.578125 },
-  { x: 0.671875, y: 0.578125 },
-  { x: 0.671875, y: 0.578125 },
-  { x: 0.703125, y: 0.578125 },
-  { x: 0.703125, y: 0.578125 },
-  { x: 0.734375, y: 0.578125 },
-  { x: 0.734375, y: 0.578125 },
-  { x: 0.765625, y: 0.578125 },
-  { x: 0.765625, y: 0.578125 },
-  { x: 0.796875, y: 0.578125 },
-  { x: 0.796875, y: 0.578125 },
-  { x: 0.828125, y: 0.578125 },
-  { x: 0.828125, y: 0.578125 },
-  { x: 0.859375, y: 0.578125 },
-  { x: 0.859375, y: 0.578125 },
-  { x: 0.890625, y: 0.578125 },
-  { x: 0.890625, y: 0.578125 },
-  { x: 0.921875, y: 0.578125 },
-  { x: 0.921875, y: 0.578125 },
-  { x: 0.953125, y: 0.578125 },
-  { x: 0.953125, y: 0.578125 },
-  { x: 0.984375, y: 0.578125 },
-  { x: 0.984375, y: 0.578125 },
-  { x: 0.015625, y: 0.609375 },
-  { x: 0.015625, y: 0.609375 },
-  { x: 0.046875, y: 0.609375 },
-  { x: 0.046875, y: 0.609375 },
-  { x: 0.078125, y: 0.609375 },
-  { x: 0.078125, y: 0.609375 },
-  { x: 0.109375, y: 0.609375 },
-  { x: 0.109375, y: 0.609375 },
-  { x: 0.140625, y: 0.609375 },
-  { x: 0.140625, y: 0.609375 },
-  { x: 0.171875, y: 0.609375 },
-  { x: 0.171875, y: 0.609375 },
-  { x: 0.203125, y: 0.609375 },
-  { x: 0.203125, y: 0.609375 },
-  { x: 0.234375, y: 0.609375 },
-  { x: 0.234375, y: 0.609375 },
-  { x: 0.265625, y: 0.609375 },
-  { x: 0.265625, y: 0.609375 },
-  { x: 0.296875, y: 0.609375 },
-  { x: 0.296875, y: 0.609375 },
-  { x: 0.328125, y: 0.609375 },
-  { x: 0.328125, y: 0.609375 },
-  { x: 0.359375, y: 0.609375 },
-  { x: 0.359375, y: 0.609375 },
-  { x: 0.390625, y: 0.609375 },
-  { x: 0.390625, y: 0.609375 },
-  { x: 0.421875, y: 0.609375 },
-  { x: 0.421875, y: 0.609375 },
-  { x: 0.453125, y: 0.609375 },
-  { x: 0.453125, y: 0.609375 },
-  { x: 0.484375, y: 0.609375 },
-  { x: 0.484375, y: 0.609375 },
-  { x: 0.515625, y: 0.609375 },
-  { x: 0.515625, y: 0.609375 },
-  { x: 0.546875, y: 0.609375 },
-  { x: 0.546875, y: 0.609375 },
-  { x: 0.578125, y: 0.609375 },
-  { x: 0.578125, y: 0.609375 },
-  { x: 0.609375, y: 0.609375 },
-  { x: 0.609375, y: 0.609375 },
-  { x: 0.640625, y: 0.609375 },
-  { x: 0.640625, y: 0.609375 },
-  { x: 0.671875, y: 0.609375 },
-  { x: 0.671875, y: 0.609375 },
-  { x: 0.703125, y: 0.609375 },
-  { x: 0.703125, y: 0.609375 },
-  { x: 0.734375, y: 0.609375 },
-  { x: 0.734375, y: 0.609375 },
-  { x: 0.765625, y: 0.609375 },
-  { x: 0.765625, y: 0.609375 },
-  { x: 0.796875, y: 0.609375 },
-  { x: 0.796875, y: 0.609375 },
-  { x: 0.828125, y: 0.609375 },
-  { x: 0.828125, y: 0.609375 },
-  { x: 0.859375, y: 0.609375 },
-  { x: 0.859375, y: 0.609375 },
-  { x: 0.890625, y: 0.609375 },
-  { x: 0.890625, y: 0.609375 },
-  { x: 0.921875, y: 0.609375 },
-  { x: 0.921875, y: 0.609375 },
-  { x: 0.953125, y: 0.609375 },
-  { x: 0.953125, y: 0.609375 },
-  { x: 0.984375, y: 0.609375 },
-  { x: 0.984375, y: 0.609375 },
-  { x: 0.015625, y: 0.640625 },
-  { x: 0.015625, y: 0.640625 },
-  { x: 0.046875, y: 0.640625 },
-  { x: 0.046875, y: 0.640625 },
-  { x: 0.078125, y: 0.640625 },
-  { x: 0.078125, y: 0.640625 },
-  { x: 0.109375, y: 0.640625 },
-  { x: 0.109375, y: 0.640625 },
-  { x: 0.140625, y: 0.640625 },
-  { x: 0.140625, y: 0.640625 },
-  { x: 0.171875, y: 0.640625 },
-  { x: 0.171875, y: 0.640625 },
-  { x: 0.203125, y: 0.640625 },
-  { x: 0.203125, y: 0.640625 },
-  { x: 0.234375, y: 0.640625 },
-  { x: 0.234375, y: 0.640625 },
-  { x: 0.265625, y: 0.640625 },
-  { x: 0.265625, y: 0.640625 },
-  { x: 0.296875, y: 0.640625 },
-  { x: 0.296875, y: 0.640625 },
-  { x: 0.328125, y: 0.640625 },
-  { x: 0.328125, y: 0.640625 },
-  { x: 0.359375, y: 0.640625 },
-  { x: 0.359375, y: 0.640625 },
-  { x: 0.390625, y: 0.640625 },
-  { x: 0.390625, y: 0.640625 },
-  { x: 0.421875, y: 0.640625 },
-  { x: 0.421875, y: 0.640625 },
-  { x: 0.453125, y: 0.640625 },
-  { x: 0.453125, y: 0.640625 },
-  { x: 0.484375, y: 0.640625 },
-  { x: 0.484375, y: 0.640625 },
-  { x: 0.515625, y: 0.640625 },
-  { x: 0.515625, y: 0.640625 },
-  { x: 0.546875, y: 0.640625 },
-  { x: 0.546875, y: 0.640625 },
-  { x: 0.578125, y: 0.640625 },
-  { x: 0.578125, y: 0.640625 },
-  { x: 0.609375, y: 0.640625 },
-  { x: 0.609375, y: 0.640625 },
-  { x: 0.640625, y: 0.640625 },
-  { x: 0.640625, y: 0.640625 },
-  { x: 0.671875, y: 0.640625 },
-  { x: 0.671875, y: 0.640625 },
-  { x: 0.703125, y: 0.640625 },
-  { x: 0.703125, y: 0.640625 },
-  { x: 0.734375, y: 0.640625 },
-  { x: 0.734375, y: 0.640625 },
-  { x: 0.765625, y: 0.640625 },
-  { x: 0.765625, y: 0.640625 },
-  { x: 0.796875, y: 0.640625 },
-  { x: 0.796875, y: 0.640625 },
-  { x: 0.828125, y: 0.640625 },
-  { x: 0.828125, y: 0.640625 },
-  { x: 0.859375, y: 0.640625 },
-  { x: 0.859375, y: 0.640625 },
-  { x: 0.890625, y: 0.640625 },
-  { x: 0.890625, y: 0.640625 },
-  { x: 0.921875, y: 0.640625 },
-  { x: 0.921875, y: 0.640625 },
-  { x: 0.953125, y: 0.640625 },
-  { x: 0.953125, y: 0.640625 },
-  { x: 0.984375, y: 0.640625 },
-  { x: 0.984375, y: 0.640625 },
-  { x: 0.015625, y: 0.671875 },
-  { x: 0.015625, y: 0.671875 },
-  { x: 0.046875, y: 0.671875 },
-  { x: 0.046875, y: 0.671875 },
-  { x: 0.078125, y: 0.671875 },
-  { x: 0.078125, y: 0.671875 },
-  { x: 0.109375, y: 0.671875 },
-  { x: 0.109375, y: 0.671875 },
-  { x: 0.140625, y: 0.671875 },
-  { x: 0.140625, y: 0.671875 },
-  { x: 0.171875, y: 0.671875 },
-  { x: 0.171875, y: 0.671875 },
-  { x: 0.203125, y: 0.671875 },
-  { x: 0.203125, y: 0.671875 },
-  { x: 0.234375, y: 0.671875 },
-  { x: 0.234375, y: 0.671875 },
-  { x: 0.265625, y: 0.671875 },
-  { x: 0.265625, y: 0.671875 },
-  { x: 0.296875, y: 0.671875 },
-  { x: 0.296875, y: 0.671875 },
-  { x: 0.328125, y: 0.671875 },
-  { x: 0.328125, y: 0.671875 },
-  { x: 0.359375, y: 0.671875 },
-  { x: 0.359375, y: 0.671875 },
-  { x: 0.390625, y: 0.671875 },
-  { x: 0.390625, y: 0.671875 },
-  { x: 0.421875, y: 0.671875 },
-  { x: 0.421875, y: 0.671875 },
-  { x: 0.453125, y: 0.671875 },
-  { x: 0.453125, y: 0.671875 },
-  { x: 0.484375, y: 0.671875 },
-  { x: 0.484375, y: 0.671875 },
-  { x: 0.515625, y: 0.671875 },
-  { x: 0.515625, y: 0.671875 },
-  { x: 0.546875, y: 0.671875 },
-  { x: 0.546875, y: 0.671875 },
-  { x: 0.578125, y: 0.671875 },
-  { x: 0.578125, y: 0.671875 },
-  { x: 0.609375, y: 0.671875 },
-  { x: 0.609375, y: 0.671875 },
-  { x: 0.640625, y: 0.671875 },
-  { x: 0.640625, y: 0.671875 },
-  { x: 0.671875, y: 0.671875 },
-  { x: 0.671875, y: 0.671875 },
-  { x: 0.703125, y: 0.671875 },
-  { x: 0.703125, y: 0.671875 },
-  { x: 0.734375, y: 0.671875 },
-  { x: 0.734375, y: 0.671875 },
-  { x: 0.765625, y: 0.671875 },
-  { x: 0.765625, y: 0.671875 },
-  { x: 0.796875, y: 0.671875 },
-  { x: 0.796875, y: 0.671875 },
-  { x: 0.828125, y: 0.671875 },
-  { x: 0.828125, y: 0.671875 },
-  { x: 0.859375, y: 0.671875 },
-  { x: 0.859375, y: 0.671875 },
-  { x: 0.890625, y: 0.671875 },
-  { x: 0.890625, y: 0.671875 },
-  { x: 0.921875, y: 0.671875 },
-  { x: 0.921875, y: 0.671875 },
-  { x: 0.953125, y: 0.671875 },
-  { x: 0.953125, y: 0.671875 },
-  { x: 0.984375, y: 0.671875 },
-  { x: 0.984375, y: 0.671875 },
-  { x: 0.015625, y: 0.703125 },
-  { x: 0.015625, y: 0.703125 },
-  { x: 0.046875, y: 0.703125 },
-  { x: 0.046875, y: 0.703125 },
-  { x: 0.078125, y: 0.703125 },
-  { x: 0.078125, y: 0.703125 },
-  { x: 0.109375, y: 0.703125 },
-  { x: 0.109375, y: 0.703125 },
-  { x: 0.140625, y: 0.703125 },
-  { x: 0.140625, y: 0.703125 },
-  { x: 0.171875, y: 0.703125 },
-  { x: 0.171875, y: 0.703125 },
-  { x: 0.203125, y: 0.703125 },
-  { x: 0.203125, y: 0.703125 },
-  { x: 0.234375, y: 0.703125 },
-  { x: 0.234375, y: 0.703125 },
-  { x: 0.265625, y: 0.703125 },
-  { x: 0.265625, y: 0.703125 },
-  { x: 0.296875, y: 0.703125 },
-  { x: 0.296875, y: 0.703125 },
-  { x: 0.328125, y: 0.703125 },
-  { x: 0.328125, y: 0.703125 },
-  { x: 0.359375, y: 0.703125 },
-  { x: 0.359375, y: 0.703125 },
-  { x: 0.390625, y: 0.703125 },
-  { x: 0.390625, y: 0.703125 },
-  { x: 0.421875, y: 0.703125 },
-  { x: 0.421875, y: 0.703125 },
-  { x: 0.453125, y: 0.703125 },
-  { x: 0.453125, y: 0.703125 },
-  { x: 0.484375, y: 0.703125 },
-  { x: 0.484375, y: 0.703125 },
-  { x: 0.515625, y: 0.703125 },
-  { x: 0.515625, y: 0.703125 },
-  { x: 0.546875, y: 0.703125 },
-  { x: 0.546875, y: 0.703125 },
-  { x: 0.578125, y: 0.703125 },
-  { x: 0.578125, y: 0.703125 },
-  { x: 0.609375, y: 0.703125 },
-  { x: 0.609375, y: 0.703125 },
-  { x: 0.640625, y: 0.703125 },
-  { x: 0.640625, y: 0.703125 },
-  { x: 0.671875, y: 0.703125 },
-  { x: 0.671875, y: 0.703125 },
-  { x: 0.703125, y: 0.703125 },
-  { x: 0.703125, y: 0.703125 },
-  { x: 0.734375, y: 0.703125 },
-  { x: 0.734375, y: 0.703125 },
-  { x: 0.765625, y: 0.703125 },
-  { x: 0.765625, y: 0.703125 },
-  { x: 0.796875, y: 0.703125 },
-  { x: 0.796875, y: 0.703125 },
-  { x: 0.828125, y: 0.703125 },
-  { x: 0.828125, y: 0.703125 },
-  { x: 0.859375, y: 0.703125 },
-  { x: 0.859375, y: 0.703125 },
-  { x: 0.890625, y: 0.703125 },
-  { x: 0.890625, y: 0.703125 },
-  { x: 0.921875, y: 0.703125 },
-  { x: 0.921875, y: 0.703125 },
-  { x: 0.953125, y: 0.703125 },
-  { x: 0.953125, y: 0.703125 },
-  { x: 0.984375, y: 0.703125 },
-  { x: 0.984375, y: 0.703125 },
-  { x: 0.015625, y: 0.734375 },
-  { x: 0.015625, y: 0.734375 },
-  { x: 0.046875, y: 0.734375 },
-  { x: 0.046875, y: 0.734375 },
-  { x: 0.078125, y: 0.734375 },
-  { x: 0.078125, y: 0.734375 },
-  { x: 0.109375, y: 0.734375 },
-  { x: 0.109375, y: 0.734375 },
-  { x: 0.140625, y: 0.734375 },
-  { x: 0.140625, y: 0.734375 },
-  { x: 0.171875, y: 0.734375 },
-  { x: 0.171875, y: 0.734375 },
-  { x: 0.203125, y: 0.734375 },
-  { x: 0.203125, y: 0.734375 },
-  { x: 0.234375, y: 0.734375 },
-  { x: 0.234375, y: 0.734375 },
-  { x: 0.265625, y: 0.734375 },
-  { x: 0.265625, y: 0.734375 },
-  { x: 0.296875, y: 0.734375 },
-  { x: 0.296875, y: 0.734375 },
-  { x: 0.328125, y: 0.734375 },
-  { x: 0.328125, y: 0.734375 },
-  { x: 0.359375, y: 0.734375 },
-  { x: 0.359375, y: 0.734375 },
-  { x: 0.390625, y: 0.734375 },
-  { x: 0.390625, y: 0.734375 },
-  { x: 0.421875, y: 0.734375 },
-  { x: 0.421875, y: 0.734375 },
-  { x: 0.453125, y: 0.734375 },
-  { x: 0.453125, y: 0.734375 },
-  { x: 0.484375, y: 0.734375 },
-  { x: 0.484375, y: 0.734375 },
-  { x: 0.515625, y: 0.734375 },
-  { x: 0.515625, y: 0.734375 },
-  { x: 0.546875, y: 0.734375 },
-  { x: 0.546875, y: 0.734375 },
-  { x: 0.578125, y: 0.734375 },
-  { x: 0.578125, y: 0.734375 },
-  { x: 0.609375, y: 0.734375 },
-  { x: 0.609375, y: 0.734375 },
-  { x: 0.640625, y: 0.734375 },
-  { x: 0.640625, y: 0.734375 },
-  { x: 0.671875, y: 0.734375 },
-  { x: 0.671875, y: 0.734375 },
-  { x: 0.703125, y: 0.734375 },
-  { x: 0.703125, y: 0.734375 },
-  { x: 0.734375, y: 0.734375 },
-  { x: 0.734375, y: 0.734375 },
-  { x: 0.765625, y: 0.734375 },
-  { x: 0.765625, y: 0.734375 },
-  { x: 0.796875, y: 0.734375 },
-  { x: 0.796875, y: 0.734375 },
-  { x: 0.828125, y: 0.734375 },
-  { x: 0.828125, y: 0.734375 },
-  { x: 0.859375, y: 0.734375 },
-  { x: 0.859375, y: 0.734375 },
-  { x: 0.890625, y: 0.734375 },
-  { x: 0.890625, y: 0.734375 },
-  { x: 0.921875, y: 0.734375 },
-  { x: 0.921875, y: 0.734375 },
-  { x: 0.953125, y: 0.734375 },
-  { x: 0.953125, y: 0.734375 },
-  { x: 0.984375, y: 0.734375 },
-  { x: 0.984375, y: 0.734375 },
-  { x: 0.015625, y: 0.765625 },
-  { x: 0.015625, y: 0.765625 },
-  { x: 0.046875, y: 0.765625 },
-  { x: 0.046875, y: 0.765625 },
-  { x: 0.078125, y: 0.765625 },
-  { x: 0.078125, y: 0.765625 },
-  { x: 0.109375, y: 0.765625 },
-  { x: 0.109375, y: 0.765625 },
-  { x: 0.140625, y: 0.765625 },
-  { x: 0.140625, y: 0.765625 },
-  { x: 0.171875, y: 0.765625 },
-  { x: 0.171875, y: 0.765625 },
-  { x: 0.203125, y: 0.765625 },
-  { x: 0.203125, y: 0.765625 },
-  { x: 0.234375, y: 0.765625 },
-  { x: 0.234375, y: 0.765625 },
-  { x: 0.265625, y: 0.765625 },
-  { x: 0.265625, y: 0.765625 },
-  { x: 0.296875, y: 0.765625 },
-  { x: 0.296875, y: 0.765625 },
-  { x: 0.328125, y: 0.765625 },
-  { x: 0.328125, y: 0.765625 },
-  { x: 0.359375, y: 0.765625 },
-  { x: 0.359375, y: 0.765625 },
-  { x: 0.390625, y: 0.765625 },
-  { x: 0.390625, y: 0.765625 },
-  { x: 0.421875, y: 0.765625 },
-  { x: 0.421875, y: 0.765625 },
-  { x: 0.453125, y: 0.765625 },
-  { x: 0.453125, y: 0.765625 },
-  { x: 0.484375, y: 0.765625 },
-  { x: 0.484375, y: 0.765625 },
-  { x: 0.515625, y: 0.765625 },
-  { x: 0.515625, y: 0.765625 },
-  { x: 0.546875, y: 0.765625 },
-  { x: 0.546875, y: 0.765625 },
-  { x: 0.578125, y: 0.765625 },
-  { x: 0.578125, y: 0.765625 },
-  { x: 0.609375, y: 0.765625 },
-  { x: 0.609375, y: 0.765625 },
-  { x: 0.640625, y: 0.765625 },
-  { x: 0.640625, y: 0.765625 },
-  { x: 0.671875, y: 0.765625 },
-  { x: 0.671875, y: 0.765625 },
-  { x: 0.703125, y: 0.765625 },
-  { x: 0.703125, y: 0.765625 },
-  { x: 0.734375, y: 0.765625 },
-  { x: 0.734375, y: 0.765625 },
-  { x: 0.765625, y: 0.765625 },
-  { x: 0.765625, y: 0.765625 },
-  { x: 0.796875, y: 0.765625 },
-  { x: 0.796875, y: 0.765625 },
-  { x: 0.828125, y: 0.765625 },
-  { x: 0.828125, y: 0.765625 },
-  { x: 0.859375, y: 0.765625 },
-  { x: 0.859375, y: 0.765625 },
-  { x: 0.890625, y: 0.765625 },
-  { x: 0.890625, y: 0.765625 },
-  { x: 0.921875, y: 0.765625 },
-  { x: 0.921875, y: 0.765625 },
-  { x: 0.953125, y: 0.765625 },
-  { x: 0.953125, y: 0.765625 },
-  { x: 0.984375, y: 0.765625 },
-  { x: 0.984375, y: 0.765625 },
-  { x: 0.015625, y: 0.796875 },
-  { x: 0.015625, y: 0.796875 },
-  { x: 0.046875, y: 0.796875 },
-  { x: 0.046875, y: 0.796875 },
-  { x: 0.078125, y: 0.796875 },
-  { x: 0.078125, y: 0.796875 },
-  { x: 0.109375, y: 0.796875 },
-  { x: 0.109375, y: 0.796875 },
-  { x: 0.140625, y: 0.796875 },
-  { x: 0.140625, y: 0.796875 },
-  { x: 0.171875, y: 0.796875 },
-  { x: 0.171875, y: 0.796875 },
-  { x: 0.203125, y: 0.796875 },
-  { x: 0.203125, y: 0.796875 },
-  { x: 0.234375, y: 0.796875 },
-  { x: 0.234375, y: 0.796875 },
-  { x: 0.265625, y: 0.796875 },
-  { x: 0.265625, y: 0.796875 },
-  { x: 0.296875, y: 0.796875 },
-  { x: 0.296875, y: 0.796875 },
-  { x: 0.328125, y: 0.796875 },
-  { x: 0.328125, y: 0.796875 },
-  { x: 0.359375, y: 0.796875 },
-  { x: 0.359375, y: 0.796875 },
-  { x: 0.390625, y: 0.796875 },
-  { x: 0.390625, y: 0.796875 },
-  { x: 0.421875, y: 0.796875 },
-  { x: 0.421875, y: 0.796875 },
-  { x: 0.453125, y: 0.796875 },
-  { x: 0.453125, y: 0.796875 },
-  { x: 0.484375, y: 0.796875 },
-  { x: 0.484375, y: 0.796875 },
-  { x: 0.515625, y: 0.796875 },
-  { x: 0.515625, y: 0.796875 },
-  { x: 0.546875, y: 0.796875 },
-  { x: 0.546875, y: 0.796875 },
-  { x: 0.578125, y: 0.796875 },
-  { x: 0.578125, y: 0.796875 },
-  { x: 0.609375, y: 0.796875 },
-  { x: 0.609375, y: 0.796875 },
-  { x: 0.640625, y: 0.796875 },
-  { x: 0.640625, y: 0.796875 },
-  { x: 0.671875, y: 0.796875 },
-  { x: 0.671875, y: 0.796875 },
-  { x: 0.703125, y: 0.796875 },
-  { x: 0.703125, y: 0.796875 },
-  { x: 0.734375, y: 0.796875 },
-  { x: 0.734375, y: 0.796875 },
-  { x: 0.765625, y: 0.796875 },
-  { x: 0.765625, y: 0.796875 },
-  { x: 0.796875, y: 0.796875 },
-  { x: 0.796875, y: 0.796875 },
-  { x: 0.828125, y: 0.796875 },
-  { x: 0.828125, y: 0.796875 },
-  { x: 0.859375, y: 0.796875 },
-  { x: 0.859375, y: 0.796875 },
-  { x: 0.890625, y: 0.796875 },
-  { x: 0.890625, y: 0.796875 },
-  { x: 0.921875, y: 0.796875 },
-  { x: 0.921875, y: 0.796875 },
-  { x: 0.953125, y: 0.796875 },
-  { x: 0.953125, y: 0.796875 },
-  { x: 0.984375, y: 0.796875 },
-  { x: 0.984375, y: 0.796875 },
-  { x: 0.015625, y: 0.828125 },
-  { x: 0.015625, y: 0.828125 },
-  { x: 0.046875, y: 0.828125 },
-  { x: 0.046875, y: 0.828125 },
-  { x: 0.078125, y: 0.828125 },
-  { x: 0.078125, y: 0.828125 },
-  { x: 0.109375, y: 0.828125 },
-  { x: 0.109375, y: 0.828125 },
-  { x: 0.140625, y: 0.828125 },
-  { x: 0.140625, y: 0.828125 },
-  { x: 0.171875, y: 0.828125 },
-  { x: 0.171875, y: 0.828125 },
-  { x: 0.203125, y: 0.828125 },
-  { x: 0.203125, y: 0.828125 },
-  { x: 0.234375, y: 0.828125 },
-  { x: 0.234375, y: 0.828125 },
-  { x: 0.265625, y: 0.828125 },
-  { x: 0.265625, y: 0.828125 },
-  { x: 0.296875, y: 0.828125 },
-  { x: 0.296875, y: 0.828125 },
-  { x: 0.328125, y: 0.828125 },
-  { x: 0.328125, y: 0.828125 },
-  { x: 0.359375, y: 0.828125 },
-  { x: 0.359375, y: 0.828125 },
-  { x: 0.390625, y: 0.828125 },
-  { x: 0.390625, y: 0.828125 },
-  { x: 0.421875, y: 0.828125 },
-  { x: 0.421875, y: 0.828125 },
-  { x: 0.453125, y: 0.828125 },
-  { x: 0.453125, y: 0.828125 },
-  { x: 0.484375, y: 0.828125 },
-  { x: 0.484375, y: 0.828125 },
-  { x: 0.515625, y: 0.828125 },
-  { x: 0.515625, y: 0.828125 },
-  { x: 0.546875, y: 0.828125 },
-  { x: 0.546875, y: 0.828125 },
-  { x: 0.578125, y: 0.828125 },
-  { x: 0.578125, y: 0.828125 },
-  { x: 0.609375, y: 0.828125 },
-  { x: 0.609375, y: 0.828125 },
-  { x: 0.640625, y: 0.828125 },
-  { x: 0.640625, y: 0.828125 },
-  { x: 0.671875, y: 0.828125 },
-  { x: 0.671875, y: 0.828125 },
-  { x: 0.703125, y: 0.828125 },
-  { x: 0.703125, y: 0.828125 },
-  { x: 0.734375, y: 0.828125 },
-  { x: 0.734375, y: 0.828125 },
-  { x: 0.765625, y: 0.828125 },
-  { x: 0.765625, y: 0.828125 },
-  { x: 0.796875, y: 0.828125 },
-  { x: 0.796875, y: 0.828125 },
-  { x: 0.828125, y: 0.828125 },
-  { x: 0.828125, y: 0.828125 },
-  { x: 0.859375, y: 0.828125 },
-  { x: 0.859375, y: 0.828125 },
-  { x: 0.890625, y: 0.828125 },
-  { x: 0.890625, y: 0.828125 },
-  { x: 0.921875, y: 0.828125 },
-  { x: 0.921875, y: 0.828125 },
-  { x: 0.953125, y: 0.828125 },
-  { x: 0.953125, y: 0.828125 },
-  { x: 0.984375, y: 0.828125 },
-  { x: 0.984375, y: 0.828125 },
-  { x: 0.015625, y: 0.859375 },
-  { x: 0.015625, y: 0.859375 },
-  { x: 0.046875, y: 0.859375 },
-  { x: 0.046875, y: 0.859375 },
-  { x: 0.078125, y: 0.859375 },
-  { x: 0.078125, y: 0.859375 },
-  { x: 0.109375, y: 0.859375 },
-  { x: 0.109375, y: 0.859375 },
-  { x: 0.140625, y: 0.859375 },
-  { x: 0.140625, y: 0.859375 },
-  { x: 0.171875, y: 0.859375 },
-  { x: 0.171875, y: 0.859375 },
-  { x: 0.203125, y: 0.859375 },
-  { x: 0.203125, y: 0.859375 },
-  { x: 0.234375, y: 0.859375 },
-  { x: 0.234375, y: 0.859375 },
-  { x: 0.265625, y: 0.859375 },
-  { x: 0.265625, y: 0.859375 },
-  { x: 0.296875, y: 0.859375 },
-  { x: 0.296875, y: 0.859375 },
-  { x: 0.328125, y: 0.859375 },
-  { x: 0.328125, y: 0.859375 },
-  { x: 0.359375, y: 0.859375 },
-  { x: 0.359375, y: 0.859375 },
-  { x: 0.390625, y: 0.859375 },
-  { x: 0.390625, y: 0.859375 },
-  { x: 0.421875, y: 0.859375 },
-  { x: 0.421875, y: 0.859375 },
-  { x: 0.453125, y: 0.859375 },
-  { x: 0.453125, y: 0.859375 },
-  { x: 0.484375, y: 0.859375 },
-  { x: 0.484375, y: 0.859375 },
-  { x: 0.515625, y: 0.859375 },
-  { x: 0.515625, y: 0.859375 },
-  { x: 0.546875, y: 0.859375 },
-  { x: 0.546875, y: 0.859375 },
-  { x: 0.578125, y: 0.859375 },
-  { x: 0.578125, y: 0.859375 },
-  { x: 0.609375, y: 0.859375 },
-  { x: 0.609375, y: 0.859375 },
-  { x: 0.640625, y: 0.859375 },
-  { x: 0.640625, y: 0.859375 },
-  { x: 0.671875, y: 0.859375 },
-  { x: 0.671875, y: 0.859375 },
-  { x: 0.703125, y: 0.859375 },
-  { x: 0.703125, y: 0.859375 },
-  { x: 0.734375, y: 0.859375 },
-  { x: 0.734375, y: 0.859375 },
-  { x: 0.765625, y: 0.859375 },
-  { x: 0.765625, y: 0.859375 },
-  { x: 0.796875, y: 0.859375 },
-  { x: 0.796875, y: 0.859375 },
-  { x: 0.828125, y: 0.859375 },
-  { x: 0.828125, y: 0.859375 },
-  { x: 0.859375, y: 0.859375 },
-  { x: 0.859375, y: 0.859375 },
-  { x: 0.890625, y: 0.859375 },
-  { x: 0.890625, y: 0.859375 },
-  { x: 0.921875, y: 0.859375 },
-  { x: 0.921875, y: 0.859375 },
-  { x: 0.953125, y: 0.859375 },
-  { x: 0.953125, y: 0.859375 },
-  { x: 0.984375, y: 0.859375 },
-  { x: 0.984375, y: 0.859375 },
-  { x: 0.015625, y: 0.890625 },
-  { x: 0.015625, y: 0.890625 },
-  { x: 0.046875, y: 0.890625 },
-  { x: 0.046875, y: 0.890625 },
-  { x: 0.078125, y: 0.890625 },
-  { x: 0.078125, y: 0.890625 },
-  { x: 0.109375, y: 0.890625 },
-  { x: 0.109375, y: 0.890625 },
-  { x: 0.140625, y: 0.890625 },
-  { x: 0.140625, y: 0.890625 },
-  { x: 0.171875, y: 0.890625 },
-  { x: 0.171875, y: 0.890625 },
-  { x: 0.203125, y: 0.890625 },
-  { x: 0.203125, y: 0.890625 },
-  { x: 0.234375, y: 0.890625 },
-  { x: 0.234375, y: 0.890625 },
-  { x: 0.265625, y: 0.890625 },
-  { x: 0.265625, y: 0.890625 },
-  { x: 0.296875, y: 0.890625 },
-  { x: 0.296875, y: 0.890625 },
-  { x: 0.328125, y: 0.890625 },
-  { x: 0.328125, y: 0.890625 },
-  { x: 0.359375, y: 0.890625 },
-  { x: 0.359375, y: 0.890625 },
-  { x: 0.390625, y: 0.890625 },
-  { x: 0.390625, y: 0.890625 },
-  { x: 0.421875, y: 0.890625 },
-  { x: 0.421875, y: 0.890625 },
-  { x: 0.453125, y: 0.890625 },
-  { x: 0.453125, y: 0.890625 },
-  { x: 0.484375, y: 0.890625 },
-  { x: 0.484375, y: 0.890625 },
-  { x: 0.515625, y: 0.890625 },
-  { x: 0.515625, y: 0.890625 },
-  { x: 0.546875, y: 0.890625 },
-  { x: 0.546875, y: 0.890625 },
-  { x: 0.578125, y: 0.890625 },
-  { x: 0.578125, y: 0.890625 },
-  { x: 0.609375, y: 0.890625 },
-  { x: 0.609375, y: 0.890625 },
-  { x: 0.640625, y: 0.890625 },
-  { x: 0.640625, y: 0.890625 },
-  { x: 0.671875, y: 0.890625 },
-  { x: 0.671875, y: 0.890625 },
-  { x: 0.703125, y: 0.890625 },
-  { x: 0.703125, y: 0.890625 },
-  { x: 0.734375, y: 0.890625 },
-  { x: 0.734375, y: 0.890625 },
-  { x: 0.765625, y: 0.890625 },
-  { x: 0.765625, y: 0.890625 },
-  { x: 0.796875, y: 0.890625 },
-  { x: 0.796875, y: 0.890625 },
-  { x: 0.828125, y: 0.890625 },
-  { x: 0.828125, y: 0.890625 },
-  { x: 0.859375, y: 0.890625 },
-  { x: 0.859375, y: 0.890625 },
-  { x: 0.890625, y: 0.890625 },
-  { x: 0.890625, y: 0.890625 },
-  { x: 0.921875, y: 0.890625 },
-  { x: 0.921875, y: 0.890625 },
-  { x: 0.953125, y: 0.890625 },
-  { x: 0.953125, y: 0.890625 },
-  { x: 0.984375, y: 0.890625 },
-  { x: 0.984375, y: 0.890625 },
-  { x: 0.015625, y: 0.921875 },
-  { x: 0.015625, y: 0.921875 },
-  { x: 0.046875, y: 0.921875 },
-  { x: 0.046875, y: 0.921875 },
-  { x: 0.078125, y: 0.921875 },
-  { x: 0.078125, y: 0.921875 },
-  { x: 0.109375, y: 0.921875 },
-  { x: 0.109375, y: 0.921875 },
-  { x: 0.140625, y: 0.921875 },
-  { x: 0.140625, y: 0.921875 },
-  { x: 0.171875, y: 0.921875 },
-  { x: 0.171875, y: 0.921875 },
-  { x: 0.203125, y: 0.921875 },
-  { x: 0.203125, y: 0.921875 },
-  { x: 0.234375, y: 0.921875 },
-  { x: 0.234375, y: 0.921875 },
-  { x: 0.265625, y: 0.921875 },
-  { x: 0.265625, y: 0.921875 },
-  { x: 0.296875, y: 0.921875 },
-  { x: 0.296875, y: 0.921875 },
-  { x: 0.328125, y: 0.921875 },
-  { x: 0.328125, y: 0.921875 },
-  { x: 0.359375, y: 0.921875 },
-  { x: 0.359375, y: 0.921875 },
-  { x: 0.390625, y: 0.921875 },
-  { x: 0.390625, y: 0.921875 },
-  { x: 0.421875, y: 0.921875 },
-  { x: 0.421875, y: 0.921875 },
-  { x: 0.453125, y: 0.921875 },
-  { x: 0.453125, y: 0.921875 },
-  { x: 0.484375, y: 0.921875 },
-  { x: 0.484375, y: 0.921875 },
-  { x: 0.515625, y: 0.921875 },
-  { x: 0.515625, y: 0.921875 },
-  { x: 0.546875, y: 0.921875 },
-  { x: 0.546875, y: 0.921875 },
-  { x: 0.578125, y: 0.921875 },
-  { x: 0.578125, y: 0.921875 },
-  { x: 0.609375, y: 0.921875 },
-  { x: 0.609375, y: 0.921875 },
-  { x: 0.640625, y: 0.921875 },
-  { x: 0.640625, y: 0.921875 },
-  { x: 0.671875, y: 0.921875 },
-  { x: 0.671875, y: 0.921875 },
-  { x: 0.703125, y: 0.921875 },
-  { x: 0.703125, y: 0.921875 },
-  { x: 0.734375, y: 0.921875 },
-  { x: 0.734375, y: 0.921875 },
-  { x: 0.765625, y: 0.921875 },
-  { x: 0.765625, y: 0.921875 },
-  { x: 0.796875, y: 0.921875 },
-  { x: 0.796875, y: 0.921875 },
-  { x: 0.828125, y: 0.921875 },
-  { x: 0.828125, y: 0.921875 },
-  { x: 0.859375, y: 0.921875 },
-  { x: 0.859375, y: 0.921875 },
-  { x: 0.890625, y: 0.921875 },
-  { x: 0.890625, y: 0.921875 },
-  { x: 0.921875, y: 0.921875 },
-  { x: 0.921875, y: 0.921875 },
-  { x: 0.953125, y: 0.921875 },
-  { x: 0.953125, y: 0.921875 },
-  { x: 0.984375, y: 0.921875 },
-  { x: 0.984375, y: 0.921875 },
-  { x: 0.015625, y: 0.953125 },
-  { x: 0.015625, y: 0.953125 },
-  { x: 0.046875, y: 0.953125 },
-  { x: 0.046875, y: 0.953125 },
-  { x: 0.078125, y: 0.953125 },
-  { x: 0.078125, y: 0.953125 },
-  { x: 0.109375, y: 0.953125 },
-  { x: 0.109375, y: 0.953125 },
-  { x: 0.140625, y: 0.953125 },
-  { x: 0.140625, y: 0.953125 },
-  { x: 0.171875, y: 0.953125 },
-  { x: 0.171875, y: 0.953125 },
-  { x: 0.203125, y: 0.953125 },
-  { x: 0.203125, y: 0.953125 },
-  { x: 0.234375, y: 0.953125 },
-  { x: 0.234375, y: 0.953125 },
-  { x: 0.265625, y: 0.953125 },
-  { x: 0.265625, y: 0.953125 },
-  { x: 0.296875, y: 0.953125 },
-  { x: 0.296875, y: 0.953125 },
-  { x: 0.328125, y: 0.953125 },
-  { x: 0.328125, y: 0.953125 },
-  { x: 0.359375, y: 0.953125 },
-  { x: 0.359375, y: 0.953125 },
-  { x: 0.390625, y: 0.953125 },
-  { x: 0.390625, y: 0.953125 },
-  { x: 0.421875, y: 0.953125 },
-  { x: 0.421875, y: 0.953125 },
-  { x: 0.453125, y: 0.953125 },
-  { x: 0.453125, y: 0.953125 },
-  { x: 0.484375, y: 0.953125 },
-  { x: 0.484375, y: 0.953125 },
-  { x: 0.515625, y: 0.953125 },
-  { x: 0.515625, y: 0.953125 },
-  { x: 0.546875, y: 0.953125 },
-  { x: 0.546875, y: 0.953125 },
-  { x: 0.578125, y: 0.953125 },
-  { x: 0.578125, y: 0.953125 },
-  { x: 0.609375, y: 0.953125 },
-  { x: 0.609375, y: 0.953125 },
-  { x: 0.640625, y: 0.953125 },
-  { x: 0.640625, y: 0.953125 },
-  { x: 0.671875, y: 0.953125 },
-  { x: 0.671875, y: 0.953125 },
-  { x: 0.703125, y: 0.953125 },
-  { x: 0.703125, y: 0.953125 },
-  { x: 0.734375, y: 0.953125 },
-  { x: 0.734375, y: 0.953125 },
-  { x: 0.765625, y: 0.953125 },
-  { x: 0.765625, y: 0.953125 },
-  { x: 0.796875, y: 0.953125 },
-  { x: 0.796875, y: 0.953125 },
-  { x: 0.828125, y: 0.953125 },
-  { x: 0.828125, y: 0.953125 },
-  { x: 0.859375, y: 0.953125 },
-  { x: 0.859375, y: 0.953125 },
-  { x: 0.890625, y: 0.953125 },
-  { x: 0.890625, y: 0.953125 },
-  { x: 0.921875, y: 0.953125 },
-  { x: 0.921875, y: 0.953125 },
-  { x: 0.953125, y: 0.953125 },
-  { x: 0.953125, y: 0.953125 },
-  { x: 0.984375, y: 0.953125 },
-  { x: 0.984375, y: 0.953125 },
-  { x: 0.015625, y: 0.984375 },
-  { x: 0.015625, y: 0.984375 },
-  { x: 0.046875, y: 0.984375 },
-  { x: 0.046875, y: 0.984375 },
-  { x: 0.078125, y: 0.984375 },
-  { x: 0.078125, y: 0.984375 },
-  { x: 0.109375, y: 0.984375 },
-  { x: 0.109375, y: 0.984375 },
-  { x: 0.140625, y: 0.984375 },
-  { x: 0.140625, y: 0.984375 },
-  { x: 0.171875, y: 0.984375 },
-  { x: 0.171875, y: 0.984375 },
-  { x: 0.203125, y: 0.984375 },
-  { x: 0.203125, y: 0.984375 },
-  { x: 0.234375, y: 0.984375 },
-  { x: 0.234375, y: 0.984375 },
-  { x: 0.265625, y: 0.984375 },
-  { x: 0.265625, y: 0.984375 },
-  { x: 0.296875, y: 0.984375 },
-  { x: 0.296875, y: 0.984375 },
-  { x: 0.328125, y: 0.984375 },
-  { x: 0.328125, y: 0.984375 },
-  { x: 0.359375, y: 0.984375 },
-  { x: 0.359375, y: 0.984375 },
-  { x: 0.390625, y: 0.984375 },
-  { x: 0.390625, y: 0.984375 },
-  { x: 0.421875, y: 0.984375 },
-  { x: 0.421875, y: 0.984375 },
-  { x: 0.453125, y: 0.984375 },
-  { x: 0.453125, y: 0.984375 },
-  { x: 0.484375, y: 0.984375 },
-  { x: 0.484375, y: 0.984375 },
-  { x: 0.515625, y: 0.984375 },
-  { x: 0.515625, y: 0.984375 },
-  { x: 0.546875, y: 0.984375 },
-  { x: 0.546875, y: 0.984375 },
-  { x: 0.578125, y: 0.984375 },
-  { x: 0.578125, y: 0.984375 },
-  { x: 0.609375, y: 0.984375 },
-  { x: 0.609375, y: 0.984375 },
-  { x: 0.640625, y: 0.984375 },
-  { x: 0.640625, y: 0.984375 },
-  { x: 0.671875, y: 0.984375 },
-  { x: 0.671875, y: 0.984375 },
-  { x: 0.703125, y: 0.984375 },
-  { x: 0.703125, y: 0.984375 },
-  { x: 0.734375, y: 0.984375 },
-  { x: 0.734375, y: 0.984375 },
-  { x: 0.765625, y: 0.984375 },
-  { x: 0.765625, y: 0.984375 },
-  { x: 0.796875, y: 0.984375 },
-  { x: 0.796875, y: 0.984375 },
-  { x: 0.828125, y: 0.984375 },
-  { x: 0.828125, y: 0.984375 },
-  { x: 0.859375, y: 0.984375 },
-  { x: 0.859375, y: 0.984375 },
-  { x: 0.890625, y: 0.984375 },
-  { x: 0.890625, y: 0.984375 },
-  { x: 0.921875, y: 0.984375 },
-  { x: 0.921875, y: 0.984375 },
-  { x: 0.953125, y: 0.984375 },
-  { x: 0.953125, y: 0.984375 },
-  { x: 0.984375, y: 0.984375 },
-  { x: 0.984375, y: 0.984375 },
-  { x: 0.03125, y: 0.03125 },
-  { x: 0.03125, y: 0.03125 },
-  { x: 0.09375, y: 0.03125 },
-  { x: 0.09375, y: 0.03125 },
-  { x: 0.15625, y: 0.03125 },
-  { x: 0.15625, y: 0.03125 },
-  { x: 0.21875, y: 0.03125 },
-  { x: 0.21875, y: 0.03125 },
-  { x: 0.28125, y: 0.03125 },
-  { x: 0.28125, y: 0.03125 },
-  { x: 0.34375, y: 0.03125 },
-  { x: 0.34375, y: 0.03125 },
-  { x: 0.40625, y: 0.03125 },
-  { x: 0.40625, y: 0.03125 },
-  { x: 0.46875, y: 0.03125 },
-  { x: 0.46875, y: 0.03125 },
-  { x: 0.53125, y: 0.03125 },
-  { x: 0.53125, y: 0.03125 },
-  { x: 0.59375, y: 0.03125 },
-  { x: 0.59375, y: 0.03125 },
-  { x: 0.65625, y: 0.03125 },
-  { x: 0.65625, y: 0.03125 },
-  { x: 0.71875, y: 0.03125 },
-  { x: 0.71875, y: 0.03125 },
-  { x: 0.78125, y: 0.03125 },
-  { x: 0.78125, y: 0.03125 },
-  { x: 0.84375, y: 0.03125 },
-  { x: 0.84375, y: 0.03125 },
-  { x: 0.90625, y: 0.03125 },
-  { x: 0.90625, y: 0.03125 },
-  { x: 0.96875, y: 0.03125 },
-  { x: 0.96875, y: 0.03125 },
-  { x: 0.03125, y: 0.09375 },
-  { x: 0.03125, y: 0.09375 },
-  { x: 0.09375, y: 0.09375 },
-  { x: 0.09375, y: 0.09375 },
-  { x: 0.15625, y: 0.09375 },
-  { x: 0.15625, y: 0.09375 },
-  { x: 0.21875, y: 0.09375 },
-  { x: 0.21875, y: 0.09375 },
-  { x: 0.28125, y: 0.09375 },
-  { x: 0.28125, y: 0.09375 },
-  { x: 0.34375, y: 0.09375 },
-  { x: 0.34375, y: 0.09375 },
-  { x: 0.40625, y: 0.09375 },
-  { x: 0.40625, y: 0.09375 },
-  { x: 0.46875, y: 0.09375 },
-  { x: 0.46875, y: 0.09375 },
-  { x: 0.53125, y: 0.09375 },
-  { x: 0.53125, y: 0.09375 },
-  { x: 0.59375, y: 0.09375 },
-  { x: 0.59375, y: 0.09375 },
-  { x: 0.65625, y: 0.09375 },
-  { x: 0.65625, y: 0.09375 },
-  { x: 0.71875, y: 0.09375 },
-  { x: 0.71875, y: 0.09375 },
-  { x: 0.78125, y: 0.09375 },
-  { x: 0.78125, y: 0.09375 },
-  { x: 0.84375, y: 0.09375 },
-  { x: 0.84375, y: 0.09375 },
-  { x: 0.90625, y: 0.09375 },
-  { x: 0.90625, y: 0.09375 },
-  { x: 0.96875, y: 0.09375 },
-  { x: 0.96875, y: 0.09375 },
-  { x: 0.03125, y: 0.15625 },
-  { x: 0.03125, y: 0.15625 },
-  { x: 0.09375, y: 0.15625 },
-  { x: 0.09375, y: 0.15625 },
-  { x: 0.15625, y: 0.15625 },
-  { x: 0.15625, y: 0.15625 },
-  { x: 0.21875, y: 0.15625 },
-  { x: 0.21875, y: 0.15625 },
-  { x: 0.28125, y: 0.15625 },
-  { x: 0.28125, y: 0.15625 },
-  { x: 0.34375, y: 0.15625 },
-  { x: 0.34375, y: 0.15625 },
-  { x: 0.40625, y: 0.15625 },
-  { x: 0.40625, y: 0.15625 },
-  { x: 0.46875, y: 0.15625 },
-  { x: 0.46875, y: 0.15625 },
-  { x: 0.53125, y: 0.15625 },
-  { x: 0.53125, y: 0.15625 },
-  { x: 0.59375, y: 0.15625 },
-  { x: 0.59375, y: 0.15625 },
-  { x: 0.65625, y: 0.15625 },
-  { x: 0.65625, y: 0.15625 },
-  { x: 0.71875, y: 0.15625 },
-  { x: 0.71875, y: 0.15625 },
-  { x: 0.78125, y: 0.15625 },
-  { x: 0.78125, y: 0.15625 },
-  { x: 0.84375, y: 0.15625 },
-  { x: 0.84375, y: 0.15625 },
-  { x: 0.90625, y: 0.15625 },
-  { x: 0.90625, y: 0.15625 },
-  { x: 0.96875, y: 0.15625 },
-  { x: 0.96875, y: 0.15625 },
-  { x: 0.03125, y: 0.21875 },
-  { x: 0.03125, y: 0.21875 },
-  { x: 0.09375, y: 0.21875 },
-  { x: 0.09375, y: 0.21875 },
-  { x: 0.15625, y: 0.21875 },
-  { x: 0.15625, y: 0.21875 },
-  { x: 0.21875, y: 0.21875 },
-  { x: 0.21875, y: 0.21875 },
-  { x: 0.28125, y: 0.21875 },
-  { x: 0.28125, y: 0.21875 },
-  { x: 0.34375, y: 0.21875 },
-  { x: 0.34375, y: 0.21875 },
-  { x: 0.40625, y: 0.21875 },
-  { x: 0.40625, y: 0.21875 },
-  { x: 0.46875, y: 0.21875 },
-  { x: 0.46875, y: 0.21875 },
-  { x: 0.53125, y: 0.21875 },
-  { x: 0.53125, y: 0.21875 },
-  { x: 0.59375, y: 0.21875 },
-  { x: 0.59375, y: 0.21875 },
-  { x: 0.65625, y: 0.21875 },
-  { x: 0.65625, y: 0.21875 },
-  { x: 0.71875, y: 0.21875 },
-  { x: 0.71875, y: 0.21875 },
-  { x: 0.78125, y: 0.21875 },
-  { x: 0.78125, y: 0.21875 },
-  { x: 0.84375, y: 0.21875 },
-  { x: 0.84375, y: 0.21875 },
-  { x: 0.90625, y: 0.21875 },
-  { x: 0.90625, y: 0.21875 },
-  { x: 0.96875, y: 0.21875 },
-  { x: 0.96875, y: 0.21875 },
-  { x: 0.03125, y: 0.28125 },
-  { x: 0.03125, y: 0.28125 },
-  { x: 0.09375, y: 0.28125 },
-  { x: 0.09375, y: 0.28125 },
-  { x: 0.15625, y: 0.28125 },
-  { x: 0.15625, y: 0.28125 },
-  { x: 0.21875, y: 0.28125 },
-  { x: 0.21875, y: 0.28125 },
-  { x: 0.28125, y: 0.28125 },
-  { x: 0.28125, y: 0.28125 },
-  { x: 0.34375, y: 0.28125 },
-  { x: 0.34375, y: 0.28125 },
-  { x: 0.40625, y: 0.28125 },
-  { x: 0.40625, y: 0.28125 },
-  { x: 0.46875, y: 0.28125 },
-  { x: 0.46875, y: 0.28125 },
-  { x: 0.53125, y: 0.28125 },
-  { x: 0.53125, y: 0.28125 },
-  { x: 0.59375, y: 0.28125 },
-  { x: 0.59375, y: 0.28125 },
-  { x: 0.65625, y: 0.28125 },
-  { x: 0.65625, y: 0.28125 },
-  { x: 0.71875, y: 0.28125 },
-  { x: 0.71875, y: 0.28125 },
-  { x: 0.78125, y: 0.28125 },
-  { x: 0.78125, y: 0.28125 },
-  { x: 0.84375, y: 0.28125 },
-  { x: 0.84375, y: 0.28125 },
-  { x: 0.90625, y: 0.28125 },
-  { x: 0.90625, y: 0.28125 },
-  { x: 0.96875, y: 0.28125 },
-  { x: 0.96875, y: 0.28125 },
-  { x: 0.03125, y: 0.34375 },
-  { x: 0.03125, y: 0.34375 },
-  { x: 0.09375, y: 0.34375 },
-  { x: 0.09375, y: 0.34375 },
-  { x: 0.15625, y: 0.34375 },
-  { x: 0.15625, y: 0.34375 },
-  { x: 0.21875, y: 0.34375 },
-  { x: 0.21875, y: 0.34375 },
-  { x: 0.28125, y: 0.34375 },
-  { x: 0.28125, y: 0.34375 },
-  { x: 0.34375, y: 0.34375 },
-  { x: 0.34375, y: 0.34375 },
-  { x: 0.40625, y: 0.34375 },
-  { x: 0.40625, y: 0.34375 },
-  { x: 0.46875, y: 0.34375 },
-  { x: 0.46875, y: 0.34375 },
-  { x: 0.53125, y: 0.34375 },
-  { x: 0.53125, y: 0.34375 },
-  { x: 0.59375, y: 0.34375 },
-  { x: 0.59375, y: 0.34375 },
-  { x: 0.65625, y: 0.34375 },
-  { x: 0.65625, y: 0.34375 },
-  { x: 0.71875, y: 0.34375 },
-  { x: 0.71875, y: 0.34375 },
-  { x: 0.78125, y: 0.34375 },
-  { x: 0.78125, y: 0.34375 },
-  { x: 0.84375, y: 0.34375 },
-  { x: 0.84375, y: 0.34375 },
-  { x: 0.90625, y: 0.34375 },
-  { x: 0.90625, y: 0.34375 },
-  { x: 0.96875, y: 0.34375 },
-  { x: 0.96875, y: 0.34375 },
-  { x: 0.03125, y: 0.40625 },
-  { x: 0.03125, y: 0.40625 },
-  { x: 0.09375, y: 0.40625 },
-  { x: 0.09375, y: 0.40625 },
-  { x: 0.15625, y: 0.40625 },
-  { x: 0.15625, y: 0.40625 },
-  { x: 0.21875, y: 0.40625 },
-  { x: 0.21875, y: 0.40625 },
-  { x: 0.28125, y: 0.40625 },
-  { x: 0.28125, y: 0.40625 },
-  { x: 0.34375, y: 0.40625 },
-  { x: 0.34375, y: 0.40625 },
-  { x: 0.40625, y: 0.40625 },
-  { x: 0.40625, y: 0.40625 },
-  { x: 0.46875, y: 0.40625 },
-  { x: 0.46875, y: 0.40625 },
-  { x: 0.53125, y: 0.40625 },
-  { x: 0.53125, y: 0.40625 },
-  { x: 0.59375, y: 0.40625 },
-  { x: 0.59375, y: 0.40625 },
-  { x: 0.65625, y: 0.40625 },
-  { x: 0.65625, y: 0.40625 },
-  { x: 0.71875, y: 0.40625 },
-  { x: 0.71875, y: 0.40625 },
-  { x: 0.78125, y: 0.40625 },
-  { x: 0.78125, y: 0.40625 },
-  { x: 0.84375, y: 0.40625 },
-  { x: 0.84375, y: 0.40625 },
-  { x: 0.90625, y: 0.40625 },
-  { x: 0.90625, y: 0.40625 },
-  { x: 0.96875, y: 0.40625 },
-  { x: 0.96875, y: 0.40625 },
-  { x: 0.03125, y: 0.46875 },
-  { x: 0.03125, y: 0.46875 },
-  { x: 0.09375, y: 0.46875 },
-  { x: 0.09375, y: 0.46875 },
-  { x: 0.15625, y: 0.46875 },
-  { x: 0.15625, y: 0.46875 },
-  { x: 0.21875, y: 0.46875 },
-  { x: 0.21875, y: 0.46875 },
-  { x: 0.28125, y: 0.46875 },
-  { x: 0.28125, y: 0.46875 },
-  { x: 0.34375, y: 0.46875 },
-  { x: 0.34375, y: 0.46875 },
-  { x: 0.40625, y: 0.46875 },
-  { x: 0.40625, y: 0.46875 },
-  { x: 0.46875, y: 0.46875 },
-  { x: 0.46875, y: 0.46875 },
-  { x: 0.53125, y: 0.46875 },
-  { x: 0.53125, y: 0.46875 },
-  { x: 0.59375, y: 0.46875 },
-  { x: 0.59375, y: 0.46875 },
-  { x: 0.65625, y: 0.46875 },
-  { x: 0.65625, y: 0.46875 },
-  { x: 0.71875, y: 0.46875 },
-  { x: 0.71875, y: 0.46875 },
-  { x: 0.78125, y: 0.46875 },
-  { x: 0.78125, y: 0.46875 },
-  { x: 0.84375, y: 0.46875 },
-  { x: 0.84375, y: 0.46875 },
-  { x: 0.90625, y: 0.46875 },
-  { x: 0.90625, y: 0.46875 },
-  { x: 0.96875, y: 0.46875 },
-  { x: 0.96875, y: 0.46875 },
-  { x: 0.03125, y: 0.53125 },
-  { x: 0.03125, y: 0.53125 },
-  { x: 0.09375, y: 0.53125 },
-  { x: 0.09375, y: 0.53125 },
-  { x: 0.15625, y: 0.53125 },
-  { x: 0.15625, y: 0.53125 },
-  { x: 0.21875, y: 0.53125 },
-  { x: 0.21875, y: 0.53125 },
-  { x: 0.28125, y: 0.53125 },
-  { x: 0.28125, y: 0.53125 },
-  { x: 0.34375, y: 0.53125 },
-  { x: 0.34375, y: 0.53125 },
-  { x: 0.40625, y: 0.53125 },
-  { x: 0.40625, y: 0.53125 },
-  { x: 0.46875, y: 0.53125 },
-  { x: 0.46875, y: 0.53125 },
-  { x: 0.53125, y: 0.53125 },
-  { x: 0.53125, y: 0.53125 },
-  { x: 0.59375, y: 0.53125 },
-  { x: 0.59375, y: 0.53125 },
-  { x: 0.65625, y: 0.53125 },
-  { x: 0.65625, y: 0.53125 },
-  { x: 0.71875, y: 0.53125 },
-  { x: 0.71875, y: 0.53125 },
-  { x: 0.78125, y: 0.53125 },
-  { x: 0.78125, y: 0.53125 },
-  { x: 0.84375, y: 0.53125 },
-  { x: 0.84375, y: 0.53125 },
-  { x: 0.90625, y: 0.53125 },
-  { x: 0.90625, y: 0.53125 },
-  { x: 0.96875, y: 0.53125 },
-  { x: 0.96875, y: 0.53125 },
-  { x: 0.03125, y: 0.59375 },
-  { x: 0.03125, y: 0.59375 },
-  { x: 0.09375, y: 0.59375 },
-  { x: 0.09375, y: 0.59375 },
-  { x: 0.15625, y: 0.59375 },
-  { x: 0.15625, y: 0.59375 },
-  { x: 0.21875, y: 0.59375 },
-  { x: 0.21875, y: 0.59375 },
-  { x: 0.28125, y: 0.59375 },
-  { x: 0.28125, y: 0.59375 },
-  { x: 0.34375, y: 0.59375 },
-  { x: 0.34375, y: 0.59375 },
-  { x: 0.40625, y: 0.59375 },
-  { x: 0.40625, y: 0.59375 },
-  { x: 0.46875, y: 0.59375 },
-  { x: 0.46875, y: 0.59375 },
-  { x: 0.53125, y: 0.59375 },
-  { x: 0.53125, y: 0.59375 },
-  { x: 0.59375, y: 0.59375 },
-  { x: 0.59375, y: 0.59375 },
-  { x: 0.65625, y: 0.59375 },
-  { x: 0.65625, y: 0.59375 },
-  { x: 0.71875, y: 0.59375 },
-  { x: 0.71875, y: 0.59375 },
-  { x: 0.78125, y: 0.59375 },
-  { x: 0.78125, y: 0.59375 },
-  { x: 0.84375, y: 0.59375 },
-  { x: 0.84375, y: 0.59375 },
-  { x: 0.90625, y: 0.59375 },
-  { x: 0.90625, y: 0.59375 },
-  { x: 0.96875, y: 0.59375 },
-  { x: 0.96875, y: 0.59375 },
-  { x: 0.03125, y: 0.65625 },
-  { x: 0.03125, y: 0.65625 },
-  { x: 0.09375, y: 0.65625 },
-  { x: 0.09375, y: 0.65625 },
-  { x: 0.15625, y: 0.65625 },
-  { x: 0.15625, y: 0.65625 },
-  { x: 0.21875, y: 0.65625 },
-  { x: 0.21875, y: 0.65625 },
-  { x: 0.28125, y: 0.65625 },
-  { x: 0.28125, y: 0.65625 },
-  { x: 0.34375, y: 0.65625 },
-  { x: 0.34375, y: 0.65625 },
-  { x: 0.40625, y: 0.65625 },
-  { x: 0.40625, y: 0.65625 },
-  { x: 0.46875, y: 0.65625 },
-  { x: 0.46875, y: 0.65625 },
-  { x: 0.53125, y: 0.65625 },
-  { x: 0.53125, y: 0.65625 },
-  { x: 0.59375, y: 0.65625 },
-  { x: 0.59375, y: 0.65625 },
-  { x: 0.65625, y: 0.65625 },
-  { x: 0.65625, y: 0.65625 },
-  { x: 0.71875, y: 0.65625 },
-  { x: 0.71875, y: 0.65625 },
-  { x: 0.78125, y: 0.65625 },
-  { x: 0.78125, y: 0.65625 },
-  { x: 0.84375, y: 0.65625 },
-  { x: 0.84375, y: 0.65625 },
-  { x: 0.90625, y: 0.65625 },
-  { x: 0.90625, y: 0.65625 },
-  { x: 0.96875, y: 0.65625 },
-  { x: 0.96875, y: 0.65625 },
-  { x: 0.03125, y: 0.71875 },
-  { x: 0.03125, y: 0.71875 },
-  { x: 0.09375, y: 0.71875 },
-  { x: 0.09375, y: 0.71875 },
-  { x: 0.15625, y: 0.71875 },
-  { x: 0.15625, y: 0.71875 },
-  { x: 0.21875, y: 0.71875 },
-  { x: 0.21875, y: 0.71875 },
-  { x: 0.28125, y: 0.71875 },
-  { x: 0.28125, y: 0.71875 },
-  { x: 0.34375, y: 0.71875 },
-  { x: 0.34375, y: 0.71875 },
-  { x: 0.40625, y: 0.71875 },
-  { x: 0.40625, y: 0.71875 },
-  { x: 0.46875, y: 0.71875 },
-  { x: 0.46875, y: 0.71875 },
-  { x: 0.53125, y: 0.71875 },
-  { x: 0.53125, y: 0.71875 },
-  { x: 0.59375, y: 0.71875 },
-  { x: 0.59375, y: 0.71875 },
-  { x: 0.65625, y: 0.71875 },
-  { x: 0.65625, y: 0.71875 },
-  { x: 0.71875, y: 0.71875 },
-  { x: 0.71875, y: 0.71875 },
-  { x: 0.78125, y: 0.71875 },
-  { x: 0.78125, y: 0.71875 },
-  { x: 0.84375, y: 0.71875 },
-  { x: 0.84375, y: 0.71875 },
-  { x: 0.90625, y: 0.71875 },
-  { x: 0.90625, y: 0.71875 },
-  { x: 0.96875, y: 0.71875 },
-  { x: 0.96875, y: 0.71875 },
-  { x: 0.03125, y: 0.78125 },
-  { x: 0.03125, y: 0.78125 },
-  { x: 0.09375, y: 0.78125 },
-  { x: 0.09375, y: 0.78125 },
-  { x: 0.15625, y: 0.78125 },
-  { x: 0.15625, y: 0.78125 },
-  { x: 0.21875, y: 0.78125 },
-  { x: 0.21875, y: 0.78125 },
-  { x: 0.28125, y: 0.78125 },
-  { x: 0.28125, y: 0.78125 },
-  { x: 0.34375, y: 0.78125 },
-  { x: 0.34375, y: 0.78125 },
-  { x: 0.40625, y: 0.78125 },
-  { x: 0.40625, y: 0.78125 },
-  { x: 0.46875, y: 0.78125 },
-  { x: 0.46875, y: 0.78125 },
-  { x: 0.53125, y: 0.78125 },
-  { x: 0.53125, y: 0.78125 },
-  { x: 0.59375, y: 0.78125 },
-  { x: 0.59375, y: 0.78125 },
-  { x: 0.65625, y: 0.78125 },
-  { x: 0.65625, y: 0.78125 },
-  { x: 0.71875, y: 0.78125 },
-  { x: 0.71875, y: 0.78125 },
-  { x: 0.78125, y: 0.78125 },
-  { x: 0.78125, y: 0.78125 },
-  { x: 0.84375, y: 0.78125 },
-  { x: 0.84375, y: 0.78125 },
-  { x: 0.90625, y: 0.78125 },
-  { x: 0.90625, y: 0.78125 },
-  { x: 0.96875, y: 0.78125 },
-  { x: 0.96875, y: 0.78125 },
-  { x: 0.03125, y: 0.84375 },
-  { x: 0.03125, y: 0.84375 },
-  { x: 0.09375, y: 0.84375 },
-  { x: 0.09375, y: 0.84375 },
-  { x: 0.15625, y: 0.84375 },
-  { x: 0.15625, y: 0.84375 },
-  { x: 0.21875, y: 0.84375 },
-  { x: 0.21875, y: 0.84375 },
-  { x: 0.28125, y: 0.84375 },
-  { x: 0.28125, y: 0.84375 },
-  { x: 0.34375, y: 0.84375 },
-  { x: 0.34375, y: 0.84375 },
-  { x: 0.40625, y: 0.84375 },
-  { x: 0.40625, y: 0.84375 },
-  { x: 0.46875, y: 0.84375 },
-  { x: 0.46875, y: 0.84375 },
-  { x: 0.53125, y: 0.84375 },
-  { x: 0.53125, y: 0.84375 },
-  { x: 0.59375, y: 0.84375 },
-  { x: 0.59375, y: 0.84375 },
-  { x: 0.65625, y: 0.84375 },
-  { x: 0.65625, y: 0.84375 },
-  { x: 0.71875, y: 0.84375 },
-  { x: 0.71875, y: 0.84375 },
-  { x: 0.78125, y: 0.84375 },
-  { x: 0.78125, y: 0.84375 },
-  { x: 0.84375, y: 0.84375 },
-  { x: 0.84375, y: 0.84375 },
-  { x: 0.90625, y: 0.84375 },
-  { x: 0.90625, y: 0.84375 },
-  { x: 0.96875, y: 0.84375 },
-  { x: 0.96875, y: 0.84375 },
-  { x: 0.03125, y: 0.90625 },
-  { x: 0.03125, y: 0.90625 },
-  { x: 0.09375, y: 0.90625 },
-  { x: 0.09375, y: 0.90625 },
-  { x: 0.15625, y: 0.90625 },
-  { x: 0.15625, y: 0.90625 },
-  { x: 0.21875, y: 0.90625 },
-  { x: 0.21875, y: 0.90625 },
-  { x: 0.28125, y: 0.90625 },
-  { x: 0.28125, y: 0.90625 },
-  { x: 0.34375, y: 0.90625 },
-  { x: 0.34375, y: 0.90625 },
-  { x: 0.40625, y: 0.90625 },
-  { x: 0.40625, y: 0.90625 },
-  { x: 0.46875, y: 0.90625 },
-  { x: 0.46875, y: 0.90625 },
-  { x: 0.53125, y: 0.90625 },
-  { x: 0.53125, y: 0.90625 },
-  { x: 0.59375, y: 0.90625 },
-  { x: 0.59375, y: 0.90625 },
-  { x: 0.65625, y: 0.90625 },
-  { x: 0.65625, y: 0.90625 },
-  { x: 0.71875, y: 0.90625 },
-  { x: 0.71875, y: 0.90625 },
-  { x: 0.78125, y: 0.90625 },
-  { x: 0.78125, y: 0.90625 },
-  { x: 0.84375, y: 0.90625 },
-  { x: 0.84375, y: 0.90625 },
-  { x: 0.90625, y: 0.90625 },
-  { x: 0.90625, y: 0.90625 },
-  { x: 0.96875, y: 0.90625 },
-  { x: 0.96875, y: 0.90625 },
-  { x: 0.03125, y: 0.96875 },
-  { x: 0.03125, y: 0.96875 },
-  { x: 0.09375, y: 0.96875 },
-  { x: 0.09375, y: 0.96875 },
-  { x: 0.15625, y: 0.96875 },
-  { x: 0.15625, y: 0.96875 },
-  { x: 0.21875, y: 0.96875 },
-  { x: 0.21875, y: 0.96875 },
-  { x: 0.28125, y: 0.96875 },
-  { x: 0.28125, y: 0.96875 },
-  { x: 0.34375, y: 0.96875 },
-  { x: 0.34375, y: 0.96875 },
-  { x: 0.40625, y: 0.96875 },
-  { x: 0.40625, y: 0.96875 },
-  { x: 0.46875, y: 0.96875 },
-  { x: 0.46875, y: 0.96875 },
-  { x: 0.53125, y: 0.96875 },
-  { x: 0.53125, y: 0.96875 },
-  { x: 0.59375, y: 0.96875 },
-  { x: 0.59375, y: 0.96875 },
-  { x: 0.65625, y: 0.96875 },
-  { x: 0.65625, y: 0.96875 },
-  { x: 0.71875, y: 0.96875 },
-  { x: 0.71875, y: 0.96875 },
-  { x: 0.78125, y: 0.96875 },
-  { x: 0.78125, y: 0.96875 },
-  { x: 0.84375, y: 0.96875 },
-  { x: 0.84375, y: 0.96875 },
-  { x: 0.90625, y: 0.96875 },
-  { x: 0.90625, y: 0.96875 },
-  { x: 0.96875, y: 0.96875 },
-  { x: 0.96875, y: 0.96875 },
-  { x: 0.0625, y: 0.0625 },
-  { x: 0.0625, y: 0.0625 },
-  { x: 0.0625, y: 0.0625 },
-  { x: 0.0625, y: 0.0625 },
-  { x: 0.0625, y: 0.0625 },
-  { x: 0.0625, y: 0.0625 },
-  { x: 0.1875, y: 0.0625 },
-  { x: 0.1875, y: 0.0625 },
-  { x: 0.1875, y: 0.0625 },
-  { x: 0.1875, y: 0.0625 },
-  { x: 0.1875, y: 0.0625 },
-  { x: 0.1875, y: 0.0625 },
-  { x: 0.3125, y: 0.0625 },
-  { x: 0.3125, y: 0.0625 },
-  { x: 0.3125, y: 0.0625 },
-  { x: 0.3125, y: 0.0625 },
-  { x: 0.3125, y: 0.0625 },
-  { x: 0.3125, y: 0.0625 },
-  { x: 0.4375, y: 0.0625 },
-  { x: 0.4375, y: 0.0625 },
-  { x: 0.4375, y: 0.0625 },
-  { x: 0.4375, y: 0.0625 },
-  { x: 0.4375, y: 0.0625 },
-  { x: 0.4375, y: 0.0625 },
-  { x: 0.5625, y: 0.0625 },
-  { x: 0.5625, y: 0.0625 },
-  { x: 0.5625, y: 0.0625 },
-  { x: 0.5625, y: 0.0625 },
-  { x: 0.5625, y: 0.0625 },
-  { x: 0.5625, y: 0.0625 },
-  { x: 0.6875, y: 0.0625 },
-  { x: 0.6875, y: 0.0625 },
-  { x: 0.6875, y: 0.0625 },
-  { x: 0.6875, y: 0.0625 },
-  { x: 0.6875, y: 0.0625 },
-  { x: 0.6875, y: 0.0625 },
-  { x: 0.8125, y: 0.0625 },
-  { x: 0.8125, y: 0.0625 },
-  { x: 0.8125, y: 0.0625 },
-  { x: 0.8125, y: 0.0625 },
-  { x: 0.8125, y: 0.0625 },
-  { x: 0.8125, y: 0.0625 },
-  { x: 0.9375, y: 0.0625 },
-  { x: 0.9375, y: 0.0625 },
-  { x: 0.9375, y: 0.0625 },
-  { x: 0.9375, y: 0.0625 },
-  { x: 0.9375, y: 0.0625 },
-  { x: 0.9375, y: 0.0625 },
-  { x: 0.0625, y: 0.1875 },
-  { x: 0.0625, y: 0.1875 },
-  { x: 0.0625, y: 0.1875 },
-  { x: 0.0625, y: 0.1875 },
-  { x: 0.0625, y: 0.1875 },
-  { x: 0.0625, y: 0.1875 },
-  { x: 0.1875, y: 0.1875 },
-  { x: 0.1875, y: 0.1875 },
-  { x: 0.1875, y: 0.1875 },
-  { x: 0.1875, y: 0.1875 },
-  { x: 0.1875, y: 0.1875 },
-  { x: 0.1875, y: 0.1875 },
-  { x: 0.3125, y: 0.1875 },
-  { x: 0.3125, y: 0.1875 },
-  { x: 0.3125, y: 0.1875 },
-  { x: 0.3125, y: 0.1875 },
-  { x: 0.3125, y: 0.1875 },
-  { x: 0.3125, y: 0.1875 },
-  { x: 0.4375, y: 0.1875 },
-  { x: 0.4375, y: 0.1875 },
-  { x: 0.4375, y: 0.1875 },
-  { x: 0.4375, y: 0.1875 },
-  { x: 0.4375, y: 0.1875 },
-  { x: 0.4375, y: 0.1875 },
-  { x: 0.5625, y: 0.1875 },
-  { x: 0.5625, y: 0.1875 },
-  { x: 0.5625, y: 0.1875 },
-  { x: 0.5625, y: 0.1875 },
-  { x: 0.5625, y: 0.1875 },
-  { x: 0.5625, y: 0.1875 },
-  { x: 0.6875, y: 0.1875 },
-  { x: 0.6875, y: 0.1875 },
-  { x: 0.6875, y: 0.1875 },
-  { x: 0.6875, y: 0.1875 },
-  { x: 0.6875, y: 0.1875 },
-  { x: 0.6875, y: 0.1875 },
-  { x: 0.8125, y: 0.1875 },
-  { x: 0.8125, y: 0.1875 },
-  { x: 0.8125, y: 0.1875 },
-  { x: 0.8125, y: 0.1875 },
-  { x: 0.8125, y: 0.1875 },
-  { x: 0.8125, y: 0.1875 },
-  { x: 0.9375, y: 0.1875 },
-  { x: 0.9375, y: 0.1875 },
-  { x: 0.9375, y: 0.1875 },
-  { x: 0.9375, y: 0.1875 },
-  { x: 0.9375, y: 0.1875 },
-  { x: 0.9375, y: 0.1875 },
-  { x: 0.0625, y: 0.3125 },
-  { x: 0.0625, y: 0.3125 },
-  { x: 0.0625, y: 0.3125 },
-  { x: 0.0625, y: 0.3125 },
-  { x: 0.0625, y: 0.3125 },
-  { x: 0.0625, y: 0.3125 },
-  { x: 0.1875, y: 0.3125 },
-  { x: 0.1875, y: 0.3125 },
-  { x: 0.1875, y: 0.3125 },
-  { x: 0.1875, y: 0.3125 },
-  { x: 0.1875, y: 0.3125 },
-  { x: 0.1875, y: 0.3125 },
-  { x: 0.3125, y: 0.3125 },
-  { x: 0.3125, y: 0.3125 },
-  { x: 0.3125, y: 0.3125 },
-  { x: 0.3125, y: 0.3125 },
-  { x: 0.3125, y: 0.3125 },
-  { x: 0.3125, y: 0.3125 },
-  { x: 0.4375, y: 0.3125 },
-  { x: 0.4375, y: 0.3125 },
-  { x: 0.4375, y: 0.3125 },
-  { x: 0.4375, y: 0.3125 },
-  { x: 0.4375, y: 0.3125 },
-  { x: 0.4375, y: 0.3125 },
-  { x: 0.5625, y: 0.3125 },
-  { x: 0.5625, y: 0.3125 },
-  { x: 0.5625, y: 0.3125 },
-  { x: 0.5625, y: 0.3125 },
-  { x: 0.5625, y: 0.3125 },
-  { x: 0.5625, y: 0.3125 },
-  { x: 0.6875, y: 0.3125 },
-  { x: 0.6875, y: 0.3125 },
-  { x: 0.6875, y: 0.3125 },
-  { x: 0.6875, y: 0.3125 },
-  { x: 0.6875, y: 0.3125 },
-  { x: 0.6875, y: 0.3125 },
-  { x: 0.8125, y: 0.3125 },
-  { x: 0.8125, y: 0.3125 },
-  { x: 0.8125, y: 0.3125 },
-  { x: 0.8125, y: 0.3125 },
-  { x: 0.8125, y: 0.3125 },
-  { x: 0.8125, y: 0.3125 },
-  { x: 0.9375, y: 0.3125 },
-  { x: 0.9375, y: 0.3125 },
-  { x: 0.9375, y: 0.3125 },
-  { x: 0.9375, y: 0.3125 },
-  { x: 0.9375, y: 0.3125 },
-  { x: 0.9375, y: 0.3125 },
-  { x: 0.0625, y: 0.4375 },
-  { x: 0.0625, y: 0.4375 },
-  { x: 0.0625, y: 0.4375 },
-  { x: 0.0625, y: 0.4375 },
-  { x: 0.0625, y: 0.4375 },
-  { x: 0.0625, y: 0.4375 },
-  { x: 0.1875, y: 0.4375 },
-  { x: 0.1875, y: 0.4375 },
-  { x: 0.1875, y: 0.4375 },
-  { x: 0.1875, y: 0.4375 },
-  { x: 0.1875, y: 0.4375 },
-  { x: 0.1875, y: 0.4375 },
-  { x: 0.3125, y: 0.4375 },
-  { x: 0.3125, y: 0.4375 },
-  { x: 0.3125, y: 0.4375 },
-  { x: 0.3125, y: 0.4375 },
-  { x: 0.3125, y: 0.4375 },
-  { x: 0.3125, y: 0.4375 },
-  { x: 0.4375, y: 0.4375 },
-  { x: 0.4375, y: 0.4375 },
-  { x: 0.4375, y: 0.4375 },
-  { x: 0.4375, y: 0.4375 },
-  { x: 0.4375, y: 0.4375 },
-  { x: 0.4375, y: 0.4375 },
-  { x: 0.5625, y: 0.4375 },
-  { x: 0.5625, y: 0.4375 },
-  { x: 0.5625, y: 0.4375 },
-  { x: 0.5625, y: 0.4375 },
-  { x: 0.5625, y: 0.4375 },
-  { x: 0.5625, y: 0.4375 },
-  { x: 0.6875, y: 0.4375 },
-  { x: 0.6875, y: 0.4375 },
-  { x: 0.6875, y: 0.4375 },
-  { x: 0.6875, y: 0.4375 },
-  { x: 0.6875, y: 0.4375 },
-  { x: 0.6875, y: 0.4375 },
-  { x: 0.8125, y: 0.4375 },
-  { x: 0.8125, y: 0.4375 },
-  { x: 0.8125, y: 0.4375 },
-  { x: 0.8125, y: 0.4375 },
-  { x: 0.8125, y: 0.4375 },
-  { x: 0.8125, y: 0.4375 },
-  { x: 0.9375, y: 0.4375 },
-  { x: 0.9375, y: 0.4375 },
-  { x: 0.9375, y: 0.4375 },
-  { x: 0.9375, y: 0.4375 },
-  { x: 0.9375, y: 0.4375 },
-  { x: 0.9375, y: 0.4375 },
-  { x: 0.0625, y: 0.5625 },
-  { x: 0.0625, y: 0.5625 },
-  { x: 0.0625, y: 0.5625 },
-  { x: 0.0625, y: 0.5625 },
-  { x: 0.0625, y: 0.5625 },
-  { x: 0.0625, y: 0.5625 },
-  { x: 0.1875, y: 0.5625 },
-  { x: 0.1875, y: 0.5625 },
-  { x: 0.1875, y: 0.5625 },
-  { x: 0.1875, y: 0.5625 },
-  { x: 0.1875, y: 0.5625 },
-  { x: 0.1875, y: 0.5625 },
-  { x: 0.3125, y: 0.5625 },
-  { x: 0.3125, y: 0.5625 },
-  { x: 0.3125, y: 0.5625 },
-  { x: 0.3125, y: 0.5625 },
-  { x: 0.3125, y: 0.5625 },
-  { x: 0.3125, y: 0.5625 },
-  { x: 0.4375, y: 0.5625 },
-  { x: 0.4375, y: 0.5625 },
-  { x: 0.4375, y: 0.5625 },
-  { x: 0.4375, y: 0.5625 },
-  { x: 0.4375, y: 0.5625 },
-  { x: 0.4375, y: 0.5625 },
-  { x: 0.5625, y: 0.5625 },
-  { x: 0.5625, y: 0.5625 },
-  { x: 0.5625, y: 0.5625 },
-  { x: 0.5625, y: 0.5625 },
-  { x: 0.5625, y: 0.5625 },
-  { x: 0.5625, y: 0.5625 },
-  { x: 0.6875, y: 0.5625 },
-  { x: 0.6875, y: 0.5625 },
-  { x: 0.6875, y: 0.5625 },
-  { x: 0.6875, y: 0.5625 },
-  { x: 0.6875, y: 0.5625 },
-  { x: 0.6875, y: 0.5625 },
-  { x: 0.8125, y: 0.5625 },
-  { x: 0.8125, y: 0.5625 },
-  { x: 0.8125, y: 0.5625 },
-  { x: 0.8125, y: 0.5625 },
-  { x: 0.8125, y: 0.5625 },
-  { x: 0.8125, y: 0.5625 },
-  { x: 0.9375, y: 0.5625 },
-  { x: 0.9375, y: 0.5625 },
-  { x: 0.9375, y: 0.5625 },
-  { x: 0.9375, y: 0.5625 },
-  { x: 0.9375, y: 0.5625 },
-  { x: 0.9375, y: 0.5625 },
-  { x: 0.0625, y: 0.6875 },
-  { x: 0.0625, y: 0.6875 },
-  { x: 0.0625, y: 0.6875 },
-  { x: 0.0625, y: 0.6875 },
-  { x: 0.0625, y: 0.6875 },
-  { x: 0.0625, y: 0.6875 },
-  { x: 0.1875, y: 0.6875 },
-  { x: 0.1875, y: 0.6875 },
-  { x: 0.1875, y: 0.6875 },
-  { x: 0.1875, y: 0.6875 },
-  { x: 0.1875, y: 0.6875 },
-  { x: 0.1875, y: 0.6875 },
-  { x: 0.3125, y: 0.6875 },
-  { x: 0.3125, y: 0.6875 },
-  { x: 0.3125, y: 0.6875 },
-  { x: 0.3125, y: 0.6875 },
-  { x: 0.3125, y: 0.6875 },
-  { x: 0.3125, y: 0.6875 },
-  { x: 0.4375, y: 0.6875 },
-  { x: 0.4375, y: 0.6875 },
-  { x: 0.4375, y: 0.6875 },
-  { x: 0.4375, y: 0.6875 },
-  { x: 0.4375, y: 0.6875 },
-  { x: 0.4375, y: 0.6875 },
-  { x: 0.5625, y: 0.6875 },
-  { x: 0.5625, y: 0.6875 },
-  { x: 0.5625, y: 0.6875 },
-  { x: 0.5625, y: 0.6875 },
-  { x: 0.5625, y: 0.6875 },
-  { x: 0.5625, y: 0.6875 },
-  { x: 0.6875, y: 0.6875 },
-  { x: 0.6875, y: 0.6875 },
-  { x: 0.6875, y: 0.6875 },
-  { x: 0.6875, y: 0.6875 },
-  { x: 0.6875, y: 0.6875 },
-  { x: 0.6875, y: 0.6875 },
-  { x: 0.8125, y: 0.6875 },
-  { x: 0.8125, y: 0.6875 },
-  { x: 0.8125, y: 0.6875 },
-  { x: 0.8125, y: 0.6875 },
-  { x: 0.8125, y: 0.6875 },
-  { x: 0.8125, y: 0.6875 },
-  { x: 0.9375, y: 0.6875 },
-  { x: 0.9375, y: 0.6875 },
-  { x: 0.9375, y: 0.6875 },
-  { x: 0.9375, y: 0.6875 },
-  { x: 0.9375, y: 0.6875 },
-  { x: 0.9375, y: 0.6875 },
-  { x: 0.0625, y: 0.8125 },
-  { x: 0.0625, y: 0.8125 },
-  { x: 0.0625, y: 0.8125 },
-  { x: 0.0625, y: 0.8125 },
-  { x: 0.0625, y: 0.8125 },
-  { x: 0.0625, y: 0.8125 },
-  { x: 0.1875, y: 0.8125 },
-  { x: 0.1875, y: 0.8125 },
-  { x: 0.1875, y: 0.8125 },
-  { x: 0.1875, y: 0.8125 },
-  { x: 0.1875, y: 0.8125 },
-  { x: 0.1875, y: 0.8125 },
-  { x: 0.3125, y: 0.8125 },
-  { x: 0.3125, y: 0.8125 },
-  { x: 0.3125, y: 0.8125 },
-  { x: 0.3125, y: 0.8125 },
-  { x: 0.3125, y: 0.8125 },
-  { x: 0.3125, y: 0.8125 },
-  { x: 0.4375, y: 0.8125 },
-  { x: 0.4375, y: 0.8125 },
-  { x: 0.4375, y: 0.8125 },
-  { x: 0.4375, y: 0.8125 },
-  { x: 0.4375, y: 0.8125 },
-  { x: 0.4375, y: 0.8125 },
-  { x: 0.5625, y: 0.8125 },
-  { x: 0.5625, y: 0.8125 },
-  { x: 0.5625, y: 0.8125 },
-  { x: 0.5625, y: 0.8125 },
-  { x: 0.5625, y: 0.8125 },
-  { x: 0.5625, y: 0.8125 },
-  { x: 0.6875, y: 0.8125 },
-  { x: 0.6875, y: 0.8125 },
-  { x: 0.6875, y: 0.8125 },
-  { x: 0.6875, y: 0.8125 },
-  { x: 0.6875, y: 0.8125 },
-  { x: 0.6875, y: 0.8125 },
-  { x: 0.8125, y: 0.8125 },
-  { x: 0.8125, y: 0.8125 },
-  { x: 0.8125, y: 0.8125 },
-  { x: 0.8125, y: 0.8125 },
-  { x: 0.8125, y: 0.8125 },
-  { x: 0.8125, y: 0.8125 },
-  { x: 0.9375, y: 0.8125 },
-  { x: 0.9375, y: 0.8125 },
-  { x: 0.9375, y: 0.8125 },
-  { x: 0.9375, y: 0.8125 },
-  { x: 0.9375, y: 0.8125 },
-  { x: 0.9375, y: 0.8125 },
-  { x: 0.0625, y: 0.9375 },
-  { x: 0.0625, y: 0.9375 },
-  { x: 0.0625, y: 0.9375 },
-  { x: 0.0625, y: 0.9375 },
-  { x: 0.0625, y: 0.9375 },
-  { x: 0.0625, y: 0.9375 },
-  { x: 0.1875, y: 0.9375 },
-  { x: 0.1875, y: 0.9375 },
-  { x: 0.1875, y: 0.9375 },
-  { x: 0.1875, y: 0.9375 },
-  { x: 0.1875, y: 0.9375 },
-  { x: 0.1875, y: 0.9375 },
-  { x: 0.3125, y: 0.9375 },
-  { x: 0.3125, y: 0.9375 },
-  { x: 0.3125, y: 0.9375 },
-  { x: 0.3125, y: 0.9375 },
-  { x: 0.3125, y: 0.9375 },
-  { x: 0.3125, y: 0.9375 },
-  { x: 0.4375, y: 0.9375 },
-  { x: 0.4375, y: 0.9375 },
-  { x: 0.4375, y: 0.9375 },
-  { x: 0.4375, y: 0.9375 },
-  { x: 0.4375, y: 0.9375 },
-  { x: 0.4375, y: 0.9375 },
-  { x: 0.5625, y: 0.9375 },
-  { x: 0.5625, y: 0.9375 },
-  { x: 0.5625, y: 0.9375 },
-  { x: 0.5625, y: 0.9375 },
-  { x: 0.5625, y: 0.9375 },
-  { x: 0.5625, y: 0.9375 },
-  { x: 0.6875, y: 0.9375 },
-  { x: 0.6875, y: 0.9375 },
-  { x: 0.6875, y: 0.9375 },
-  { x: 0.6875, y: 0.9375 },
-  { x: 0.6875, y: 0.9375 },
-  { x: 0.6875, y: 0.9375 },
-  { x: 0.8125, y: 0.9375 },
-  { x: 0.8125, y: 0.9375 },
-  { x: 0.8125, y: 0.9375 },
-  { x: 0.8125, y: 0.9375 },
-  { x: 0.8125, y: 0.9375 },
-  { x: 0.8125, y: 0.9375 },
-  { x: 0.9375, y: 0.9375 },
-  { x: 0.9375, y: 0.9375 },
-  { x: 0.9375, y: 0.9375 },
-  { x: 0.9375, y: 0.9375 },
-  { x: 0.9375, y: 0.9375 },
-  { x: 0.9375, y: 0.9375 }
-];
-
-// src/hand/handposedetector.ts
-var HandDetector = class {
-  constructor(model23) {
-    __publicField(this, "model");
-    __publicField(this, "anchors");
-    __publicField(this, "anchorsTensor");
-    __publicField(this, "inputSize");
-    __publicField(this, "inputSizeTensor");
-    __publicField(this, "doubleInputSizeTensor");
-    var _a, _b, _c2, _d2;
-    this.model = model23;
-    this.anchors = anchors2.map((anchor) => [anchor.x, anchor.y]);
-    this.anchorsTensor = mu(this.anchors);
-    this.inputSize = ((_d2 = (_c2 = (_b = (_a = this == null ? void 0 : this.model) == null ? void 0 : _a.inputs) == null ? void 0 : _b[0]) == null ? void 0 : _c2.shape) == null ? void 0 : _d2[2]) || 0;
-    this.inputSizeTensor = Jt([this.inputSize, this.inputSize]);
-    this.doubleInputSizeTensor = Jt([this.inputSize * 2, this.inputSize * 2]);
-  }
-  normalizeBoxes(boxes) {
-    const t10 = {};
-    t10.boxOffsets = Xe(boxes, [0, 0], [-1, 2]);
-    t10.boxSizes = Xe(boxes, [0, 2], [-1, 2]);
-    t10.div = je(t10.boxOffsets, this.inputSizeTensor);
-    t10.boxCenterPoints = Ce(t10.div, this.anchorsTensor);
-    t10.halfBoxSizes = je(t10.boxSizes, this.doubleInputSizeTensor);
-    t10.sub = Te(t10.boxCenterPoints, t10.halfBoxSizes);
-    t10.startPoints = se(t10.sub, this.inputSizeTensor);
-    t10.add = Ce(t10.boxCenterPoints, t10.halfBoxSizes);
-    t10.endPoints = se(t10.add, this.inputSizeTensor);
-    const res = r22([t10.startPoints, t10.endPoints], 1);
-    Object.keys(t10).forEach((tensor2) => Ot(t10[tensor2]));
-    return res;
-  }
-  normalizeLandmarks(rawPalmLandmarks, index2) {
-    const t10 = {};
-    t10.reshape = W(rawPalmLandmarks, [-1, 7, 2]);
-    t10.div = je(t10.reshape, this.inputSizeTensor);
-    t10.landmarks = Ce(t10.div, this.anchors[index2] ? this.anchors[index2] : 0);
-    const res = se(t10.landmarks, this.inputSizeTensor);
-    Object.keys(t10).forEach((tensor2) => Ot(t10[tensor2]));
-    return res;
-  }
-  async predict(input, config3) {
-    var _a;
-    const t10 = {};
-    t10.resize = eX.resizeBilinear(input, [this.inputSize, this.inputSize]);
-    t10.div = je(t10.resize, constants.tf127);
-    t10.image = Te(t10.div, constants.tf1);
-    t10.batched = this.model.execute(t10.image);
-    t10.predictions = cc(t10.batched);
-    t10.slice = Xe(t10.predictions, [0, 0], [-1, 1]);
-    t10.sigmoid = Ea(t10.slice);
-    t10.scores = cc(t10.sigmoid);
-    const scores = await t10.scores.data();
-    t10.boxes = Xe(t10.predictions, [0, 1], [-1, 4]);
-    t10.norm = this.normalizeBoxes(t10.boxes);
-    t10.nms = await eX.nonMaxSuppressionAsync(t10.norm, t10.scores, 3 * (((_a = config3.hand) == null ? void 0 : _a.maxDetected) || 1), config3.hand.iouThreshold, config3.hand.minConfidence);
-    const nms = await t10.nms.array();
-    const hands = [];
-    for (const index2 of nms) {
-      const p = {};
-      p.box = Xe(t10.norm, [index2, 0], [1, -1]);
-      p.slice = Xe(t10.predictions, [index2, 5], [1, 14]);
-      p.norm = this.normalizeLandmarks(p.slice, index2);
-      p.palmLandmarks = W(p.norm, [-1, 2]);
-      const box = await p.box.data();
-      const startPoint = box.slice(0, 2);
-      const endPoint = box.slice(2, 4);
-      const palmLandmarks = await p.palmLandmarks.array();
-      const hand3 = { startPoint, endPoint, palmLandmarks, confidence: scores[index2] };
-      const scaled = scaleBoxCoordinates2(hand3, [(input.shape[2] || 1) / this.inputSize, (input.shape[1] || 0) / this.inputSize]);
-      hands.push(scaled);
-      Object.keys(p).forEach((tensor2) => Ot(p[tensor2]));
-    }
-    Object.keys(t10).forEach((tensor2) => Ot(t10[tensor2]));
-    return hands;
-  }
-};
-
-// src/hand/handposepipeline.ts
-var palmBoxEnlargeFactor = 5;
-var handBoxEnlargeFactor = 1.65;
-var palmLandmarkIds = [0, 5, 9, 13, 17, 1, 2];
-var palmLandmarksPalmBase = 0;
-var palmLandmarksMiddleFingerBase = 2;
-var lastTime13 = 0;
-var HandPipeline = class {
-  constructor(handDetector, handPoseModel2) {
-    __publicField(this, "handDetector");
-    __publicField(this, "handPoseModel");
-    __publicField(this, "inputSize");
-    __publicField(this, "storedBoxes");
-    __publicField(this, "skipped");
-    __publicField(this, "detectedHands");
-    var _a, _b, _c2;
-    this.handDetector = handDetector;
-    this.handPoseModel = handPoseModel2;
-    this.inputSize = ((_c2 = (_b = (_a = this.handPoseModel) == null ? void 0 : _a.inputs) == null ? void 0 : _b[0].shape) == null ? void 0 : _c2[2]) || 0;
-    this.storedBoxes = [];
-    this.skipped = Number.MAX_SAFE_INTEGER;
-    this.detectedHands = 0;
-  }
-  calculateLandmarksBoundingBox(landmarks) {
-    const xs2 = landmarks.map((d) => d[0]);
-    const ys2 = landmarks.map((d) => d[1]);
-    const startPoint = [Math.min(...xs2), Math.min(...ys2)];
-    const endPoint = [Math.max(...xs2), Math.max(...ys2)];
-    return { startPoint, endPoint };
-  }
-  getBoxForPalmLandmarks(palmLandmarks, rotationMatrix) {
-    const rotatedPalmLandmarks = palmLandmarks.map((coord) => rotatePoint2([...coord, 1], rotationMatrix));
-    const boxAroundPalm = this.calculateLandmarksBoundingBox(rotatedPalmLandmarks);
-    return enlargeBox2(squarifyBox2(boxAroundPalm), palmBoxEnlargeFactor);
-  }
-  getBoxForHandLandmarks(landmarks) {
-    const boundingBox = this.calculateLandmarksBoundingBox(landmarks);
-    const boxAroundHand = enlargeBox2(squarifyBox2(boundingBox), handBoxEnlargeFactor);
-    boxAroundHand.palmLandmarks = [];
-    for (let i = 0; i < palmLandmarkIds.length; i++) {
-      boxAroundHand.palmLandmarks.push(landmarks[palmLandmarkIds[i]].slice(0, 2));
-    }
-    return boxAroundHand;
-  }
-  transformRawCoords(rawCoords, box2, angle, rotationMatrix) {
-    const boxSize = getBoxSize2(box2);
-    const scaleFactor = [boxSize[0] / this.inputSize, boxSize[1] / this.inputSize, (boxSize[0] + boxSize[1]) / this.inputSize / 2];
-    const coordsScaled = rawCoords.map((coord) => [
-      scaleFactor[0] * (coord[0] - this.inputSize / 2),
-      scaleFactor[1] * (coord[1] - this.inputSize / 2),
-      scaleFactor[2] * coord[2]
-    ]);
-    const coordsRotationMatrix = buildRotationMatrix2(angle, [0, 0]);
-    const coordsRotated = coordsScaled.map((coord) => {
-      const rotated = rotatePoint2(coord, coordsRotationMatrix);
-      return [...rotated, coord[2]];
-    });
-    const inverseRotationMatrix = invertTransformMatrix2(rotationMatrix);
-    const boxCenter = [...getBoxCenter2(box2), 1];
-    const originalBoxCenter = [
-      dot2(boxCenter, inverseRotationMatrix[0]),
-      dot2(boxCenter, inverseRotationMatrix[1])
-    ];
-    return coordsRotated.map((coord) => [
-      Math.trunc(coord[0] + originalBoxCenter[0]),
-      Math.trunc(coord[1] + originalBoxCenter[1]),
-      Math.trunc(coord[2])
-    ]);
-  }
-  async estimateHands(image, config3) {
-    let useFreshBox = false;
-    let boxes;
-    const skipTime = (config3.hand.skipTime || 0) > now() - lastTime13;
-    const skipFrame = this.skipped < (config3.hand.skipFrames || 0);
-    if (config3.skipAllowed && skipTime && skipFrame) {
-      this.skipped++;
-    } else {
-      boxes = await this.handDetector.predict(image, config3);
-      this.skipped = 0;
-    }
-    if (boxes && boxes.length > 0 && (boxes.length !== this.detectedHands && this.detectedHands !== config3.hand.maxDetected || !config3.hand.landmarks)) {
-      this.detectedHands = 0;
-      this.storedBoxes = [...boxes];
-      if (this.storedBoxes.length > 0) useFreshBox = true;
-    }
-    const hands = [];
-    for (let i = 0; i < this.storedBoxes.length; i++) {
-      const currentBox = this.storedBoxes[i];
-      if (!currentBox) continue;
-      if (config3.hand.landmarks) {
-        const angle = config3.hand.rotation ? computeRotation2(currentBox.palmLandmarks[palmLandmarksPalmBase], currentBox.palmLandmarks[palmLandmarksMiddleFingerBase]) : 0;
-        const palmCenter = getBoxCenter2(currentBox);
-        const palmCenterNormalized = [palmCenter[0] / image.shape[2], palmCenter[1] / image.shape[1]];
-        const rotatedImage = config3.hand.rotation && env.kernels.includes("rotatewithoffset") ? eX.rotateWithOffset(image, angle, 0, palmCenterNormalized) : image.clone();
-        const rotationMatrix = buildRotationMatrix2(-angle, palmCenter);
-        const newBox = useFreshBox ? this.getBoxForPalmLandmarks(currentBox.palmLandmarks, rotationMatrix) : currentBox;
-        const croppedInput = cutBoxFromImageAndResize(newBox, rotatedImage, [this.inputSize, this.inputSize]);
-        const handImage = je(croppedInput, constants.tf255);
-        Ot(croppedInput);
-        Ot(rotatedImage);
-        const [confidenceT, keypoints] = this.handPoseModel.execute(handImage);
-        lastTime13 = now();
-        Ot(handImage);
-        const confidence = (await confidenceT.data())[0];
-        Ot(confidenceT);
-        if (confidence >= config3.hand.minConfidence / 4) {
-          const keypointsReshaped = W(keypoints, [-1, 3]);
-          const rawCoords = await keypointsReshaped.array();
-          Ot(keypoints);
-          Ot(keypointsReshaped);
-          const coords = this.transformRawCoords(rawCoords, newBox, angle, rotationMatrix);
-          const nextBoundingBox = this.getBoxForHandLandmarks(coords);
-          this.storedBoxes[i] = { ...nextBoundingBox, confidence };
-          const result = {
-            landmarks: coords,
-            confidence,
-            boxConfidence: currentBox.confidence,
-            fingerConfidence: confidence,
-            box: { topLeft: nextBoundingBox.startPoint, bottomRight: nextBoundingBox.endPoint }
-          };
-          hands.push(result);
-        } else {
-          this.storedBoxes[i] = null;
-        }
-        Ot(keypoints);
-      } else {
-        const enlarged = enlargeBox2(squarifyBox2(currentBox), handBoxEnlargeFactor);
-        const result = {
-          confidence: currentBox.confidence,
-          boxConfidence: currentBox.confidence,
-          fingerConfidence: 0,
-          box: { topLeft: enlarged.startPoint, bottomRight: enlarged.endPoint },
-          landmarks: []
-        };
-        hands.push(result);
-      }
-    }
-    this.storedBoxes = this.storedBoxes.filter((a) => a !== null);
-    this.detectedHands = hands.length;
-    if (hands.length > config3.hand.maxDetected) hands.length = config3.hand.maxDetected;
-    return hands;
-  }
-};
 
 // src/hand/handpose.ts
-var meshAnnotations2 = {
-  thumb: [1, 2, 3, 4],
-  index: [5, 6, 7, 8],
-  middle: [9, 10, 11, 12],
-  ring: [13, 14, 15, 16],
-  pinky: [17, 18, 19, 20],
-  palm: [0]
-};
 var handDetectorModel;
 var handPoseModel;
-var handPipeline;
-function initPipeline() {
-  const handDetector = handDetectorModel ? new HandDetector(handDetectorModel) : void 0;
-  if (handDetector && handPoseModel) handPipeline = new HandPipeline(handDetector, handPoseModel);
-}
-async function predict14(input, config3) {
-  if (!handPipeline) initPipeline();
-  const predictions = await handPipeline.estimateHands(input, config3);
-  if (!predictions) return [];
-  const hands = [];
-  for (let i = 0; i < predictions.length; i++) {
-    const annotations2 = {};
-    if (predictions[i].landmarks) {
-      for (const key of Object.keys(meshAnnotations2)) {
-        annotations2[key] = meshAnnotations2[key].map((index2) => predictions[i].landmarks[index2]);
-      }
-    }
-    const keypoints = predictions[i].landmarks;
-    let box = [Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, 0, 0];
-    let boxRaw = [0, 0, 0, 0];
-    if (keypoints && keypoints.length > 0) {
-      for (const pt2 of keypoints) {
-        if (pt2[0] < box[0]) box[0] = pt2[0];
-        if (pt2[1] < box[1]) box[1] = pt2[1];
-        if (pt2[0] > box[2]) box[2] = pt2[0];
-        if (pt2[1] > box[3]) box[3] = pt2[1];
-      }
-      box[2] -= box[0];
-      box[3] -= box[1];
-      boxRaw = [box[0] / (input.shape[2] || 0), box[1] / (input.shape[1] || 0), box[2] / (input.shape[2] || 0), box[3] / (input.shape[1] || 0)];
-    } else {
-      box = predictions[i].box ? [
-        Math.trunc(Math.max(0, predictions[i].box.topLeft[0])),
-        Math.trunc(Math.max(0, predictions[i].box.topLeft[1])),
-        Math.trunc(Math.min(input.shape[2] || 0, predictions[i].box.bottomRight[0]) - Math.max(0, predictions[i].box.topLeft[0])),
-        Math.trunc(Math.min(input.shape[1] || 0, predictions[i].box.bottomRight[1]) - Math.max(0, predictions[i].box.topLeft[1]))
-      ] : [0, 0, 0, 0];
-      boxRaw = [
-        predictions[i].box.topLeft[0] / (input.shape[2] || 0),
-        predictions[i].box.topLeft[1] / (input.shape[1] || 0),
-        (predictions[i].box.bottomRight[0] - predictions[i].box.topLeft[0]) / (input.shape[2] || 0),
-        (predictions[i].box.bottomRight[1] - predictions[i].box.topLeft[1]) / (input.shape[1] || 0)
-      ];
-    }
-    const landmarks = analyze(keypoints);
-    hands.push({
-      id: i,
-      score: Math.round(100 * predictions[i].confidence) / 100,
-      boxScore: Math.round(100 * predictions[i].boxConfidence) / 100,
-      fingerScore: Math.round(100 * predictions[i].fingerConfidence) / 100,
-      label: "hand",
-      box,
-      boxRaw,
-      keypoints,
-      annotations: annotations2,
-      landmarks
-    });
-  }
-  return hands;
-}
 async function loadDetect2(config3) {
   var _a;
   if (env.initial) handDetectorModel = null;
@@ -44101,39 +39258,299 @@ async function loadSkeleton(config3) {
   return handPoseModel;
 }
 
+// src/tfjs/humangl.ts
+var config2 = {
+  name: "humangl",
+  priority: 999,
+  canvas: null,
+  gl: null,
+  extensions: [],
+  webGLattr: {
+    // https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.2
+    alpha: false,
+    antialias: false,
+    premultipliedAlpha: false,
+    preserveDrawingBuffer: false,
+    depth: false,
+    stencil: false,
+    failIfMajorPerformanceCaveat: false,
+    // default=true
+    desynchronized: true
+    // default=undefined
+  }
+};
+function extensions() {
+  const gl2 = config2.gl;
+  if (!gl2) return;
+  config2.extensions = gl2.getSupportedExtensions();
+}
+function register(instance) {
+  var _a;
+  if (instance.config.backend !== "humangl") return;
+  if (config2.name in ur().registry && !((_a = config2 == null ? void 0 : config2.gl) == null ? void 0 : _a.getParameter(config2.gl.VERSION))) {
+    log("humangl error: backend invalid context");
+    instance.models.reset();
+  }
+  if (!kme(config2.name)) {
+    try {
+      config2.canvas = canvas(100, 100);
+    } catch (err) {
+      log("humangl error: cannot create canvas:", err);
+      return;
+    }
+    try {
+      config2.gl = config2.canvas.getContext("webgl2", config2.webGLattr);
+      if (!config2.gl) {
+        log("humangl error: cannot get webgl context");
+        return;
+      }
+      const glv2 = config2.gl.getParameter(config2.gl.VERSION).includes("2.0");
+      if (!glv2) {
+        log("backend override: using fallback webgl backend as webgl 2.0 is not detected");
+        instance.config.backend = "webgl";
+        return;
+      }
+      if (config2.canvas) {
+        config2.canvas.addEventListener("webglcontextlost", (e) => {
+          log("humangl error:", e.type);
+          log("possible browser memory leak using webgl or conflict with multiple backend registrations");
+          instance.emit("error");
+          throw new Error("backend error: webgl context lost");
+        });
+        config2.canvas.addEventListener("webglcontextrestored", (e) => {
+          log("humangl error: context restored:", e);
+        });
+        config2.canvas.addEventListener("webglcontextcreationerror", (e) => {
+          log("humangl error: context create:", e);
+        });
+      }
+    } catch (err) {
+      log("humangl error: cannot get webgl context:", err);
+      return;
+    }
+    try {
+      NI(2, config2.gl);
+    } catch (err) {
+      log("humangl error: cannot set webgl context:", err);
+      return;
+    }
+    try {
+      const ctx = new bp(config2.gl);
+      tu(config2.name, () => new Lc(ctx), config2.priority);
+    } catch (err) {
+      log("humangl error: cannot register webgl backend:", err);
+      return;
+    }
+    try {
+      const kernels = Ym("webgl");
+      kernels.forEach((kernelConfig) => {
+        const newKernelConfig = { ...kernelConfig, backendName: config2.name };
+        ti(newKernelConfig);
+      });
+    } catch (err) {
+      log("humangl error: cannot update webgl backend registration:", err);
+      return;
+    }
+    try {
+      if (A().flagRegistry.WEBGL_VERSION) A().set("WEBGL_VERSION", 2);
+    } catch (err) {
+      log("humangl error: cannot set WebGL backend flags:", err);
+      return;
+    }
+    extensions();
+    const backend = ak();
+    const current = typeof backend["gpgpu"] !== "undefined" ? backend["getGPGPUContext"]().gl : null;
+    if (current) {
+      if (instance.config.debug) log("humangl backend registered:", { webgl: current.getParameter(current.VERSION), renderer: current.getParameter(current.RENDERER) });
+    } else {
+      log("humangl error: no current gl context:", current, config2.gl);
+    }
+  }
+}
+
+// src/tfjs/backend.ts
+async function getBestBackend() {
+  var _a;
+  await env.updateBackend();
+  if ((_a = env.tensorflow) == null ? void 0 : _a.version) return "tensorflow";
+  if (env.webgpu.supported && env.webgpu.backend) return "webgpu";
+  if (env.webgl.supported && env.webgl.backend) return "webgl";
+  if (env.wasm.supported && env.wasm.backend) return "wasm";
+  return "cpu";
+}
+function registerCustomOps(config3) {
+  const newKernels = [];
+  if (!env.kernels.includes("mod")) {
+    const kernelMod = {
+      kernelName: "Mod",
+      backendName: sk(),
+      kernelFunc: (op2) => De(() => Te(op2.inputs.a, se(je(op2.inputs.a, op2.inputs.b), op2.inputs.b)))
+    };
+    ti(kernelMod);
+    env.kernels.push("mod");
+    newKernels.push("mod");
+  }
+  if (!env.kernels.includes("floormod")) {
+    const kernelFloorMod = {
+      kernelName: "FloorMod",
+      backendName: sk(),
+      kernelFunc: (op2) => De(() => Ce(se(md(op2.inputs.a, op2.inputs.b), op2.inputs.b), z2(op2.inputs.a, op2.inputs.b)))
+    };
+    ti(kernelFloorMod);
+    env.kernels.push("floormod");
+    newKernels.push("floormod");
+  }
+  if (!env.kernels.includes("rotatewithoffset") && config3.softwareKernels) {
+    const kernelRotateWithOffset = {
+      kernelName: "RotateWithOffset",
+      backendName: sk(),
+      kernelFunc: (op2) => De(() => {
+        const backend = sk();
+        Sme("cpu");
+        const t10 = eX.rotateWithOffset(op2.inputs.image, op2.attrs.radians, op2.attrs.fillValue, op2.attrs.center);
+        Sme(backend);
+        return t10;
+      })
+    };
+    ti(kernelRotateWithOffset);
+    env.kernels.push("rotatewithoffset");
+    newKernels.push("rotatewithoffset");
+  }
+  if (newKernels.length > 0 && config3.debug) log("registered kernels:", newKernels);
+}
+var defaultFlags = {};
+async function check(instance, force = false) {
+  var _a, _b;
+  instance.state = "backend";
+  if (((_a = instance.config.backend) == null ? void 0 : _a.length) === 0) instance.config.backend = await getBestBackend();
+  if (force || env.initial || instance.config.backend && instance.config.backend.length > 0 && sk() !== instance.config.backend) {
+    const timeStamp = now();
+    if (instance.config.backend && instance.config.backend.length > 0) {
+      if (typeof window === "undefined" && typeof WorkerGlobalScope !== "undefined" && instance.config.debug) {
+        if (instance.config.debug) log("running inside web worker");
+      }
+      if (typeof navigator !== "undefined" && ((_b = navigator == null ? void 0 : navigator.userAgent) == null ? void 0 : _b.toLowerCase().includes("electron"))) {
+        if (instance.config.debug) log("running inside electron");
+      }
+      let available = Object.keys(ur().registryFactory);
+      if (instance.config.backend === "humangl" && !available.includes("humangl")) {
+        register(instance);
+        available = Object.keys(ur().registryFactory);
+      }
+      if (instance.config.debug) log("available backends:", available);
+      if (env.browser && !env.node && instance.config.backend === "tensorflow" && available.includes("webgl")) {
+        if (instance.config.debug) log("override: backend set to tensorflow while running in browser");
+        instance.config.backend = "webgl";
+      }
+      if (env.node && !env.browser && (instance.config.backend === "webgl" || instance.config.backend === "humangl") && available.includes("tensorflow")) {
+        if (instance.config.debug) log(`override: backend set to ${instance.config.backend} while running in nodejs`);
+        instance.config.backend = "tensorflow";
+      }
+      if (env.browser && instance.config.backend === "webgpu") {
+        if (typeof navigator === "undefined" || typeof navigator.gpu === "undefined") {
+          log("override: backend set to webgpu but browser does not support webgpu");
+          instance.config.backend = "webgl";
+        } else {
+          const adapter = await navigator.gpu.requestAdapter();
+          if (instance.config.debug) log("enumerated webgpu adapter:", adapter);
+          if (!adapter) {
+            log("override: backend set to webgpu but browser reports no available gpu");
+            instance.config.backend = "webgl";
+          } else {
+            let adapterInfo;
+            if ("requestAdapterInfo" in adapter) adapterInfo = await (adapter == null ? void 0 : adapter.requestAdapterInfo());
+            else adapterInfo = adapter.info;
+            log("webgpu adapter info:", adapterInfo);
+          }
+        }
+      }
+      if (!available.includes(instance.config.backend)) {
+        log(`error: backend ${instance.config.backend} not found in registry`);
+        instance.config.backend = env.node ? "tensorflow" : "webgl";
+        if (instance.config.debug) log(`override: setting backend ${instance.config.backend}`);
+      }
+      if (instance.config.debug) log("setting backend:", [instance.config.backend]);
+      if (instance.config.backend === "wasm") {
+        if (A().flagRegistry.CANVAS2D_WILL_READ_FREQUENTLY) A().set("CANVAS2D_WILL_READ_FREQUENTLY", true);
+        if (instance.config.debug) log("wasm path:", instance.config.wasmPath);
+        if (typeof nae !== "undefined") nae(instance.config.wasmPath, instance.config.wasmPlatformFetch);
+        else throw new Error("backend error: attempting to use wasm backend but wasm path is not set");
+        let mt2 = false;
+        let simd = false;
+        try {
+          mt2 = await A().getAsync("WASM_HAS_MULTITHREAD_SUPPORT");
+          simd = await A().getAsync("WASM_HAS_SIMD_SUPPORT");
+          if (instance.config.debug) log(`wasm execution: ${simd ? "simd" : "no simd"} ${mt2 ? "multithreaded" : "singlethreaded"}`);
+          if (instance.config.debug && !simd) log("warning: wasm simd support is not enabled");
+        } catch (e) {
+          log("wasm detection failed");
+        }
+      }
+      try {
+        await Sme(instance.config.backend);
+        await Ime();
+      } catch (err) {
+        log("error: cannot set backend:", instance.config.backend, err);
+        return false;
+      }
+      if (instance.config.debug) defaultFlags = JSON.parse(JSON.stringify(A().flags));
+    }
+    if (sk() === "humangl" || sk() === "webgl") {
+      if (A().flagRegistry.WEBGL_USE_SHAPES_UNIFORMS) A().set("WEBGL_USE_SHAPES_UNIFORMS", true);
+      if (A().flagRegistry.WEBGL_EXP_CONV) A().set("WEBGL_EXP_CONV", true);
+      if (instance.config.debug && typeof instance.config.deallocate !== "undefined" && instance.config.deallocate) {
+        log("changing webgl: WEBGL_DELETE_TEXTURE_THRESHOLD:", true);
+        A().set("WEBGL_DELETE_TEXTURE_THRESHOLD", 0);
+      }
+    }
+    if (sk() === "webgpu") {
+    }
+    if (instance.config.debug) {
+      const newFlags = A().flags;
+      const updatedFlags = {};
+      for (const key of Object.keys(newFlags)) {
+        if (defaultFlags[key] === newFlags[key]) continue;
+        updatedFlags[key] = newFlags[key];
+      }
+      if (instance.config.debug && Object.keys(updatedFlags).length > 0) log("backend:", sk(), "flags:", updatedFlags);
+    }
+    if (instance.config.flags && Object.keys(instance.config.flags).length > 0) {
+      if (instance.config.debug) log("flags:", instance.config["flags"]);
+      for (const [key, val] of Object.entries(instance.config.flags)) {
+        A().set(key, val);
+      }
+    }
+    hme();
+    init2();
+    instance.performance.initBackend = Math.trunc(now() - timeStamp);
+    instance.config.backend = sk();
+    await env.updateBackend();
+    registerCustomOps(instance.config);
+  }
+  return true;
+}
+function fakeOps(kernelNames, config3) {
+  for (const kernelName of kernelNames) {
+    const kernelConfig = {
+      kernelName,
+      backendName: config3.backend,
+      kernelFunc: (param) => {
+        var _a;
+        if (config3.debug) log("kernelFunc", kernelName, config3.backend, param);
+        return (_a = param == null ? void 0 : param.inputs) == null ? void 0 : _a.info;
+      }
+      // setupFunc: () => { if (config.debug) log('kernelFunc', kernelName, config.backend); },
+      // disposeFunc: () => { if (config.debug) log('kernelFunc', kernelName, config.backend); },
+    };
+    ti(kernelConfig);
+  }
+  env.kernels = Ym(sk()).map((kernel) => kernel.kernelName.toLowerCase());
+}
+
 // src/hand/handtrack.ts
 var models2 = [null, null];
-var modelOutputNodes = ["StatefulPartitionedCall/Postprocessor/Slice", "StatefulPartitionedCall/Postprocessor/ExpandDims_1"];
 var inputSize7 = [[0, 0], [0, 0]];
-var classes = ["hand", "fist", "pinch", "point", "face", "tip", "pinchtip"];
-var faceIndex = 4;
-var boxExpandFact = 1.6;
-var maxDetectorResolution = 512;
-var detectorExpandFact = 1.4;
 var skipped13 = Number.MAX_SAFE_INTEGER;
-var lastTime14 = 0;
-var outputSize = [0, 0];
-var cache4 = {
-  boxes: [],
-  hands: []
-};
-var fingerMap = {
-  /*
-  thumb: [0, 1, 2, 3, 4],
-  index: [0, 5, 6, 7, 8],
-  middle: [0, 9, 10, 11, 12],
-  ring: [0, 13, 14, 15, 16],
-  pinky: [0, 17, 18, 19, 20],
-  palm: [0],
-  */
-  thumb: [1, 2, 3, 4],
-  index: [5, 6, 7, 8],
-  middle: [9, 10, 11, 12],
-  ring: [13, 14, 15, 16],
-  pinky: [17, 18, 19, 20],
-  base: [0],
-  palm: [0, 17, 13, 9, 5, 1, 0]
-};
 async function loadDetect3(config3) {
   var _a;
   if (env.initial) models2[0] = null;
@@ -44157,331 +39574,6 @@ async function loadSkeleton2(config3) {
   } else if (config3.debug) log("cached model:", models2[1]["modelUrl"]);
   return models2[1];
 }
-async function detectHands(input, config3) {
-  const hands = [];
-  if (!input || !models2[0]) return hands;
-  const t10 = {};
-  const ratio2 = (input.shape[2] || 1) / (input.shape[1] || 1);
-  const height = Math.min(Math.round((input.shape[1] || 0) / 8) * 8, maxDetectorResolution);
-  const width = Math.round(height * ratio2 / 8) * 8;
-  t10.resize = eX.resizeBilinear(input, [height, width]);
-  t10.cast = Ue(t10.resize, "int32");
-  [t10.rawScores, t10.rawBoxes] = await models2[0].executeAsync(t10.cast, modelOutputNodes);
-  t10.boxes = cc(t10.rawBoxes, [0, 2]);
-  t10.scores = cc(t10.rawScores, [0]);
-  const classScores = fo(t10.scores, 1);
-  Ot(classScores[faceIndex]);
-  classScores.splice(faceIndex, 1);
-  t10.filtered = vr(classScores, 1);
-  Ot(classScores);
-  t10.max = Ra(t10.filtered, 1);
-  t10.argmax = Ok(t10.filtered, 1);
-  let id2 = 0;
-  t10.nms = await eX.nonMaxSuppressionAsync(t10.boxes, t10.max, (config3.hand.maxDetected || 0) + 1, config3.hand.iouThreshold || 0, config3.hand.minConfidence || 1);
-  const nms = await t10.nms.data();
-  const scores = await t10.max.data();
-  const classNum = await t10.argmax.data();
-  for (const nmsIndex of Array.from(nms)) {
-    const boxSlice = Xe(t10.boxes, nmsIndex, 1);
-    const boxYX = await boxSlice.data();
-    Ot(boxSlice);
-    const boxData = [boxYX[1], boxYX[0], boxYX[3] - boxYX[1], boxYX[2] - boxYX[0]];
-    const boxRaw = scale(boxData, detectorExpandFact);
-    const boxFull = [Math.trunc(boxData[0] * outputSize[0]), Math.trunc(boxData[1] * outputSize[1]), Math.trunc(boxData[2] * outputSize[0]), Math.trunc(boxData[3] * outputSize[1])];
-    const score = scores[nmsIndex];
-    const label = classes[classNum[nmsIndex]];
-    const hand3 = { id: id2++, score, box: boxFull, boxRaw, label };
-    hands.push(hand3);
-  }
-  Object.keys(t10).forEach((tensor2) => Ot(t10[tensor2]));
-  hands.sort((a, b) => b.score - a.score);
-  if (hands.length > (config3.hand.maxDetected || 1)) hands.length = config3.hand.maxDetected || 1;
-  return hands;
-}
-async function detectFingers(input, h, config3) {
-  const hand3 = {
-    // initial values inherited from hand detect
-    id: h.id,
-    score: Math.round(100 * h.score) / 100,
-    boxScore: Math.round(100 * h.score) / 100,
-    fingerScore: 0,
-    box: h.box,
-    boxRaw: h.boxRaw,
-    label: h.label,
-    keypoints: [],
-    landmarks: {},
-    annotations: {}
-  };
-  if (input && models2[1] && config3.hand.landmarks && h.score > (config3.hand.minConfidence || 0)) {
-    const t10 = {};
-    const boxCrop = [h.boxRaw[1], h.boxRaw[0], h.boxRaw[3] + h.boxRaw[1], h.boxRaw[2] + h.boxRaw[0]];
-    t10.crop = eX.cropAndResize(input, [boxCrop], [0], [inputSize7[1][0], inputSize7[1][1]], "bilinear");
-    t10.div = je(t10.crop, constants.tf255);
-    [t10.score, t10.keypoints] = models2[1].execute(t10.div, ["Identity_1", "Identity"]);
-    const rawScore = (await t10.score.data())[0];
-    const score = (100 - Math.trunc(100 / (1 + Math.exp(rawScore)))) / 100;
-    if (score >= (config3.hand.minConfidence || 0)) {
-      hand3.fingerScore = score;
-      t10.reshaped = W(t10.keypoints, [-1, 3]);
-      const coordsData = await t10.reshaped.array();
-      const coordsRaw = coordsData.map((kpt4) => [kpt4[0] / inputSize7[1][1], kpt4[1] / inputSize7[1][0], kpt4[2] || 0]);
-      const coordsNorm = coordsRaw.map((kpt4) => [kpt4[0] * h.boxRaw[2], kpt4[1] * h.boxRaw[3], kpt4[2] || 0]);
-      hand3.keypoints = coordsNorm.map((kpt4) => [outputSize[0] * (kpt4[0] + h.boxRaw[0]), outputSize[1] * (kpt4[1] + h.boxRaw[1]), kpt4[2] || 0]);
-      hand3.landmarks = analyze(hand3.keypoints);
-      for (const key of Object.keys(fingerMap)) {
-        hand3.annotations[key] = fingerMap[key].map((index2) => hand3.landmarks && hand3.keypoints[index2] ? hand3.keypoints[index2] : null);
-      }
-    }
-    Object.keys(t10).forEach((tensor2) => Ot(t10[tensor2]));
-  }
-  return hand3;
-}
-async function predict15(input, config3) {
-  var _a, _b;
-  if (!((_a = models2[0]) == null ? void 0 : _a["executor"]) || !((_b = models2[1]) == null ? void 0 : _b["executor"]) || !models2[0].inputs[0].shape || !models2[1].inputs[0].shape) return [];
-  outputSize = [input.shape[2] || 0, input.shape[1] || 0];
-  skipped13++;
-  const skipTime = (config3.hand.skipTime || 0) > now() - lastTime14;
-  const skipFrame = skipped13 < (config3.hand.skipFrames || 0);
-  if (config3.skipAllowed && skipTime && skipFrame) {
-    return cache4.hands;
-  }
-  return new Promise(async (resolve) => {
-    const skipTimeExtended = 3 * (config3.hand.skipTime || 0) > now() - lastTime14;
-    const skipFrameExtended = skipped13 < 3 * (config3.hand.skipFrames || 0);
-    if (config3.skipAllowed && cache4.hands.length === config3.hand.maxDetected) {
-      cache4.hands = await Promise.all(cache4.boxes.map((handBox) => detectFingers(input, handBox, config3)));
-    } else if (config3.skipAllowed && skipTimeExtended && skipFrameExtended && cache4.hands.length > 0) {
-      cache4.hands = await Promise.all(cache4.boxes.map((handBox) => detectFingers(input, handBox, config3)));
-    } else {
-      cache4.boxes = await detectHands(input, config3);
-      lastTime14 = now();
-      cache4.hands = await Promise.all(cache4.boxes.map((handBox) => detectFingers(input, handBox, config3)));
-      skipped13 = 0;
-    }
-    const oldCache = [...cache4.boxes];
-    cache4.boxes.length = 0;
-    if (config3.cacheSensitivity > 0) {
-      for (let i = 0; i < cache4.hands.length; i++) {
-        const boxKpt = square(cache4.hands[i].keypoints, outputSize);
-        if (boxKpt.box[2] / (input.shape[2] || 1) > 0.05 && boxKpt.box[3] / (input.shape[1] || 1) > 0.05 && cache4.hands[i].fingerScore && cache4.hands[i].fingerScore > (config3.hand.minConfidence || 0)) {
-          const boxScale = scale(boxKpt.box, boxExpandFact);
-          const boxScaleRaw = scale(boxKpt.boxRaw, boxExpandFact);
-          cache4.boxes.push({ ...oldCache[i], box: boxScale, boxRaw: boxScaleRaw });
-        }
-      }
-    }
-    for (let i = 0; i < cache4.hands.length; i++) {
-      const bbox = calc(cache4.hands[i].keypoints, outputSize);
-      cache4.hands[i].box = bbox.box;
-      cache4.hands[i].boxRaw = bbox.boxRaw;
-    }
-    resolve(cache4.hands);
-  });
-}
-
-// src/result.ts
-var empty = (error = null) => ({ face: [], body: [], hand: [], gesture: [], object: [], persons: [], performance: {}, timestamp: 0, width: 0, height: 0, error });
-
-// src/body/movenetcoords.ts
-var movenetcoords_exports = {};
-__export(movenetcoords_exports, {
-  connected: () => connected3,
-  horizontal: () => horizontal,
-  kpt: () => kpt3,
-  relative: () => relative,
-  vertical: () => vertical
-});
-var kpt3 = [
-  // used to create part labels
-  "nose",
-  "leftEye",
-  "rightEye",
-  "leftEar",
-  "rightEar",
-  "leftShoulder",
-  "rightShoulder",
-  "leftElbow",
-  "rightElbow",
-  "leftWrist",
-  "rightWrist",
-  "leftHip",
-  "rightHip",
-  "leftKnee",
-  "rightKnee",
-  "leftAnkle",
-  "rightAnkle"
-];
-var horizontal = [
-  // used to fix left vs right
-  ["leftEye", "rightEye"],
-  ["leftEar", "rightEar"],
-  ["leftShoulder", "rightShoulder"],
-  ["leftElbow", "rightElbow"],
-  ["leftWrist", "rightWrist"],
-  ["leftHip", "rightHip"],
-  ["leftKnee", "rightKnee"],
-  ["leftAnkle", "rightAnkle"]
-];
-var vertical = [
-  // used to remove unlikely keypoint positions
-  ["leftKnee", "leftShoulder"],
-  ["rightKnee", "rightShoulder"],
-  ["leftAnkle", "leftKnee"],
-  ["rightAnkle", "rightKnee"]
-];
-var relative = [
-  // used to match relative body parts
-  [["leftHip", "rightHip"], ["leftShoulder", "rightShoulder"]],
-  [["leftElbow", "rightElbow"], ["leftShoulder", "rightShoulder"]]
-];
-var connected3 = {
-  // used to create body outline in annotations
-  leftLeg: ["leftHip", "leftKnee", "leftAnkle"],
-  rightLeg: ["rightHip", "rightKnee", "rightAnkle"],
-  torso: ["leftShoulder", "rightShoulder", "rightHip", "leftHip", "leftShoulder"],
-  leftArm: ["leftShoulder", "leftElbow", "leftWrist"],
-  rightArm: ["rightShoulder", "rightElbow", "rightWrist"],
-  head: []
-};
-
-// src/util/interpolate.ts
-var bufferedResult = empty();
-var interpolateTime = 0;
-function calc2(newResult, config3) {
-  var _a, _b, _c2, _d2, _e, _f2, _g2, _h2, _i2, _j2, _k2, _l2, _m, _n2, _o2, _p2, _q2, _r2, _s2, _t, _u2, _v2, _w2, _x2, _y, _z2;
-  const t02 = now();
-  if (!newResult) return empty();
-  const elapsed = Date.now() - newResult.timestamp;
-  const bufferedFactor = elapsed < 1e3 ? 8 - Math.log(elapsed + 1) : 1;
-  if (newResult.canvas) bufferedResult.canvas = newResult.canvas;
-  if (newResult.error) bufferedResult.error = newResult.error;
-  if (!bufferedResult.body || newResult.body.length !== bufferedResult.body.length) {
-    bufferedResult.body = JSON.parse(JSON.stringify(newResult.body));
-  } else {
-    for (let i = 0; i < newResult.body.length; i++) {
-      const box = newResult.body[i].box.map((newBoxCoord, j) => ((bufferedFactor - 1) * bufferedResult.body[i].box[j] + newBoxCoord) / bufferedFactor);
-      const boxRaw = newResult.body[i].boxRaw.map((newBoxCoord, j) => ((bufferedFactor - 1) * bufferedResult.body[i].boxRaw[j] + newBoxCoord) / bufferedFactor);
-      const keypoints = newResult.body[i].keypoints.map((newKpt, j) => {
-        var _a2, _b2, _c3, _d3, _e2, _f3, _g3, _h3, _i3;
-        return {
-          score: newKpt.score,
-          part: newKpt.part,
-          position: [
-            bufferedResult.body[i].keypoints[j] ? ((bufferedFactor - 1) * (bufferedResult.body[i].keypoints[j].position[0] || 0) + (newKpt.position[0] || 0)) / bufferedFactor : newKpt.position[0],
-            bufferedResult.body[i].keypoints[j] ? ((bufferedFactor - 1) * (bufferedResult.body[i].keypoints[j].position[1] || 0) + (newKpt.position[1] || 0)) / bufferedFactor : newKpt.position[1],
-            bufferedResult.body[i].keypoints[j] ? ((bufferedFactor - 1) * (bufferedResult.body[i].keypoints[j].position[2] || 0) + (newKpt.position[2] || 0)) / bufferedFactor : newKpt.position[2]
-          ],
-          positionRaw: [
-            bufferedResult.body[i].keypoints[j] ? ((bufferedFactor - 1) * (bufferedResult.body[i].keypoints[j].positionRaw[0] || 0) + (newKpt.positionRaw[0] || 0)) / bufferedFactor : newKpt.positionRaw[0],
-            bufferedResult.body[i].keypoints[j] ? ((bufferedFactor - 1) * (bufferedResult.body[i].keypoints[j].positionRaw[1] || 0) + (newKpt.positionRaw[1] || 0)) / bufferedFactor : newKpt.positionRaw[1],
-            bufferedResult.body[i].keypoints[j] ? ((bufferedFactor - 1) * (bufferedResult.body[i].keypoints[j].positionRaw[2] || 0) + (newKpt.positionRaw[2] || 0)) / bufferedFactor : newKpt.positionRaw[2]
-          ],
-          distance: [
-            bufferedResult.body[i].keypoints[j] ? ((bufferedFactor - 1) * (((_a2 = bufferedResult.body[i].keypoints[j].distance) == null ? void 0 : _a2[0]) || 0) + (((_b2 = newKpt.distance) == null ? void 0 : _b2[0]) || 0)) / bufferedFactor : (_c3 = newKpt.distance) == null ? void 0 : _c3[0],
-            bufferedResult.body[i].keypoints[j] ? ((bufferedFactor - 1) * (((_d3 = bufferedResult.body[i].keypoints[j].distance) == null ? void 0 : _d3[1]) || 0) + (((_e2 = newKpt.distance) == null ? void 0 : _e2[1]) || 0)) / bufferedFactor : (_f3 = newKpt.distance) == null ? void 0 : _f3[1],
-            bufferedResult.body[i].keypoints[j] ? ((bufferedFactor - 1) * (((_g3 = bufferedResult.body[i].keypoints[j].distance) == null ? void 0 : _g3[2]) || 0) + (((_h3 = newKpt.distance) == null ? void 0 : _h3[2]) || 0)) / bufferedFactor : (_i3 = newKpt.distance) == null ? void 0 : _i3[2]
-          ]
-        };
-      });
-      const annotations2 = {};
-      let coords = { connected: {} };
-      if ((_a = config3.body.modelPath) == null ? void 0 : _a.includes("efficientpose")) coords = efficientposecoords_exports;
-      else if ((_b = config3.body.modelPath) == null ? void 0 : _b.includes("blazepose")) coords = blazeposecoords_exports;
-      else if ((_c2 = config3.body.modelPath) == null ? void 0 : _c2.includes("movenet")) coords = movenetcoords_exports;
-      for (const [name, indexes] of Object.entries(coords.connected)) {
-        const pt2 = [];
-        for (let j = 0; j < indexes.length - 1; j++) {
-          const pt0 = keypoints.find((kp2) => kp2.part === indexes[j]);
-          const pt1 = keypoints.find((kp2) => kp2.part === indexes[j + 1]);
-          if (pt0 && pt1) pt2.push([pt0.position, pt1.position]);
-        }
-        annotations2[name] = pt2;
-      }
-      bufferedResult.body[i] = { ...newResult.body[i], box, boxRaw, keypoints, annotations: annotations2 };
-    }
-  }
-  if (!bufferedResult.hand || newResult.hand.length !== bufferedResult.hand.length) {
-    bufferedResult.hand = JSON.parse(JSON.stringify(newResult.hand));
-  } else {
-    for (let i = 0; i < newResult.hand.length; i++) {
-      const box = newResult.hand[i].box.map((b, j) => ((bufferedFactor - 1) * bufferedResult.hand[i].box[j] + b) / bufferedFactor);
-      const boxRaw = newResult.hand[i].boxRaw.map((b, j) => ((bufferedFactor - 1) * bufferedResult.hand[i].boxRaw[j] + b) / bufferedFactor);
-      if (bufferedResult.hand[i].keypoints.length !== newResult.hand[i].keypoints.length) bufferedResult.hand[i].keypoints = newResult.hand[i].keypoints;
-      const keypoints = newResult.hand[i].keypoints && newResult.hand[i].keypoints.length > 0 ? newResult.hand[i].keypoints.map((landmark, j) => landmark.map((coord, k) => ((bufferedFactor - 1) * (bufferedResult.hand[i].keypoints[j][k] || 1) + (coord || 0)) / bufferedFactor)) : [];
-      let annotations2 = {};
-      if (Object.keys(bufferedResult.hand[i].annotations).length !== Object.keys(newResult.hand[i].annotations).length) {
-        bufferedResult.hand[i].annotations = newResult.hand[i].annotations;
-        annotations2 = bufferedResult.hand[i].annotations;
-      } else if (newResult.hand[i].annotations) {
-        for (const key of Object.keys(newResult.hand[i].annotations)) {
-          annotations2[key] = ((_f2 = (_e = (_d2 = newResult.hand[i]) == null ? void 0 : _d2.annotations) == null ? void 0 : _e[key]) == null ? void 0 : _f2[0]) ? newResult.hand[i].annotations[key].map((val, j) => val.map((coord, k) => ((bufferedFactor - 1) * bufferedResult.hand[i].annotations[key][j][k] + coord) / bufferedFactor)) : null;
-        }
-      }
-      bufferedResult.hand[i] = { ...newResult.hand[i], box, boxRaw, keypoints, annotations: annotations2 };
-    }
-  }
-  if (!bufferedResult.face || newResult.face.length !== bufferedResult.face.length) {
-    bufferedResult.face = JSON.parse(JSON.stringify(newResult.face));
-  } else {
-    for (let i = 0; i < newResult.face.length; i++) {
-      const box = newResult.face[i].box.map((b, j) => ((bufferedFactor - 1) * bufferedResult.face[i].box[j] + b) / bufferedFactor);
-      const boxRaw = newResult.face[i].boxRaw.map((b, j) => ((bufferedFactor - 1) * bufferedResult.face[i].boxRaw[j] + b) / bufferedFactor);
-      let annotations2 = newResult.face[i].annotations;
-      if (Object.keys(bufferedResult.face[i].annotations).length !== Object.keys(newResult.face[i].annotations).length) {
-        bufferedResult.face[i].annotations = newResult.face[i].annotations;
-        annotations2 = bufferedResult.face[i].annotations;
-      } else if (newResult.face[i].annotations) {
-        for (const key of Object.keys(newResult.face[i].annotations)) {
-          annotations2[key] = ((_i2 = (_h2 = (_g2 = newResult.face[i]) == null ? void 0 : _g2.annotations) == null ? void 0 : _h2[key]) == null ? void 0 : _i2[0]) ? newResult.face[i].annotations[key].map((val, j) => val.map((coord, k) => ((bufferedFactor - 1) * bufferedResult.face[i].annotations[key][j][k] + coord) / bufferedFactor)) : null;
-        }
-      }
-      if (newResult.face[i].rotation) {
-        const rotation = { matrix: [0, 0, 0, 0, 0, 0, 0, 0, 0], angle: { roll: 0, yaw: 0, pitch: 0 }, gaze: { bearing: 0, strength: 0 } };
-        rotation.matrix = (_j2 = newResult.face[i].rotation) == null ? void 0 : _j2.matrix;
-        rotation.angle = {
-          roll: ((bufferedFactor - 1) * (((_l2 = (_k2 = bufferedResult.face[i].rotation) == null ? void 0 : _k2.angle) == null ? void 0 : _l2.roll) || 0) + (((_n2 = (_m = newResult.face[i].rotation) == null ? void 0 : _m.angle) == null ? void 0 : _n2.roll) || 0)) / bufferedFactor,
-          yaw: ((bufferedFactor - 1) * (((_p2 = (_o2 = bufferedResult.face[i].rotation) == null ? void 0 : _o2.angle) == null ? void 0 : _p2.yaw) || 0) + (((_r2 = (_q2 = newResult.face[i].rotation) == null ? void 0 : _q2.angle) == null ? void 0 : _r2.yaw) || 0)) / bufferedFactor,
-          pitch: ((bufferedFactor - 1) * (((_t = (_s2 = bufferedResult.face[i].rotation) == null ? void 0 : _s2.angle) == null ? void 0 : _t.pitch) || 0) + (((_v2 = (_u2 = newResult.face[i].rotation) == null ? void 0 : _u2.angle) == null ? void 0 : _v2.pitch) || 0)) / bufferedFactor
-        };
-        rotation.gaze = {
-          // not fully correct due projection on circle, also causes wrap-around draw on jump from negative to positive
-          bearing: ((bufferedFactor - 1) * (((_w2 = bufferedResult.face[i].rotation) == null ? void 0 : _w2.gaze.bearing) || 0) + (((_x2 = newResult.face[i].rotation) == null ? void 0 : _x2.gaze.bearing) || 0)) / bufferedFactor,
-          strength: ((bufferedFactor - 1) * (((_y = bufferedResult.face[i].rotation) == null ? void 0 : _y.gaze.strength) || 0) + (((_z2 = newResult.face[i].rotation) == null ? void 0 : _z2.gaze.strength) || 0)) / bufferedFactor
-        };
-        bufferedResult.face[i] = { ...newResult.face[i], rotation, box, boxRaw, annotations: annotations2 };
-      } else {
-        bufferedResult.face[i] = { ...newResult.face[i], box, boxRaw, annotations: annotations2 };
-      }
-    }
-  }
-  if (!bufferedResult.object || newResult.object.length !== bufferedResult.object.length) {
-    bufferedResult.object = JSON.parse(JSON.stringify(newResult.object));
-  } else {
-    for (let i = 0; i < newResult.object.length; i++) {
-      const box = newResult.object[i].box.map((b, j) => ((bufferedFactor - 1) * bufferedResult.object[i].box[j] + b) / bufferedFactor);
-      const boxRaw = newResult.object[i].boxRaw.map((b, j) => ((bufferedFactor - 1) * bufferedResult.object[i].boxRaw[j] + b) / bufferedFactor);
-      bufferedResult.object[i] = { ...newResult.object[i], box, boxRaw };
-    }
-  }
-  if (newResult.persons) {
-    const newPersons = newResult.persons;
-    if (!bufferedResult.persons || newPersons.length !== bufferedResult.persons.length) {
-      bufferedResult.persons = JSON.parse(JSON.stringify(newPersons));
-    } else {
-      for (let i = 0; i < newPersons.length; i++) {
-        bufferedResult.persons[i].box = newPersons[i].box.map((box, j) => ((bufferedFactor - 1) * bufferedResult.persons[i].box[j] + box) / bufferedFactor);
-      }
-    }
-  }
-  if (newResult.gesture) bufferedResult.gesture = newResult.gesture;
-  bufferedResult.width = newResult.width;
-  bufferedResult.height = newResult.height;
-  const t12 = now();
-  interpolateTime = env.perfadd ? interpolateTime + Math.round(t12 - t02) : Math.round(t12 - t02);
-  if (newResult.performance) bufferedResult.performance = { ...newResult.performance, interpolate: interpolateTime };
-  return bufferedResult;
-}
 
 // src/segmentation/meet.ts
 var model17;
@@ -44490,7 +39582,7 @@ async function load15(config3) {
   else if (config3.debug) log("cached model:", model17["modelUrl"]);
   return model17;
 }
-async function predict16(input, config3) {
+async function predict11(input, config3) {
   var _a;
   if (!model17) model17 = await load15(config3);
   if (!(model17 == null ? void 0 : model17["executor"]) || !((_a = model17 == null ? void 0 : model17.inputs) == null ? void 0 : _a[0].shape)) return null;
@@ -44521,169 +39613,10 @@ async function predict16(input, config3) {
   return rgba;
 }
 
-// src/face/match.ts
-var match_exports = {};
-__export(match_exports, {
-  distance: () => distance,
-  find: () => find,
-  similarity: () => similarity
-});
-function distance(descriptor1, descriptor2, options4 = { order: 2, multiplier: 25 }) {
-  if (!descriptor1 || !descriptor1) return Number.MAX_SAFE_INTEGER;
-  let sum = 0;
-  for (let i = 0; i < descriptor1.length; i++) {
-    const diff = !options4.order || options4.order === 2 ? descriptor1[i] - descriptor2[i] : Math.abs(descriptor1[i] - descriptor2[i]);
-    sum += !options4.order || options4.order === 2 ? diff * diff : diff ** options4.order;
-  }
-  const dist = Math.round(100 * (options4.multiplier || 20) * sum) / 100;
-  return dist;
-}
-var normalizeDistance = (dist, order, min, max) => {
-  if (dist === 0) return 1;
-  const root = order === 2 ? Math.sqrt(dist) : dist ** (1 / order);
-  const norm = (1 - root / 100 - min) / (max - min);
-  const clamp2 = Math.round(100 * Math.max(Math.min(norm, 1), 0)) / 100;
-  return clamp2;
-};
-function similarity(descriptor1, descriptor2, options4 = { order: 2, multiplier: 25, min: 0.2, max: 0.8 }) {
-  const dist = distance(descriptor1, descriptor2, options4);
-  return normalizeDistance(dist, options4.order || 2, options4.min || 0, options4.max || 1);
-}
-function find(descriptor, descriptors, options4 = { order: 2, multiplier: 25, threshold: 0, min: 0.2, max: 0.8 }) {
-  if (!Array.isArray(descriptor) || !Array.isArray(descriptors) || descriptor.length < 64 || descriptors.length === 0) {
-    return { index: -1, distance: Number.POSITIVE_INFINITY, similarity: 0 };
-  }
-  let lowestDistance = Number.MAX_SAFE_INTEGER;
-  let index2 = -1;
-  for (let i = 0; i < descriptors.length; i++) {
-    const res = descriptors[i].length === descriptor.length ? distance(descriptor, descriptors[i], options4) : Number.MAX_SAFE_INTEGER;
-    if (res < lowestDistance) {
-      lowestDistance = res;
-      index2 = i;
-    }
-    if (lowestDistance < (options4.threshold || 0)) break;
-  }
-  const normalizedSimilarity = normalizeDistance(lowestDistance, options4.order || 2, options4.min || 0, options4.max || 1);
-  return { index: index2, distance: lowestDistance, similarity: normalizedSimilarity };
-}
-
-// src/models.ts
-var models_exports2 = {};
-__export(models_exports2, {
-  Models: () => Models,
-  validateModel: () => validateModel
-});
-
-// src/body/movenetfix.ts
-var maxJitter = 5e-3;
-var cache5 = {
-  keypoints: [],
-  padding: [[0, 0], [0, 0], [0, 0], [0, 0]]
-};
-function bodyParts(body4) {
-  for (const pair of horizontal) {
-    const left = body4.keypoints.findIndex((kp2) => kp2.part === pair[0]);
-    const right = body4.keypoints.findIndex((kp2) => kp2.part === pair[1]);
-    if (body4.keypoints[left] && body4.keypoints[right]) {
-      if (body4.keypoints[left].position[0] < body4.keypoints[right].position[0]) {
-        const tmp = body4.keypoints[left];
-        body4.keypoints[left] = body4.keypoints[right];
-        body4.keypoints[right] = tmp;
-      }
-    }
-  }
-  for (const pair of vertical) {
-    const lower = body4.keypoints.findIndex((kp2) => kp2 && kp2.part === pair[0]);
-    const higher = body4.keypoints.findIndex((kp2) => kp2 && kp2.part === pair[1]);
-    if (body4.keypoints[lower] && body4.keypoints[higher]) {
-      if (body4.keypoints[lower].position[1] < body4.keypoints[higher].position[1]) {
-        body4.keypoints.splice(lower, 1);
-      }
-    }
-  }
-  for (const [pair, compare2] of relative) {
-    const left = body4.keypoints.findIndex((kp2) => kp2 && kp2.part === pair[0]);
-    const right = body4.keypoints.findIndex((kp2) => kp2 && kp2.part === pair[1]);
-    const leftTo = body4.keypoints.findIndex((kp2) => kp2 && kp2.part === compare2[0]);
-    const rightTo = body4.keypoints.findIndex((kp2) => kp2 && kp2.part === compare2[1]);
-    if (!body4.keypoints[leftTo] || !body4.keypoints[rightTo]) continue;
-    const distanceLeft = body4.keypoints[left] ? [
-      Math.abs(body4.keypoints[leftTo].position[0] - body4.keypoints[left].position[0]),
-      Math.abs(body4.keypoints[rightTo].position[0] - body4.keypoints[left].position[0])
-    ] : [0, 0];
-    const distanceRight = body4.keypoints[right] ? [
-      Math.abs(body4.keypoints[rightTo].position[0] - body4.keypoints[right].position[0]),
-      Math.abs(body4.keypoints[leftTo].position[0] - body4.keypoints[right].position[0])
-    ] : [0, 0];
-    if (distanceLeft[0] > distanceLeft[1] || distanceRight[0] > distanceRight[1]) {
-      const tmp = body4.keypoints[left];
-      body4.keypoints[left] = body4.keypoints[right];
-      body4.keypoints[right] = tmp;
-    }
-  }
-}
-function jitter(keypoints) {
-  for (let i = 0; i < keypoints.length; i++) {
-    if (keypoints[i] && cache5.keypoints[i]) {
-      const diff = [Math.abs(keypoints[i].positionRaw[0] - cache5.keypoints[i].positionRaw[0]), Math.abs(keypoints[i].positionRaw[1] - cache5.keypoints[i].positionRaw[1])];
-      if (diff[0] < maxJitter && diff[1] < maxJitter) {
-        keypoints[i] = cache5.keypoints[i];
-      } else {
-        cache5.keypoints[i] = keypoints[i];
-      }
-    } else {
-      cache5.keypoints[i] = keypoints[i];
-    }
-  }
-  return keypoints;
-}
-function padInput(input, inputSize10) {
-  var _a, _b;
-  const t10 = {};
-  if (!((_a = input == null ? void 0 : input.shape) == null ? void 0 : _a[1]) || !((_b = input == null ? void 0 : input.shape) == null ? void 0 : _b[2])) return input;
-  cache5.padding = [
-    [0, 0],
-    // dont touch batch
-    [input.shape[2] > input.shape[1] ? Math.trunc((input.shape[2] - input.shape[1]) / 2) : 0, input.shape[2] > input.shape[1] ? Math.trunc((input.shape[2] - input.shape[1]) / 2) : 0],
-    // height before&after
-    [input.shape[1] > input.shape[2] ? Math.trunc((input.shape[1] - input.shape[2]) / 2) : 0, input.shape[1] > input.shape[2] ? Math.trunc((input.shape[1] - input.shape[2]) / 2) : 0],
-    // width before&after
-    [0, 0]
-    // dont touch rbg
-  ];
-  t10.pad = Aa(input, cache5.padding);
-  t10.resize = eX.resizeBilinear(t10.pad, [inputSize10, inputSize10]);
-  const final = Ue(t10.resize, "int32");
-  Object.keys(t10).forEach((tensor2) => Ot(t10[tensor2]));
-  return final;
-}
-function rescaleBody(body4, outputSize2) {
-  body4.keypoints = body4.keypoints.filter((kpt4) => kpt4 == null ? void 0 : kpt4.position);
-  for (const kpt4 of body4.keypoints) {
-    kpt4.position = [
-      kpt4.position[0] * (outputSize2[0] + cache5.padding[2][0] + cache5.padding[2][1]) / outputSize2[0] - cache5.padding[2][0],
-      kpt4.position[1] * (outputSize2[1] + cache5.padding[1][0] + cache5.padding[1][1]) / outputSize2[1] - cache5.padding[1][0]
-    ];
-    kpt4.positionRaw = [
-      kpt4.position[0] / outputSize2[0],
-      kpt4.position[1] / outputSize2[1]
-    ];
-  }
-  const rescaledBoxes = calc(body4.keypoints.map((pt2) => pt2.position), outputSize2);
-  body4.box = rescaledBoxes.box;
-  body4.boxRaw = rescaledBoxes.boxRaw;
-  return body4;
-}
-
 // src/body/movenet.ts
 var model18;
 var inputSize8 = 0;
 var skipped14 = Number.MAX_SAFE_INTEGER;
-var cache6 = {
-  boxes: [],
-  bodies: [],
-  last: 0
-};
 async function load16(config3) {
   var _a;
   if (env.initial) model18 = null;
@@ -44696,118 +39629,11 @@ async function load16(config3) {
   if (A().flagRegistry.WEBGL_USE_SHAPES_UNIFORMS) A().set("WEBGL_USE_SHAPES_UNIFORMS", false);
   return model18;
 }
-function parseSinglePose(res, config3, image) {
-  const kpt4 = res[0][0];
-  const keypoints = [];
-  let score = 0;
-  for (let id2 = 0; id2 < kpt4.length; id2++) {
-    score = kpt4[id2][2];
-    if (score > config3.body.minConfidence) {
-      const positionRaw = [kpt4[id2][1], kpt4[id2][0]];
-      keypoints.push({
-        score: Math.round(100 * score) / 100,
-        part: kpt3[id2],
-        positionRaw,
-        position: [
-          // normalized to input image size
-          Math.round((image.shape[2] || 0) * positionRaw[0]),
-          Math.round((image.shape[1] || 0) * positionRaw[1])
-        ]
-      });
-    }
-  }
-  score = keypoints.reduce((prev, curr) => curr.score > prev ? curr.score : prev, 0);
-  const bodies = [];
-  const newBox = calc(keypoints.map((pt2) => pt2.position), [image.shape[2], image.shape[1]]);
-  const annotations2 = {};
-  for (const [name, indexes] of Object.entries(connected3)) {
-    const pt2 = [];
-    for (let i = 0; i < indexes.length - 1; i++) {
-      const pt0 = keypoints.find((kp2) => kp2.part === indexes[i]);
-      const pt1 = keypoints.find((kp2) => kp2.part === indexes[i + 1]);
-      if (pt0 && pt1 && pt0.score > (config3.body.minConfidence || 0) && pt1.score > (config3.body.minConfidence || 0)) pt2.push([pt0.position, pt1.position]);
-    }
-    annotations2[name] = pt2;
-  }
-  const body4 = { id: 0, score, box: newBox.box, boxRaw: newBox.boxRaw, keypoints, annotations: annotations2 };
-  bodyParts(body4);
-  bodies.push(body4);
-  return bodies;
-}
-function parseMultiPose(res, config3, image) {
-  const bodies = [];
-  for (let id2 = 0; id2 < res[0].length; id2++) {
-    const kpt4 = res[0][id2];
-    const boxScore = Math.round(100 * kpt4[51 + 4]) / 100;
-    if (boxScore > config3.body.minConfidence) {
-      const keypoints = [];
-      for (let i = 0; i < 17; i++) {
-        const score = kpt4[3 * i + 2];
-        if (score > config3.body.minConfidence) {
-          const positionRaw = [kpt4[3 * i + 1], kpt4[3 * i + 0]];
-          keypoints.push({
-            part: kpt3[i],
-            score: Math.round(100 * score) / 100,
-            positionRaw,
-            position: [Math.round((image.shape[2] || 0) * positionRaw[0]), Math.round((image.shape[1] || 0) * positionRaw[1])]
-          });
-        }
-      }
-      const boxRaw = [kpt4[51 + 1], kpt4[51 + 0], kpt4[51 + 3] - kpt4[51 + 1], kpt4[51 + 2] - kpt4[51 + 0]];
-      const boxNorm = [Math.trunc(boxRaw[0] * (image.shape[2] || 0)), Math.trunc(boxRaw[1] * (image.shape[1] || 0)), Math.trunc(boxRaw[2] * (image.shape[2] || 0)), Math.trunc(boxRaw[3] * (image.shape[1] || 0))];
-      const annotations2 = {};
-      for (const [name, indexes] of Object.entries(connected3)) {
-        const pt2 = [];
-        for (let i = 0; i < indexes.length - 1; i++) {
-          const pt0 = keypoints.find((kp2) => kp2.part === indexes[i]);
-          const pt1 = keypoints.find((kp2) => kp2.part === indexes[i + 1]);
-          if (pt0 && pt1 && pt0.score > (config3.body.minConfidence || 0) && pt1.score > (config3.body.minConfidence || 0)) pt2.push([pt0.position, pt1.position]);
-        }
-        annotations2[name] = pt2;
-      }
-      const body4 = { id: id2, score: boxScore, box: boxNorm, boxRaw, keypoints: [...keypoints], annotations: annotations2 };
-      bodyParts(body4);
-      bodies.push(body4);
-    }
-  }
-  bodies.sort((a, b) => b.score - a.score);
-  if (bodies.length > config3.body.maxDetected) bodies.length = config3.body.maxDetected;
-  return bodies;
-}
-async function predict17(input, config3) {
-  var _a;
-  if (!(model18 == null ? void 0 : model18["executor"]) || !((_a = model18 == null ? void 0 : model18.inputs) == null ? void 0 : _a[0].shape)) return [];
-  if (!config3.skipAllowed) cache6.boxes.length = 0;
-  skipped14++;
-  const skipTime = (config3.body.skipTime || 0) > now() - cache6.last;
-  const skipFrame = skipped14 < (config3.body.skipFrames || 0);
-  if (config3.skipAllowed && skipTime && skipFrame) {
-    return cache6.bodies;
-  }
-  return new Promise(async (resolve) => {
-    const t10 = {};
-    skipped14 = 0;
-    t10.input = padInput(input, inputSize8);
-    t10.res = model18 == null ? void 0 : model18.execute(t10.input);
-    cache6.last = now();
-    const res = await t10.res.array();
-    cache6.bodies = t10.res.shape[2] === 17 ? parseSinglePose(res, config3, input) : parseMultiPose(res, config3, input);
-    for (const body4 of cache6.bodies) {
-      rescaleBody(body4, [input.shape[2] || 1, input.shape[1] || 1]);
-      jitter(body4.keypoints);
-    }
-    Object.keys(t10).forEach((tensor2) => Ot(t10[tensor2]));
-    resolve(cache6.bodies);
-  });
-}
 
 // src/object/nanodet.ts
 var model19;
-var last10 = [];
-var lastTime15 = 0;
 var skipped15 = Number.MAX_SAFE_INTEGER;
 var inputSize9 = 0;
-var scaleBox = 2.5;
 async function load17(config3) {
   if (!model19 || env.initial) {
     model19 = await loadModel(config3.object.modelPath);
@@ -44815,95 +39641,6 @@ async function load17(config3) {
     inputSize9 = Array.isArray(inputs) ? parseInt(inputs[0].tensorShape.dim[2].size) : 416;
   } else if (config3.debug) log("cached model:", model19["modelUrl"]);
   return model19;
-}
-async function process4(res, outputShape, config3) {
-  var _a, _b;
-  let id2 = 0;
-  let results = [];
-  const size2 = inputSize9;
-  for (const strideSize of [1, 2, 4]) {
-    const baseSize = strideSize * 13;
-    const scoresT = cc(res.find((a) => a.shape[1] === baseSize ** 2 && (a.shape[2] || 0) === labels2.length));
-    const scores = await scoresT.array();
-    const featuresT = cc(res.find((a) => a.shape[1] === baseSize ** 2 && (a.shape[2] || 0) < labels2.length));
-    const boxesMaxT = W(featuresT, [-1, 4, (((_a = featuresT.shape) == null ? void 0 : _a[1]) || 0) / 4]);
-    const boxIdxT = Ok(boxesMaxT, 2);
-    const boxIdx = await boxIdxT.array();
-    for (let i = 0; i < scoresT.shape[0]; i++) {
-      for (let j = 0; j < (((_b = scoresT.shape) == null ? void 0 : _b[1]) || 0); j++) {
-        const score = scores[i][j];
-        if (score > (config3.object.minConfidence || 0) && j !== 61) {
-          const cx2 = (0.5 + Math.trunc(i % baseSize)) / baseSize;
-          const cy2 = (0.5 + Math.trunc(i / baseSize)) / baseSize;
-          const boxOffset = boxIdx[i].map((a) => a * (baseSize / strideSize / size2));
-          const [x, y8] = [
-            cx2 - scaleBox / strideSize * boxOffset[0],
-            cy2 - scaleBox / strideSize * boxOffset[1]
-          ];
-          const [w8, h] = [
-            cx2 + scaleBox / strideSize * boxOffset[2] - x,
-            cy2 + scaleBox / strideSize * boxOffset[3] - y8
-          ];
-          let boxRaw = [x, y8, w8, h];
-          boxRaw = boxRaw.map((a) => Math.max(0, Math.min(a, 1)));
-          const box = [
-            // results normalized to input image pixels
-            boxRaw[0] * outputShape[0],
-            boxRaw[1] * outputShape[1],
-            boxRaw[2] * outputShape[0],
-            boxRaw[3] * outputShape[1]
-          ];
-          const result = {
-            id: id2++,
-            // strideSize,
-            score: Math.round(100 * score) / 100,
-            class: j + 1,
-            label: labels2[j].label,
-            // center: [Math.trunc(outputShape[0] * cx), Math.trunc(outputShape[1] * cy)],
-            // centerRaw: [cx, cy],
-            box: box.map((a) => Math.trunc(a)),
-            boxRaw
-          };
-          results.push(result);
-        }
-      }
-    }
-    Ot([scoresT, featuresT, boxesMaxT, boxIdxT]);
-  }
-  const nmsBoxes = results.map((a) => [a.boxRaw[1], a.boxRaw[0], a.boxRaw[3], a.boxRaw[2]]);
-  const nmsScores = results.map((a) => a.score);
-  let nmsIdx = [];
-  if (nmsBoxes && nmsBoxes.length > 0) {
-    const nms = await eX.nonMaxSuppressionAsync(nmsBoxes, nmsScores, config3.object.maxDetected || 0, config3.object.iouThreshold, config3.object.minConfidence);
-    nmsIdx = Array.from(await nms.data());
-    Ot(nms);
-  }
-  results = results.filter((_val, idx) => nmsIdx.includes(idx)).sort((a, b) => b.score - a.score);
-  return results;
-}
-async function predict18(image, config3) {
-  if (!(model19 == null ? void 0 : model19["executor"])) return [];
-  const skipTime = (config3.object.skipTime || 0) > now() - lastTime15;
-  const skipFrame = skipped15 < (config3.object.skipFrames || 0);
-  if (config3.skipAllowed && skipTime && skipFrame && last10.length > 0) {
-    skipped15++;
-    return last10;
-  }
-  skipped15 = 0;
-  if (!env.kernels.includes("mod") || !env.kernels.includes("sparsetodense")) return last10;
-  return new Promise(async (resolve) => {
-    const outputSize2 = [image.shape[2] || 0, image.shape[1] || 0];
-    const resizeT = eX.resizeBilinear(image, [inputSize9, inputSize9], false);
-    const normT = je(resizeT, constants.tf255);
-    const transposeT = mc(normT, [0, 3, 1, 2]);
-    let objectT;
-    if (config3.object.enabled) objectT = model19.execute(transposeT);
-    lastTime15 = now();
-    const obj = await process4(objectT, outputSize2, config3);
-    last10 = obj;
-    Ot([resizeT, normT, transposeT, ...objectT]);
-    resolve(obj);
-  });
 }
 
 // src/body/posenetutils.ts
@@ -44946,293 +39683,10 @@ var connectedPartNames = [
   ["leftHip", "rightHip"]
 ];
 var connectedPartIndices = connectedPartNames.map(([jointNameA, jointNameB]) => [partIds[jointNameA], partIds[jointNameB]]);
-var poseChain = [
-  ["nose", "leftEye"],
-  ["leftEye", "leftEar"],
-  ["nose", "rightEye"],
-  ["rightEye", "rightEar"],
-  ["nose", "leftShoulder"],
-  ["leftShoulder", "leftElbow"],
-  ["leftElbow", "leftWrist"],
-  ["leftShoulder", "leftHip"],
-  ["leftHip", "leftKnee"],
-  ["leftKnee", "leftAnkle"],
-  ["nose", "rightShoulder"],
-  ["rightShoulder", "rightElbow"],
-  ["rightElbow", "rightWrist"],
-  ["rightShoulder", "rightHip"],
-  ["rightHip", "rightKnee"],
-  ["rightKnee", "rightAnkle"]
-];
-function getBoundingBox(keypoints) {
-  const coord = keypoints.reduce(({ maxX, maxY, minX, minY }, { position: { x, y: y8 } }) => ({
-    maxX: Math.max(maxX, x),
-    maxY: Math.max(maxY, y8),
-    minX: Math.min(minX, x),
-    minY: Math.min(minY, y8)
-  }), {
-    maxX: Number.NEGATIVE_INFINITY,
-    maxY: Number.NEGATIVE_INFINITY,
-    minX: Number.POSITIVE_INFINITY,
-    minY: Number.POSITIVE_INFINITY
-  });
-  return [coord.minX, coord.minY, coord.maxX - coord.minX, coord.maxY - coord.minY];
-}
-function scalePoses(poses, [height, width], [inputResolutionHeight, inputResolutionWidth]) {
-  const scaleY = height / inputResolutionHeight;
-  const scaleX = width / inputResolutionWidth;
-  const scalePose = (pose, i) => ({
-    id: i,
-    score: pose.score,
-    boxRaw: [pose.box[0] / inputResolutionWidth, pose.box[1] / inputResolutionHeight, pose.box[2] / inputResolutionWidth, pose.box[3] / inputResolutionHeight],
-    box: [Math.trunc(pose.box[0] * scaleX), Math.trunc(pose.box[1] * scaleY), Math.trunc(pose.box[2] * scaleX), Math.trunc(pose.box[3] * scaleY)],
-    keypoints: pose.keypoints.map(({ score, part, position }) => ({
-      score,
-      part,
-      position: [Math.trunc(position.x * scaleX), Math.trunc(position.y * scaleY)],
-      positionRaw: [position.x / inputResolutionHeight, position.y / inputResolutionHeight]
-    })),
-    annotations: {}
-  });
-  const scaledPoses = poses.map((pose, i) => scalePose(pose, i));
-  return scaledPoses;
-}
-var MaxHeap = class {
-  // function call
-  constructor(maxSize2, getElementValue) {
-    __publicField(this, "priorityQueue");
-    // don't touch
-    __publicField(this, "numberOfElements");
-    __publicField(this, "getElementValue");
-    this.priorityQueue = new Array(maxSize2);
-    this.numberOfElements = -1;
-    this.getElementValue = getElementValue;
-  }
-  enqueue(x) {
-    this.priorityQueue[++this.numberOfElements] = x;
-    this.swim(this.numberOfElements);
-  }
-  dequeue() {
-    const max = this.priorityQueue[0];
-    this.exchange(0, this.numberOfElements--);
-    this.sink(0);
-    this.priorityQueue[this.numberOfElements + 1] = null;
-    return max;
-  }
-  empty() {
-    return this.numberOfElements === -1;
-  }
-  size() {
-    return this.numberOfElements + 1;
-  }
-  all() {
-    return this.priorityQueue.slice(0, this.numberOfElements + 1);
-  }
-  max() {
-    return this.priorityQueue[0];
-  }
-  swim(k) {
-    while (k > 0 && this.less(Math.floor(k / 2), k)) {
-      this.exchange(k, Math.floor(k / 2));
-      k = Math.floor(k / 2);
-    }
-  }
-  sink(k) {
-    while (2 * k <= this.numberOfElements) {
-      let j = 2 * k;
-      if (j < this.numberOfElements && this.less(j, j + 1)) j++;
-      if (!this.less(k, j)) break;
-      this.exchange(k, j);
-      k = j;
-    }
-  }
-  getValueAt(i) {
-    return this.getElementValue(this.priorityQueue[i]);
-  }
-  less(i, j) {
-    return this.getValueAt(i) < this.getValueAt(j);
-  }
-  exchange(i, j) {
-    const t10 = this.priorityQueue[i];
-    this.priorityQueue[i] = this.priorityQueue[j];
-    this.priorityQueue[j] = t10;
-  }
-};
-function getOffsetPoint(y8, x, keypoint, offsets) {
-  return {
-    y: offsets.get(y8, x, keypoint),
-    x: offsets.get(y8, x, keypoint + count)
-  };
-}
-function getImageCoords(part, outputStride2, offsets) {
-  const { heatmapY, heatmapX, id: keypoint } = part;
-  const { y: y8, x } = getOffsetPoint(heatmapY, heatmapX, keypoint, offsets);
-  return {
-    x: part.heatmapX * outputStride2 + x,
-    y: part.heatmapY * outputStride2 + y8
-  };
-}
-function clamp(a, min, max) {
-  if (a < min) return min;
-  if (a > max) return max;
-  return a;
-}
-function squaredDistance(y12, x1, y22, x22) {
-  const dy2 = y22 - y12;
-  const dx2 = x22 - x1;
-  return dy2 * dy2 + dx2 * dx2;
-}
-function addVectors(a, b) {
-  return { x: a.x + b.x, y: a.y + b.y };
-}
 
 // src/body/posenet.ts
 var model20;
-var poseNetOutputs = [
-  "MobilenetV1/offset_2/BiasAdd",
-  "MobilenetV1/heatmap_2/BiasAdd",
-  "MobilenetV1/displacement_fwd_2/BiasAdd",
-  "MobilenetV1/displacement_bwd_2/BiasAdd"
-  /* displacementBwd */
-];
-var localMaximumRadius = 1;
-var outputStride = 16;
 var squaredNmsRadius = 50 ** 2;
-function traverse(edgeId, sourceKeypoint, targetId, scores, offsets, displacements, offsetRefineStep = 2) {
-  const getDisplacement = (point2) => ({
-    y: displacements.get(point2.y, point2.x, edgeId),
-    x: displacements.get(point2.y, point2.x, displacements.shape[2] / 2 + edgeId)
-  });
-  const getStridedIndexNearPoint = (point2, height2, width2) => ({
-    y: clamp(Math.round(point2.y / outputStride), 0, height2 - 1),
-    x: clamp(Math.round(point2.x / outputStride), 0, width2 - 1)
-  });
-  const [height, width] = scores.shape;
-  const sourceKeypointIndices = getStridedIndexNearPoint(sourceKeypoint.position, height, width);
-  const displacement = getDisplacement(sourceKeypointIndices);
-  const displacedPoint = addVectors(sourceKeypoint.position, displacement);
-  let targetKeypoint = displacedPoint;
-  for (let i = 0; i < offsetRefineStep; i++) {
-    const targetKeypointIndices = getStridedIndexNearPoint(targetKeypoint, height, width);
-    const offsetPoint = getOffsetPoint(targetKeypointIndices.y, targetKeypointIndices.x, targetId, offsets);
-    targetKeypoint = addVectors(
-      { x: targetKeypointIndices.x * outputStride, y: targetKeypointIndices.y * outputStride },
-      { x: offsetPoint.x, y: offsetPoint.y }
-    );
-  }
-  const targetKeyPointIndices = getStridedIndexNearPoint(targetKeypoint, height, width);
-  const score = scores.get(targetKeyPointIndices.y, targetKeyPointIndices.x, targetId);
-  return { position: targetKeypoint, part: partNames[targetId], score };
-}
-function decodePose(root, scores, offsets, displacementsFwd, displacementsBwd) {
-  const tuples = poseChain.map(([parentJoinName, childJoinName]) => [partIds[parentJoinName], partIds[childJoinName]]);
-  const edgesFwd = tuples.map(([, childJointId]) => childJointId);
-  const edgesBwd = tuples.map(([parentJointId]) => parentJointId);
-  const numParts = scores.shape[2];
-  const numEdges = edgesFwd.length;
-  const keypoints = new Array(numParts);
-  const rootPoint = getImageCoords(root.part, outputStride, offsets);
-  keypoints[root.part.id] = {
-    score: root.score,
-    part: partNames[root.part.id],
-    position: rootPoint
-  };
-  for (let edge = numEdges - 1; edge >= 0; --edge) {
-    const sourceId = edgesFwd[edge];
-    const targetId = edgesBwd[edge];
-    if (keypoints[sourceId] && !keypoints[targetId]) {
-      keypoints[targetId] = traverse(edge, keypoints[sourceId], targetId, scores, offsets, displacementsBwd);
-    }
-  }
-  for (let edge = 0; edge < numEdges; ++edge) {
-    const sourceId = edgesBwd[edge];
-    const targetId = edgesFwd[edge];
-    if (keypoints[sourceId] && !keypoints[targetId]) {
-      keypoints[targetId] = traverse(edge, keypoints[sourceId], targetId, scores, offsets, displacementsFwd);
-    }
-  }
-  return keypoints;
-}
-function scoreIsMaximumInLocalWindow(keypointId, score, heatmapY, heatmapX, scores) {
-  const [height, width] = scores.shape;
-  let localMaximum = true;
-  const yStart = Math.max(heatmapY - localMaximumRadius, 0);
-  const yEnd = Math.min(heatmapY + localMaximumRadius + 1, height);
-  for (let yCurrent = yStart; yCurrent < yEnd; ++yCurrent) {
-    const xStart = Math.max(heatmapX - localMaximumRadius, 0);
-    const xEnd = Math.min(heatmapX + localMaximumRadius + 1, width);
-    for (let xCurrent = xStart; xCurrent < xEnd; ++xCurrent) {
-      if (scores.get(yCurrent, xCurrent, keypointId) > score) {
-        localMaximum = false;
-        break;
-      }
-    }
-    if (!localMaximum) break;
-  }
-  return localMaximum;
-}
-function buildPartWithScoreQueue(minConfidence2, scores) {
-  const [height, width, numKeypoints] = scores.shape;
-  const queue = new MaxHeap(height * width * numKeypoints, ({ score }) => score);
-  for (let heatmapY = 0; heatmapY < height; ++heatmapY) {
-    for (let heatmapX = 0; heatmapX < width; ++heatmapX) {
-      for (let keypointId = 0; keypointId < numKeypoints; ++keypointId) {
-        const score = scores.get(heatmapY, heatmapX, keypointId);
-        if (score < minConfidence2) continue;
-        if (scoreIsMaximumInLocalWindow(keypointId, score, heatmapY, heatmapX, scores)) queue.enqueue({ score, part: { heatmapY, heatmapX, id: keypointId } });
-      }
-    }
-  }
-  return queue;
-}
-function withinRadius(poses, { x, y: y8 }, keypointId) {
-  return poses.some(({ keypoints }) => {
-    var _a;
-    const correspondingKeypoint = (_a = keypoints[keypointId]) == null ? void 0 : _a.position;
-    if (!correspondingKeypoint) return false;
-    return squaredDistance(y8, x, correspondingKeypoint.y, correspondingKeypoint.x) <= squaredNmsRadius;
-  });
-}
-function getInstanceScore(existingPoses, keypoints) {
-  const notOverlappedKeypointScores = keypoints.reduce((result, { position, score }, keypointId) => {
-    if (!withinRadius(existingPoses, position, keypointId)) result += score;
-    return result;
-  }, 0);
-  return notOverlappedKeypointScores / keypoints.length;
-}
-function decode(offsets, scores, displacementsFwd, displacementsBwd, maxDetected, minConfidence2) {
-  const poses = [];
-  const queue = buildPartWithScoreQueue(minConfidence2, scores);
-  while (poses.length < maxDetected && !queue.empty()) {
-    const root = queue.dequeue();
-    const rootImageCoords = getImageCoords(root.part, outputStride, offsets);
-    if (withinRadius(poses, rootImageCoords, root.part.id)) continue;
-    let keypoints = decodePose(root, scores, offsets, displacementsFwd, displacementsBwd);
-    keypoints = keypoints.filter((a) => a.score > minConfidence2);
-    const score = getInstanceScore(poses, keypoints);
-    const box = getBoundingBox(keypoints);
-    if (score > minConfidence2) poses.push({ keypoints, box, score: Math.round(100 * score) / 100 });
-  }
-  return poses;
-}
-async function predict19(input, config3) {
-  if (!(model20 == null ? void 0 : model20["executor"])) return [];
-  const res = De(() => {
-    if (!model20.inputs[0].shape) return [];
-    const resized = eX.resizeBilinear(input, [model20.inputs[0].shape[2], model20.inputs[0].shape[1]]);
-    const normalized = Te(je(Ue(resized, "float32"), 127.5), 1);
-    const results = model20.execute(normalized, poseNetOutputs);
-    const results3d = results.map((y8) => cc(y8, [0]));
-    results3d[1] = Ea(results3d[1]);
-    return results3d;
-  });
-  const buffers = await Promise.all(res.map((tensor2) => tensor2.buffer()));
-  for (const t10 of res) Ot(t10);
-  const decoded = decode(buffers[0], buffers[1], buffers[2], buffers[3], config3.body.maxDetected, config3.body.minConfidence);
-  if (!model20.inputs[0].shape) return [];
-  const scaled = scalePoses(decoded, [input.shape[1], input.shape[2]], [model20.inputs[0].shape[2], model20.inputs[0].shape[1]]);
-  return scaled;
-}
 async function load18(config3) {
   if (!model20 || env.initial) model20 = await loadModel(config3.body.modelPath);
   else if (config3.debug) log("cached model:", model20["modelUrl"]);
@@ -45241,7 +39695,7 @@ async function load18(config3) {
 
 // src/segmentation/rvm.ts
 var model21;
-var outputNodes2 = ["fgr", "pha", "r1o", "r2o", "r3o", "r4o"];
+var outputNodes = ["fgr", "pha", "r1o", "r2o", "r3o", "r4o"];
 var t = {};
 var ratio = 0;
 function init3(config3) {
@@ -45289,12 +39743,12 @@ function getState(state) {
     return yt([r15.tile, r15.alpha], -1);
   });
 }
-async function predict20(input, config3) {
+async function predict12(input, config3) {
   if (!model21) model21 = await load19(config3);
   if (!(model21 == null ? void 0 : model21["executor"])) return null;
   t.src = je(input, 255);
   if (ratio !== config3.segmentation.ratio) init3(config3);
-  const [fgr, pha, r1o, r2o, r3o, r4o] = await model21.executeAsync(t, outputNodes2);
+  const [fgr, pha, r1o, r2o, r3o, r4o] = await model21.executeAsync(t, outputNodes);
   let rgba;
   switch (config3.segmentation.mode || "default") {
     case "default":
@@ -45324,7 +39778,7 @@ async function load20(config3) {
   else if (config3.debug) log("cached model:", model22["modelUrl"]);
   return model22;
 }
-async function predict21(input, config3) {
+async function predict13(input, config3) {
   var _a;
   if (!model22) model22 = await load20(config3);
   if (!(model22 == null ? void 0 : model22["executor"]) || !((_a = model22 == null ? void 0 : model22.inputs) == null ? void 0 : _a[0].shape)) return null;
@@ -45416,21 +39870,21 @@ var Models = class {
     if (env.initial) this.reset();
     if (instance) this.instance = instance;
     const m = {};
-    m.blazeface = this.instance.config.face.enabled && !this.models.blazeface ? load3(this.instance.config) : null;
-    m.antispoof = this.instance.config.face.enabled && ((_a = this.instance.config.face.antispoof) == null ? void 0 : _a.enabled) && !this.models.antispoof ? load8(this.instance.config) : null;
-    m.liveness = this.instance.config.face.enabled && ((_b = this.instance.config.face.liveness) == null ? void 0 : _b.enabled) && !this.models.liveness ? load9(this.instance.config) : null;
-    m.faceres = this.instance.config.face.enabled && ((_c2 = this.instance.config.face.description) == null ? void 0 : _c2.enabled) && !this.models.faceres ? load7(this.instance.config) : null;
-    m.emotion = this.instance.config.face.enabled && ((_d2 = this.instance.config.face.emotion) == null ? void 0 : _d2.enabled) && !this.models.emotion ? load6(this.instance.config) : null;
-    m.iris = this.instance.config.face.enabled && ((_e = this.instance.config.face.iris) == null ? void 0 : _e.enabled) && !((_f2 = this.instance.config.face.attention) == null ? void 0 : _f2.enabled) && !this.models.iris ? load4(this.instance.config) : null;
-    m.facemesh = this.instance.config.face.enabled && ((_g2 = this.instance.config.face.mesh) == null ? void 0 : _g2.enabled) && !this.models.facemesh ? load5(this.instance.config) : null;
-    m.gear = this.instance.config.face.enabled && ((_h2 = this.instance.config.face["gear"]) == null ? void 0 : _h2.enabled) && !this.models.gear ? load10(this.instance.config) : null;
-    m.ssrnetage = this.instance.config.face.enabled && ((_i2 = this.instance.config.face["ssrnet"]) == null ? void 0 : _i2.enabled) && !this.models.ssrnetage ? load11(this.instance.config) : null;
-    m.ssrnetgender = this.instance.config.face.enabled && ((_j2 = this.instance.config.face["ssrnet"]) == null ? void 0 : _j2.enabled) && !this.models.ssrnetgender ? load12(this.instance.config) : null;
-    m.mobilefacenet = this.instance.config.face.enabled && ((_k2 = this.instance.config.face["mobilefacenet"]) == null ? void 0 : _k2.enabled) && !this.models.mobilefacenet ? load13(this.instance.config) : null;
-    m.insightface = this.instance.config.face.enabled && ((_l2 = this.instance.config.face["insightface"]) == null ? void 0 : _l2.enabled) && !this.models.insightface ? load14(this.instance.config) : null;
+    m.blazeface = this.instance.config.face.enabled && !this.models.blazeface ? load(this.instance.config) : null;
+    m.antispoof = this.instance.config.face.enabled && ((_a = this.instance.config.face.antispoof) == null ? void 0 : _a.enabled) && !this.models.antispoof ? load6(this.instance.config) : null;
+    m.liveness = this.instance.config.face.enabled && ((_b = this.instance.config.face.liveness) == null ? void 0 : _b.enabled) && !this.models.liveness ? load7(this.instance.config) : null;
+    m.faceres = this.instance.config.face.enabled && ((_c2 = this.instance.config.face.description) == null ? void 0 : _c2.enabled) && !this.models.faceres ? load5(this.instance.config) : null;
+    m.emotion = this.instance.config.face.enabled && ((_d2 = this.instance.config.face.emotion) == null ? void 0 : _d2.enabled) && !this.models.emotion ? load4(this.instance.config) : null;
+    m.iris = this.instance.config.face.enabled && ((_e = this.instance.config.face.iris) == null ? void 0 : _e.enabled) && !((_f2 = this.instance.config.face.attention) == null ? void 0 : _f2.enabled) && !this.models.iris ? load2(this.instance.config) : null;
+    m.facemesh = this.instance.config.face.enabled && ((_g2 = this.instance.config.face.mesh) == null ? void 0 : _g2.enabled) && !this.models.facemesh ? load3(this.instance.config) : null;
+    m.gear = this.instance.config.face.enabled && ((_h2 = this.instance.config.face["gear"]) == null ? void 0 : _h2.enabled) && !this.models.gear ? load8(this.instance.config) : null;
+    m.ssrnetage = this.instance.config.face.enabled && ((_i2 = this.instance.config.face["ssrnet"]) == null ? void 0 : _i2.enabled) && !this.models.ssrnetage ? load9(this.instance.config) : null;
+    m.ssrnetgender = this.instance.config.face.enabled && ((_j2 = this.instance.config.face["ssrnet"]) == null ? void 0 : _j2.enabled) && !this.models.ssrnetgender ? load10(this.instance.config) : null;
+    m.mobilefacenet = this.instance.config.face.enabled && ((_k2 = this.instance.config.face["mobilefacenet"]) == null ? void 0 : _k2.enabled) && !this.models.mobilefacenet ? load11(this.instance.config) : null;
+    m.insightface = this.instance.config.face.enabled && ((_l2 = this.instance.config.face["insightface"]) == null ? void 0 : _l2.enabled) && !this.models.insightface ? load12(this.instance.config) : null;
     m.blazepose = this.instance.config.body.enabled && !this.models.blazepose && ((_m = this.instance.config.body.modelPath) == null ? void 0 : _m.includes("blazepose")) ? loadPose(this.instance.config) : null;
     m.blazeposedetect = this.instance.config.body.enabled && !this.models.blazeposedetect && this.instance.config.body["detector"] && this.instance.config.body["detector"].modelPath ? loadDetect(this.instance.config) : null;
-    m.efficientpose = this.instance.config.body.enabled && !this.models.efficientpose && ((_n2 = this.instance.config.body.modelPath) == null ? void 0 : _n2.includes("efficientpose")) ? load2(this.instance.config) : null;
+    m.efficientpose = this.instance.config.body.enabled && !this.models.efficientpose && ((_n2 = this.instance.config.body.modelPath) == null ? void 0 : _n2.includes("efficientpose")) ? load14(this.instance.config) : null;
     m.movenet = this.instance.config.body.enabled && !this.models.movenet && ((_o2 = this.instance.config.body.modelPath) == null ? void 0 : _o2.includes("movenet")) ? load16(this.instance.config) : null;
     m.posenet = this.instance.config.body.enabled && !this.models.posenet && ((_p2 = this.instance.config.body.modelPath) == null ? void 0 : _p2.includes("posenet")) ? load18(this.instance.config) : null;
     m.handtrack = this.instance.config.hand.enabled && !this.models.handtrack && ((_r2 = (_q2 = this.instance.config.hand.detector) == null ? void 0 : _q2.modelPath) == null ? void 0 : _r2.includes("handtrack")) ? loadDetect3(this.instance.config) : null;
@@ -45439,7 +39893,7 @@ var Models = class {
       m.handdetect = loadDetect2(this.instance.config);
       m.handskeleton = loadSkeleton(this.instance.config);
     }
-    m.centernet = this.instance.config.object.enabled && !this.models.centernet && ((_w2 = this.instance.config.object.modelPath) == null ? void 0 : _w2.includes("centernet")) ? load(this.instance.config) : null;
+    m.centernet = this.instance.config.object.enabled && !this.models.centernet && ((_w2 = this.instance.config.object.modelPath) == null ? void 0 : _w2.includes("centernet")) ? load13(this.instance.config) : null;
     m.nanodet = this.instance.config.object.enabled && !this.models.nanodet && ((_x2 = this.instance.config.object.modelPath) == null ? void 0 : _x2.includes("nanodet")) ? load17(this.instance.config) : null;
     m.selfie = this.instance.config.segmentation.enabled && !this.models.selfie && ((_y = this.instance.config.segmentation.modelPath) == null ? void 0 : _y.includes("selfie")) ? load20(this.instance.config) : null;
     m.meet = this.instance.config.segmentation.enabled && !this.models.meet && ((_z2 = this.instance.config.segmentation.modelPath) == null ? void 0 : _z2.includes("meet")) ? load15(this.instance.config) : null;
@@ -45479,58 +39933,234 @@ var Models = class {
   }
 };
 
-// src/util/persons.ts
-function join2(faces, bodies, hands, gestures, shape) {
-  var _a, _b, _c2, _d2, _e, _f2;
-  let id2 = 0;
-  const persons = [];
-  for (const face4 of faces) {
-    const person2 = { id: id2++, face: face4, body: null, hands: { left: null, right: null }, gestures: [], box: [0, 0, 0, 0] };
-    for (const body4 of bodies) {
-      if (face4.box[0] > body4.box[0] && face4.box[0] < body4.box[0] + body4.box[2] && face4.box[1] + face4.box[3] > body4.box[1] && face4.box[1] + face4.box[3] < body4.box[1] + body4.box[3]) {
-        person2.body = body4;
-      }
-    }
-    if (person2.body) {
-      for (const hand3 of hands) {
-        if (hand3.box[0] + hand3.box[2] > person2.body.box[0] && hand3.box[0] + hand3.box[2] < person2.body.box[0] + person2.body.box[2] && hand3.box[1] + hand3.box[3] > person2.body.box[1] && hand3.box[1] + hand3.box[3] < person2.body.box[1] + person2.body.box[3]) {
-          if (person2.hands) person2.hands.left = hand3;
+// src/result.ts
+var empty = (error = null) => ({ face: [], performance: {}, timestamp: 0, width: 0, height: 0, error });
+
+// src/util/interpolate.ts
+var bufferedResult = empty();
+var interpolateTime = 0;
+function calc2(newResult) {
+  var _a, _b, _c2, _d2, _e, _f2, _g2, _h2, _i2, _j2, _k2, _l2, _m, _n2, _o2, _p2, _q2, _r2, _s2, _t;
+  const t02 = now();
+  if (!newResult) return empty();
+  const elapsed = Date.now() - newResult.timestamp;
+  const bufferedFactor = elapsed < 1e3 ? 8 - Math.log(elapsed + 1) : 1;
+  if (newResult.canvas) bufferedResult.canvas = newResult.canvas;
+  if (newResult.error) bufferedResult.error = newResult.error;
+  if (!bufferedResult.face || newResult.face.length !== bufferedResult.face.length) {
+    bufferedResult.face = JSON.parse(JSON.stringify(newResult.face));
+  } else {
+    for (let i = 0; i < newResult.face.length; i++) {
+      const box = newResult.face[i].box.map((b, j) => ((bufferedFactor - 1) * bufferedResult.face[i].box[j] + b) / bufferedFactor);
+      const boxRaw = newResult.face[i].boxRaw.map((b, j) => ((bufferedFactor - 1) * bufferedResult.face[i].boxRaw[j] + b) / bufferedFactor);
+      let annotations2 = newResult.face[i].annotations;
+      if (Object.keys(bufferedResult.face[i].annotations).length !== Object.keys(newResult.face[i].annotations).length) {
+        bufferedResult.face[i].annotations = newResult.face[i].annotations;
+        annotations2 = bufferedResult.face[i].annotations;
+      } else if (newResult.face[i].annotations) {
+        for (const key of Object.keys(newResult.face[i].annotations)) {
+          annotations2[key] = ((_c2 = (_b = (_a = newResult.face[i]) == null ? void 0 : _a.annotations) == null ? void 0 : _b[key]) == null ? void 0 : _c2[0]) ? newResult.face[i].annotations[key].map((val, j) => val.map((coord, k) => ((bufferedFactor - 1) * bufferedResult.face[i].annotations[key][j][k] + coord) / bufferedFactor)) : null;
         }
-        if (hand3.box[0] < person2.body.box[0] + person2.body.box[2] && hand3.box[0] > person2.body.box[0] && hand3.box[1] + hand3.box[3] > person2.body.box[1] && hand3.box[1] + hand3.box[3] < person2.body.box[1] + person2.body.box[3]) {
-          if (person2.hands) person2.hands.right = hand3;
-        }
+      }
+      if (newResult.face[i].rotation) {
+        const rotation = { matrix: [0, 0, 0, 0, 0, 0, 0, 0, 0], angle: { roll: 0, yaw: 0, pitch: 0 }, gaze: { bearing: 0, strength: 0 } };
+        rotation.matrix = (_d2 = newResult.face[i].rotation) == null ? void 0 : _d2.matrix;
+        rotation.angle = {
+          roll: ((bufferedFactor - 1) * (((_f2 = (_e = bufferedResult.face[i].rotation) == null ? void 0 : _e.angle) == null ? void 0 : _f2.roll) || 0) + (((_h2 = (_g2 = newResult.face[i].rotation) == null ? void 0 : _g2.angle) == null ? void 0 : _h2.roll) || 0)) / bufferedFactor,
+          yaw: ((bufferedFactor - 1) * (((_j2 = (_i2 = bufferedResult.face[i].rotation) == null ? void 0 : _i2.angle) == null ? void 0 : _j2.yaw) || 0) + (((_l2 = (_k2 = newResult.face[i].rotation) == null ? void 0 : _k2.angle) == null ? void 0 : _l2.yaw) || 0)) / bufferedFactor,
+          pitch: ((bufferedFactor - 1) * (((_n2 = (_m = bufferedResult.face[i].rotation) == null ? void 0 : _m.angle) == null ? void 0 : _n2.pitch) || 0) + (((_p2 = (_o2 = newResult.face[i].rotation) == null ? void 0 : _o2.angle) == null ? void 0 : _p2.pitch) || 0)) / bufferedFactor
+        };
+        rotation.gaze = {
+          // not fully correct due projection on circle, also causes wrap-around draw on jump from negative to positive
+          bearing: ((bufferedFactor - 1) * (((_q2 = bufferedResult.face[i].rotation) == null ? void 0 : _q2.gaze.bearing) || 0) + (((_r2 = newResult.face[i].rotation) == null ? void 0 : _r2.gaze.bearing) || 0)) / bufferedFactor,
+          strength: ((bufferedFactor - 1) * (((_s2 = bufferedResult.face[i].rotation) == null ? void 0 : _s2.gaze.strength) || 0) + (((_t = newResult.face[i].rotation) == null ? void 0 : _t.gaze.strength) || 0)) / bufferedFactor
+        };
+        bufferedResult.face[i] = { ...newResult.face[i], rotation, box, boxRaw, annotations: annotations2 };
+      } else {
+        bufferedResult.face[i] = { ...newResult.face[i], box, boxRaw, annotations: annotations2 };
       }
     }
-    for (const gesture2 of gestures) {
-      if (gesture2["face"] !== void 0 && gesture2["face"] === face4.id) person2.gestures.push(gesture2);
-      else if (gesture2["iris"] !== void 0 && gesture2["iris"] === face4.id) person2.gestures.push(gesture2);
-      else if (gesture2["body"] !== void 0 && gesture2["body"] === ((_a = person2.body) == null ? void 0 : _a.id)) person2.gestures.push(gesture2);
-      else if (gesture2["hand"] !== void 0 && gesture2["hand"] === ((_b = person2.hands.left) == null ? void 0 : _b.id)) person2.gestures.push(gesture2);
-      else if (gesture2["hand"] !== void 0 && gesture2["hand"] === ((_c2 = person2.hands.right) == null ? void 0 : _c2.id)) person2.gestures.push(gesture2);
-    }
-    const x = [];
-    const y8 = [];
-    const extractXY = (box) => {
-      if (box && box.length === 4) {
-        x.push(box[0], box[0] + box[2]);
-        y8.push(box[1], box[1] + box[3]);
-      }
-    };
-    extractXY(person2.face.box);
-    extractXY((_d2 = person2.body) == null ? void 0 : _d2.box);
-    extractXY((_e = person2.hands.left) == null ? void 0 : _e.box);
-    extractXY((_f2 = person2.hands.right) == null ? void 0 : _f2.box);
-    const minX = Math.min(...x);
-    const minY = Math.min(...y8);
-    person2.box = [minX, minY, Math.max(...x) - minX, Math.max(...y8) - minY];
-    if ((shape == null ? void 0 : shape[1]) && (shape == null ? void 0 : shape[2])) person2.boxRaw = [person2.box[0] / shape[2], person2.box[1] / shape[1], person2.box[2] / shape[2], person2.box[3] / shape[1]];
-    persons.push(person2);
   }
-  return persons;
+  bufferedResult.width = newResult.width;
+  bufferedResult.height = newResult.height;
+  const t12 = now();
+  interpolateTime = env.perfadd ? interpolateTime + Math.round(t12 - t02) : Math.round(t12 - t02);
+  if (newResult.performance) bufferedResult.performance = { ...newResult.performance, interpolate: interpolateTime };
+  return bufferedResult;
 }
 
+// src/util/webcam.ts
+var WebCam = class {
+  constructor() {
+    // eslint-disable-line @typescript-eslint/no-extraneous-class
+    /** current webcam configuration */
+    __publicField(this, "config");
+    /** instance of dom element associated with webcam stream */
+    __publicField(this, "element");
+    /** active webcam stream */
+    __publicField(this, "stream");
+    /** enumerated video devices */
+    __publicField(this, "devices", []);
+    __publicField(this, "enumerate", async () => {
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        this.devices = devices.filter((device) => device.kind === "videoinput");
+      } catch (e) {
+        this.devices = [];
+      }
+      return this.devices;
+    });
+    /** start method initializizes webcam stream and associates it with a dom video element */
+    __publicField(this, "start", async (webcamConfig) => {
+      var _a, _b;
+      if (webcamConfig == null ? void 0 : webcamConfig.debug) this.config.debug = webcamConfig == null ? void 0 : webcamConfig.debug;
+      if (webcamConfig == null ? void 0 : webcamConfig.crop) this.config.crop = webcamConfig == null ? void 0 : webcamConfig.crop;
+      if (webcamConfig == null ? void 0 : webcamConfig.mode) this.config.mode = webcamConfig == null ? void 0 : webcamConfig.mode;
+      if (webcamConfig == null ? void 0 : webcamConfig.width) this.config.width = webcamConfig == null ? void 0 : webcamConfig.width;
+      if (webcamConfig == null ? void 0 : webcamConfig.height) this.config.height = webcamConfig == null ? void 0 : webcamConfig.height;
+      if (webcamConfig == null ? void 0 : webcamConfig.id) this.config.id = webcamConfig == null ? void 0 : webcamConfig.id;
+      if (webcamConfig == null ? void 0 : webcamConfig.element) {
+        if (typeof webcamConfig.element === "string") {
+          const el2 = document.getElementById(webcamConfig.element);
+          if (el2 && el2 instanceof HTMLVideoElement) {
+            this.element = el2;
+          } else {
+            if (this.config.debug) log("webcam", "cannot get dom element", webcamConfig.element);
+            return `webcam error: cannot get dom element: ${webcamConfig.element}`;
+          }
+        } else if (webcamConfig.element instanceof HTMLVideoElement) {
+          this.element = webcamConfig.element;
+        } else {
+          if (this.config.debug) log("webcam", "unknown dom element", webcamConfig.element);
+          return `webcam error: unknown dom element: ${webcamConfig.element}`;
+        }
+      } else {
+        this.element = document.createElement("video");
+      }
+      const requestedConstraints = {
+        audio: false,
+        video: {
+          facingMode: this.config.mode === "front" ? "user" : "environment",
+          // @ts-ignore // resizeMode is still not defined in tslib
+          resizeMode: this.config.crop ? "crop-and-scale" : "none"
+        }
+      };
+      if (((_a = this.config) == null ? void 0 : _a.width) > 0) requestedConstraints.video.width = { ideal: this.config.width };
+      if (((_b = this.config) == null ? void 0 : _b.height) > 0) requestedConstraints.video.height = { ideal: this.config.height };
+      if (this.config.id) requestedConstraints.video.deviceId = this.config.id;
+      this.element.addEventListener("play", () => {
+        if (this.config.debug) log("webcam", "play");
+      });
+      this.element.addEventListener("pause", () => {
+        if (this.config.debug) log("webcam", "pause");
+      });
+      this.element.addEventListener("click", async () => {
+        if (!this.element || !this.stream) return;
+        if (this.element.paused) await this.element.play();
+        else this.element.pause();
+      });
+      if (!(navigator == null ? void 0 : navigator.mediaDevices)) {
+        if (this.config.debug) log("webcam error", "no devices");
+        return "webcam error: no devices";
+      }
+      try {
+        this.stream = await navigator.mediaDevices.getUserMedia(requestedConstraints);
+      } catch (err) {
+        log("webcam", err);
+        return `webcam error: ${err}`;
+      }
+      if (!this.stream) {
+        if (this.config.debug) log("webcam error", "no stream");
+        return "webcam error no stream";
+      }
+      this.element.srcObject = this.stream;
+      const ready = new Promise((resolve) => {
+        if (!this.element) resolve(false);
+        else this.element.onloadeddata = () => resolve(true);
+      });
+      await ready;
+      await this.element.play();
+      if (this.config.debug) {
+        log("webcam", {
+          width: this.width,
+          height: this.height,
+          label: this.label,
+          stream: this.stream,
+          track: this.track,
+          settings: this.settings,
+          constraints: this.constraints,
+          capabilities: this.capabilities
+        });
+      }
+      return `webcam: ${this.label}`;
+    });
+    /** pause webcam video method */
+    __publicField(this, "pause", () => {
+      if (this.element) this.element.pause();
+    });
+    /** play webcam video method */
+    __publicField(this, "play", async () => {
+      if (this.element) await this.element.play();
+    });
+    /** stop method stops active webcam stream track and disconnects webcam */
+    __publicField(this, "stop", () => {
+      if (this.config.debug) log("webcam", "stop");
+      if (this.track) this.track.stop();
+    });
+    this.config = {
+      element: void 0,
+      debug: true,
+      mode: "front",
+      crop: false,
+      width: 0,
+      height: 0
+    };
+  }
+  /** get active webcam stream track */
+  get track() {
+    if (!this.stream) return void 0;
+    return this.stream.getVideoTracks()[0];
+  }
+  /** get webcam capabilities */
+  get capabilities() {
+    if (!this.track) return void 0;
+    return this.track.getCapabilities ? this.track.getCapabilities() : void 0;
+  }
+  /** get webcam constraints */
+  get constraints() {
+    if (!this.track) return void 0;
+    return this.track.getConstraints ? this.track.getConstraints() : void 0;
+  }
+  /** get webcam settings */
+  get settings() {
+    if (!this.stream) return void 0;
+    const track = this.stream.getVideoTracks()[0];
+    return track.getSettings ? track.getSettings() : void 0;
+  }
+  /** get webcam label */
+  get label() {
+    if (!this.track) return "";
+    return this.track.label;
+  }
+  /** is webcam paused */
+  get paused() {
+    var _a;
+    return ((_a = this.element) == null ? void 0 : _a.paused) || false;
+  }
+  /** webcam current width */
+  get width() {
+    var _a;
+    return ((_a = this.element) == null ? void 0 : _a.videoWidth) || 0;
+  }
+  /** webcam current height */
+  get height() {
+    var _a;
+    return ((_a = this.element) == null ? void 0 : _a.videoHeight) || 0;
+  }
+};
+
 // src/sample.ts
-var face3 = `
+var face2 = `
 /9j/4AAQSkZJRgABAQEAYABgAAD/4QBoRXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUA
 AAABAAAARgEoAAMAAAABAAIAAAExAAIAAAARAAAATgAAAAAAAABgAAAAAQAAAGAAAAABcGFpbnQu
 bmV0IDQuMi4xMwAA/9sAQwAGBAUGBQQGBgUGBwcGCAoQCgoJCQoUDg8MEBcUGBgXFBYWGh0lHxob
@@ -45682,7 +40312,7 @@ c6oaM5TUJ8EgGsG4kLNUHT0M64OaqMMikSRsuKbnFMRLG3zVehOaGNE445NNlnVFpDMu6uie9Vo1
 8z5mOAOST2pDK91cNN+5tsrH3PrW54a06KxT7fdrlh/q1Pc+tJ6IUdZGvHPLezMcnBOWbsPap5r3
 ylFtbdT1xUWNWzU0/Zbwlgfmx8zGsHWtRHmMqE59aAMyNifvHPc1f0gtPdqkY5JosJHeNci2tktY
 euPnNY+oXWZEVJNrZ9aun8SIq/CzodHuriIokhDIR1ronbKZr0o6o8ipoz//2Q==`;
-var body3 = `
+var body2 = `
 /9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAsICAoIBwsKCQoNDAsNERwSEQ8PESIZGhQcKSQrKigk
 JyctMkA3LTA9MCcnOEw5PUNFSElIKzZPVU5GVEBHSEX/2wBDAQwNDREPESESEiFFLicuRUVFRUVF
 RUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUX/wAARCASwBLADASIA
@@ -46259,11 +40889,11 @@ async function warmupBitmap(instance) {
   let res;
   switch (instance.config.warmup) {
     case "face":
-      blob = await b64toBlob(face3);
+      blob = await b64toBlob(face2);
       break;
     case "body":
     case "full":
-      blob = await b64toBlob(body3);
+      blob = await b64toBlob(body2);
       break;
     default:
       blob = null;
@@ -46280,11 +40910,11 @@ async function warmupCanvas(instance) {
     let src;
     switch (instance.config.warmup) {
       case "face":
-        src = "data:image/jpeg;base64," + face3;
+        src = "data:image/jpeg;base64," + face2;
         break;
       case "full":
       case "body":
-        src = "data:image/jpeg;base64," + body3;
+        src = "data:image/jpeg;base64," + body2;
         break;
       default:
         src = "";
@@ -46316,8 +40946,8 @@ async function warmupCanvas(instance) {
 async function warmupNode(instance) {
   const atob2 = (str) => Buffer.from(str, "base64");
   let img;
-  if (instance.config.warmup === "face") img = atob2(face3);
-  else img = atob2(body3);
+  if (instance.config.warmup === "face") img = atob2(face2);
+  else img = atob2(body2);
   let res;
   if ("node" in tfjs_esm_exports && sk() === "tensorflow") {
     const data = EQt.decodeJpeg(img);
@@ -46513,7 +41143,7 @@ var Human = class {
     this.performance = {};
     this.events = typeof EventTarget !== "undefined" ? new EventTarget() : void 0;
     this.models = new Models(this);
-    init2();
+    init();
     this.result = empty();
     this.process = { tensor: null, canvas: null };
     this.faceTriangulation = triangulation;
@@ -46568,9 +41198,9 @@ var Human = class {
     const processed = await process2(input, this.config);
     if (!processed.tensor) return null;
     let tensor2 = null;
-    if ((_a = this.config.segmentation.modelPath) == null ? void 0 : _a.includes("rvm")) tensor2 = await predict20(processed.tensor, this.config);
-    if ((_b = this.config.segmentation.modelPath) == null ? void 0 : _b.includes("meet")) tensor2 = await predict16(processed.tensor, this.config);
-    if ((_c2 = this.config.segmentation.modelPath) == null ? void 0 : _c2.includes("selfie")) tensor2 = await predict21(processed.tensor, this.config);
+    if ((_a = this.config.segmentation.modelPath) == null ? void 0 : _a.includes("rvm")) tensor2 = await predict12(processed.tensor, this.config);
+    if ((_b = this.config.segmentation.modelPath) == null ? void 0 : _b.includes("meet")) tensor2 = await predict11(processed.tensor, this.config);
+    if ((_c2 = this.config.segmentation.modelPath) == null ? void 0 : _c2.includes("selfie")) tensor2 = await predict13(processed.tensor, this.config);
     Ot(processed.tensor);
     return tensor2;
   }
@@ -46630,7 +41260,7 @@ var Human = class {
    * @returns result - {@link Result}
    */
   next(result = this.result) {
-    return calc2(result, this.config);
+    return calc2(result);
   }
   /** Warmup method pre-initializes all configured models for faster inference
    * - can take significant time on startup
@@ -46682,7 +41312,7 @@ var Human = class {
   async detect(input, userConfig) {
     this.state = "detect";
     return new Promise(async (resolve) => {
-      var _a, _b, _c2, _d2, _e, _f2, _g2, _h2, _i2, _j2, _k2, _l2, _m, _n2, _o2, _p2, _q2, _r2, _s2, _t, _u2;
+      var _a;
       this.state = "config";
       let timeStamp;
       this.config = mergeDeep(this.config, userConfig);
@@ -46718,9 +41348,6 @@ var Human = class {
       this.performance.cacheCheck = this.env.perfadd ? (this.performance.cacheCheck || 0) + Math.trunc(now() - timeStamp) : Math.trunc(now() - timeStamp);
       this.analyze("Check Changed:");
       let faceRes = [];
-      let bodyRes = [];
-      let handRes = [];
-      let objectRes = [];
       this.state = "detect:face";
       if (this.config.async) {
         faceRes = this.config.face.enabled ? detectFace(this, img.tensor) : [];
@@ -46731,78 +41358,18 @@ var Human = class {
         this.performance.face = this.env.perfadd ? (this.performance.face || 0) + Math.trunc(now() - timeStamp) : Math.trunc(now() - timeStamp);
       }
       if (this.config.async && (this.config.body.maxDetected === -1 || this.config.hand.maxDetected === -1)) faceRes = await faceRes;
-      this.analyze("Start Body:");
-      this.state = "detect:body";
-      const bodyConfig = this.config.body.maxDetected === -1 ? mergeDeep(this.config, { body: { maxDetected: this.config.face.enabled ? 1 * faceRes.length : 1 } }) : this.config;
-      if (this.config.async) {
-        if ((_a = this.config.body.modelPath) == null ? void 0 : _a.includes("posenet")) bodyRes = this.config.body.enabled ? predict19(img.tensor, bodyConfig) : [];
-        else if ((_b = this.config.body.modelPath) == null ? void 0 : _b.includes("blazepose")) bodyRes = this.config.body.enabled ? predict(img.tensor, bodyConfig) : [];
-        else if ((_c2 = this.config.body.modelPath) == null ? void 0 : _c2.includes("efficientpose")) bodyRes = this.config.body.enabled ? predict3(img.tensor, bodyConfig) : [];
-        else if ((_d2 = this.config.body.modelPath) == null ? void 0 : _d2.includes("movenet")) bodyRes = this.config.body.enabled ? predict17(img.tensor, bodyConfig) : [];
-        if (this.performance.body) delete this.performance.body;
-      } else {
-        timeStamp = now();
-        if ((_e = this.config.body.modelPath) == null ? void 0 : _e.includes("posenet")) bodyRes = this.config.body.enabled ? await predict19(img.tensor, bodyConfig) : [];
-        else if ((_f2 = this.config.body.modelPath) == null ? void 0 : _f2.includes("blazepose")) bodyRes = this.config.body.enabled ? await predict(img.tensor, bodyConfig) : [];
-        else if ((_g2 = this.config.body.modelPath) == null ? void 0 : _g2.includes("efficientpose")) bodyRes = this.config.body.enabled ? await predict3(img.tensor, bodyConfig) : [];
-        else if ((_h2 = this.config.body.modelPath) == null ? void 0 : _h2.includes("movenet")) bodyRes = this.config.body.enabled ? await predict17(img.tensor, bodyConfig) : [];
-        this.performance.body = this.env.perfadd ? (this.performance.body || 0) + Math.trunc(now() - timeStamp) : Math.trunc(now() - timeStamp);
-      }
-      this.analyze("End Body:");
-      this.analyze("Start Hand:");
-      this.state = "detect:hand";
-      const handConfig = this.config.hand.maxDetected === -1 ? mergeDeep(this.config, { hand: { maxDetected: this.config.face.enabled ? 2 * faceRes.length : 1 } }) : this.config;
-      if (this.config.async) {
-        if ((_j2 = (_i2 = this.config.hand.detector) == null ? void 0 : _i2.modelPath) == null ? void 0 : _j2.includes("handdetect")) handRes = this.config.hand.enabled ? predict14(img.tensor, handConfig) : [];
-        else if ((_l2 = (_k2 = this.config.hand.detector) == null ? void 0 : _k2.modelPath) == null ? void 0 : _l2.includes("handtrack")) handRes = this.config.hand.enabled ? predict15(img.tensor, handConfig) : [];
-        if (this.performance.hand) delete this.performance.hand;
-      } else {
-        timeStamp = now();
-        if ((_n2 = (_m = this.config.hand.detector) == null ? void 0 : _m.modelPath) == null ? void 0 : _n2.includes("handdetect")) handRes = this.config.hand.enabled ? await predict14(img.tensor, handConfig) : [];
-        else if ((_p2 = (_o2 = this.config.hand.detector) == null ? void 0 : _o2.modelPath) == null ? void 0 : _p2.includes("handtrack")) handRes = this.config.hand.enabled ? await predict15(img.tensor, handConfig) : [];
-        this.performance.hand = this.env.perfadd ? (this.performance.hand || 0) + Math.trunc(now() - timeStamp) : Math.trunc(now() - timeStamp);
-      }
-      this.analyze("End Hand:");
-      this.analyze("Start Object:");
-      this.state = "detect:object";
-      if (this.config.async) {
-        if ((_q2 = this.config.object.modelPath) == null ? void 0 : _q2.includes("nanodet")) objectRes = this.config.object.enabled ? predict18(img.tensor, this.config) : [];
-        else if ((_r2 = this.config.object.modelPath) == null ? void 0 : _r2.includes("centernet")) objectRes = this.config.object.enabled ? predict2(img.tensor, this.config) : [];
-        if (this.performance.object) delete this.performance.object;
-      } else {
-        timeStamp = now();
-        if ((_s2 = this.config.object.modelPath) == null ? void 0 : _s2.includes("nanodet")) objectRes = this.config.object.enabled ? await predict18(img.tensor, this.config) : [];
-        else if ((_t = this.config.object.modelPath) == null ? void 0 : _t.includes("centernet")) objectRes = this.config.object.enabled ? await predict2(img.tensor, this.config) : [];
-        this.performance.object = this.env.perfadd ? (this.performance.object || 0) + Math.trunc(now() - timeStamp) : Math.trunc(now() - timeStamp);
-      }
-      this.analyze("End Object:");
       this.state = "detect:await";
-      if (this.config.async) [faceRes, bodyRes, handRes, objectRes] = await Promise.all([faceRes, bodyRes, handRes, objectRes]);
-      this.state = "detect:gesture";
-      let gestureRes = [];
-      if (this.config.gesture.enabled) {
-        timeStamp = now();
-        gestureRes = [...face2(faceRes), ...body2(bodyRes), ...hand2(handRes), ...iris2(faceRes)];
-        if (!this.config.async) this.performance.gesture = this.env.perfadd ? (this.performance.gesture || 0) + Math.trunc(now() - timeStamp) : Math.trunc(now() - timeStamp);
-        else if (this.performance.gesture) delete this.performance.gesture;
-      }
+      if (this.config.async) [faceRes] = await Promise.all([faceRes]);
       this.performance.total = this.env.perfadd ? (this.performance.total || 0) + Math.trunc(now() - timeStart) : Math.trunc(now() - timeStart);
-      const shape = ((_u2 = this.process.tensor) == null ? void 0 : _u2.shape) || [0, 0, 0, 0];
+      const shape = ((_a = this.process.tensor) == null ? void 0 : _a.shape) || [0, 0, 0, 0];
       this.result = {
         face: faceRes,
-        body: bodyRes,
-        hand: handRes,
-        gesture: gestureRes,
-        object: objectRes,
         performance: this.performance,
         canvas: this.process.canvas,
         timestamp: Date.now(),
         error: null,
         width: shape[2],
-        height: shape[1],
-        get persons() {
-          return join2(faceRes, bodyRes, handRes, gestureRes, shape);
-        }
+        height: shape[1]
       };
       Ot(img.tensor);
       this.emit("detect");

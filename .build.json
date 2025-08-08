@@ -6,7 +6,7 @@
     "output": "test/build.log"
   },
   "profiles": {
-    "production": ["clean", "compile", "typings", "typedoc", "lint", "changelog"],
+    "production": ["clean", "compile", "typings", "lint"],
     "development": ["serve", "watch", "compile"],
     "serve": ["serve"],
     "clean": ["clean"]
@@ -45,55 +45,6 @@
         "format": "esm",
         "input": "tfjs/tf-version.ts",
         "output": "dist/tfjs.version.js"
-      },
-      {
-        "name": "tfjs/nodejs/cpu",
-        "platform": "node",
-        "format": "cjs",
-        "input": "tfjs/tf-node.ts",
-        "output": "dist/tfjs.esm.js",
-        "external": ["@tensorflow"]
-      },
-      {
-        "name": "human/nodejs/cpu",
-        "platform": "node",
-        "format": "cjs",
-        "input": "src/human.ts",
-        "output": "dist/human.node.js",
-        "external": ["@tensorflow"]
-      },
-      {
-        "name": "tfjs/nodejs/gpu",
-        "platform": "node",
-        "format": "cjs",
-        "input": "tfjs/tf-node-gpu.ts",
-        "output": "dist/tfjs.esm.js",
-        "external": ["@tensorflow"]
-      },
-      {
-        "name": "human/nodejs/gpu",
-        "platform": "node",
-        "format": "cjs",
-        "input": "src/human.ts",
-        "output": "dist/human.node-gpu.js",
-        "external": ["@tensorflow"]
-      },
-      {
-        "name": "tfjs/nodejs/wasm",
-        "platform": "node",
-        "format": "cjs",
-        "input": "tfjs/tf-node-wasm.ts",
-        "output": "dist/tfjs.esm.js",
-        "minify": false,
-        "external": ["@tensorflow"]
-      },
-      {
-        "name": "human/nodejs/wasm",
-        "platform": "node",
-        "format": "cjs",
-        "input": "src/human.ts",
-        "output": "dist/human.node-wasm.js",
-        "external": ["@tensorflow"]
       },
       {
         "name": "tfjs/browser/esm/nobundle",
@@ -142,33 +93,6 @@
         "external": ["@tensorflow"],
         "typings": "types/lib",
         "typedoc": "typedoc"
-      },
-      {
-        "name": "demo/typescript",
-        "platform": "browser",
-        "format": "esm",
-        "input": "demo/typescript/index.ts",
-        "output": "demo/typescript/index.js",
-        "sourcemap": true,
-        "external": ["*/human.esm.js"]
-      },
-      {
-        "name": "demo/faceid",
-        "platform": "browser",
-        "format": "esm",
-        "input": "demo/faceid/index.ts",
-        "output": "demo/faceid/index.js",
-        "sourcemap": true,
-        "external": ["*/human.esm.js"]
-      },
-      {
-        "name": "demo/tracker",
-        "platform": "browser",
-        "format": "esm",
-        "input": "demo/tracker/index.ts",
-        "output": "demo/tracker/index.js",
-        "sourcemap": true,
-        "external": ["*/human.esm.js"]
       }
     ]
   },

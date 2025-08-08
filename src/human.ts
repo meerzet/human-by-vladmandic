@@ -9,37 +9,27 @@
 
 // module imports
 import * as tf from 'dist/tfjs.esm.js';
-import { log, now, mergeDeep, validate } from './util/util';
-import { defaults } from './config';
-import { env, Env } from './util/env';
-import { WebCam } from './util/webcam';
-import { setModelLoadOptions } from './tfjs/load';
 import * as app from '../package.json';
-import * as backend from './tfjs/backend';
+import { defaults } from './config';
 import * as draw from './draw/draw';
-import * as blazepose from './body/blazepose';
-import * as centernet from './object/centernet';
-import * as efficientpose from './body/efficientpose';
 import * as face from './face/face';
 import * as facemesh from './face/facemesh';
-import * as gesture from './gesture/gesture';
-import * as handpose from './hand/handpose';
-import * as handtrack from './hand/handtrack';
-import * as image from './image/image';
-import * as interpolate from './util/interpolate';
-import * as meet from './segmentation/meet';
 import * as match from './face/match';
+import * as image from './image/image';
 import * as models from './models';
-import * as movenet from './body/movenet';
-import * as nanodet from './object/nanodet';
-import * as persons from './util/persons';
-import * as posenet from './body/posenet';
+import * as meet from './segmentation/meet';
 import * as rvm from './segmentation/rvm';
 import * as selfie from './segmentation/selfie';
+import * as backend from './tfjs/backend';
+import { setModelLoadOptions } from './tfjs/load';
+import { env, Env } from './util/env';
+import * as interpolate from './util/interpolate';
+import { log, mergeDeep, now, validate } from './util/util';
+import { WebCam } from './util/webcam';
 import * as warmups from './warmup';
 
 // type definitions
-import { Input, Config, Result, FaceResult, HandResult, BodyResult, ObjectResult, GestureResult, AnyCanvas, empty } from './exports';
+import { AnyCanvas, Config, empty, FaceResult, Input, Result } from './exports';
 import type { Tensor, Tensor4D } from './tfjs/types';
 // type exports
 export * from './exports';
@@ -323,7 +313,7 @@ export class Human {
    * @returns result - {@link Result}
    */
   next(result: Result = this.result): Result {
-    return interpolate.calc(result, this.config);
+    return interpolate.calc(result);
   }
 
   /** Warmup method pre-initializes all configured models for faster inference
@@ -428,9 +418,6 @@ export class Human {
       // prepare where to store model results
       // keep them with weak typing as it can be promise or not
       let faceRes: FaceResult[] | Promise<FaceResult[]> | never[] = [];
-      let bodyRes: BodyResult[] | Promise<BodyResult[]> | never[] = [];
-      let handRes: HandResult[] | Promise<HandResult[]> | never[] = [];
-      let objectRes: ObjectResult[] | Promise<ObjectResult[]> | never[] = [];
 
       // run face detection followed by all models that rely on face bounding box: face mesh, age, gender, emotion
       this.state = 'detect:face';
@@ -445,86 +432,20 @@ export class Human {
 
       if (this.config.async && (this.config.body.maxDetected === -1 || this.config.hand.maxDetected === -1)) faceRes = await faceRes; // need face result for auto-detect number of hands or bodies
 
-      // run body: can be posenet, blazepose, efficientpose, movenet
-      this.analyze('Start Body:');
-      this.state = 'detect:body';
-      const bodyConfig = this.config.body.maxDetected === -1 ? mergeDeep(this.config, { body: { maxDetected: this.config.face.enabled ? 1 * (faceRes as FaceResult[]).length : 1 } }) : this.config; // autodetect number of bodies
-      if (this.config.async) {
-        if (this.config.body.modelPath?.includes('posenet')) bodyRes = this.config.body.enabled ? posenet.predict(img.tensor, bodyConfig) : [];
-        else if (this.config.body.modelPath?.includes('blazepose')) bodyRes = this.config.body.enabled ? blazepose.predict(img.tensor, bodyConfig) : [];
-        else if (this.config.body.modelPath?.includes('efficientpose')) bodyRes = this.config.body.enabled ? efficientpose.predict(img.tensor, bodyConfig) : [];
-        else if (this.config.body.modelPath?.includes('movenet')) bodyRes = this.config.body.enabled ? movenet.predict(img.tensor, bodyConfig) : [];
-        if (this.performance.body) delete this.performance.body;
-      } else {
-        timeStamp = now();
-        if (this.config.body.modelPath?.includes('posenet')) bodyRes = this.config.body.enabled ? await posenet.predict(img.tensor, bodyConfig) : [];
-        else if (this.config.body.modelPath?.includes('blazepose')) bodyRes = this.config.body.enabled ? await blazepose.predict(img.tensor, bodyConfig) : [];
-        else if (this.config.body.modelPath?.includes('efficientpose')) bodyRes = this.config.body.enabled ? await efficientpose.predict(img.tensor, bodyConfig) : [];
-        else if (this.config.body.modelPath?.includes('movenet')) bodyRes = this.config.body.enabled ? await movenet.predict(img.tensor, bodyConfig) : [];
-        this.performance.body = this.env.perfadd ? (this.performance.body || 0) + Math.trunc(now() - timeStamp) : Math.trunc(now() - timeStamp);
-      }
-      this.analyze('End Body:');
-
-      // run handpose
-      this.analyze('Start Hand:');
-      this.state = 'detect:hand';
-      const handConfig = this.config.hand.maxDetected === -1 ? mergeDeep(this.config, { hand: { maxDetected: this.config.face.enabled ? 2 * (faceRes as FaceResult[]).length : 1 } }) : this.config; // autodetect number of hands
-      if (this.config.async) {
-        if (this.config.hand.detector?.modelPath?.includes('handdetect')) handRes = this.config.hand.enabled ? handpose.predict(img.tensor, handConfig) : [];
-        else if (this.config.hand.detector?.modelPath?.includes('handtrack')) handRes = this.config.hand.enabled ? handtrack.predict(img.tensor, handConfig) : [];
-        if (this.performance.hand) delete this.performance.hand;
-      } else {
-        timeStamp = now();
-        if (this.config.hand.detector?.modelPath?.includes('handdetect')) handRes = this.config.hand.enabled ? await handpose.predict(img.tensor, handConfig) : [];
-        else if (this.config.hand.detector?.modelPath?.includes('handtrack')) handRes = this.config.hand.enabled ? await handtrack.predict(img.tensor, handConfig) : [];
-        this.performance.hand = this.env.perfadd ? (this.performance.hand || 0) + Math.trunc(now() - timeStamp) : Math.trunc(now() - timeStamp);
-      }
-      this.analyze('End Hand:');
-
-      // run object detection
-      this.analyze('Start Object:');
-      this.state = 'detect:object';
-      if (this.config.async) {
-        if (this.config.object.modelPath?.includes('nanodet')) objectRes = this.config.object.enabled ? nanodet.predict(img.tensor, this.config) : [];
-        else if (this.config.object.modelPath?.includes('centernet')) objectRes = this.config.object.enabled ? centernet.predict(img.tensor, this.config) : [];
-        if (this.performance.object) delete this.performance.object;
-      } else {
-        timeStamp = now();
-        if (this.config.object.modelPath?.includes('nanodet')) objectRes = this.config.object.enabled ? await nanodet.predict(img.tensor, this.config) : [];
-        else if (this.config.object.modelPath?.includes('centernet')) objectRes = this.config.object.enabled ? await centernet.predict(img.tensor, this.config) : [];
-        this.performance.object = this.env.perfadd ? (this.performance.object || 0) + Math.trunc(now() - timeStamp) : Math.trunc(now() - timeStamp);
-      }
-      this.analyze('End Object:');
-
       // if async wait for results
       this.state = 'detect:await';
-      if (this.config.async) [faceRes, bodyRes, handRes, objectRes] = await Promise.all([faceRes, bodyRes, handRes, objectRes]);
-
-      // run gesture analysis last
-      this.state = 'detect:gesture';
-      let gestureRes: GestureResult[] = [];
-      if (this.config.gesture.enabled) {
-        timeStamp = now();
-        gestureRes = [...gesture.face(faceRes as FaceResult[]), ...gesture.body(bodyRes as BodyResult[]), ...gesture.hand(handRes as HandResult[]), ...gesture.iris(faceRes as FaceResult[])];
-        if (!this.config.async) this.performance.gesture = this.env.perfadd ? (this.performance.gesture || 0) + Math.trunc(now() - timeStamp) : Math.trunc(now() - timeStamp);
-        else if (this.performance.gesture) delete this.performance.gesture;
-      }
+      if (this.config.async) [faceRes] = await Promise.all([faceRes]);
 
       this.performance.total = this.env.perfadd ? (this.performance.total || 0) + Math.trunc(now() - timeStart) : Math.trunc(now() - timeStart);
       const shape = this.process.tensor?.shape || [0, 0, 0, 0];
       this.result = {
         face: faceRes as FaceResult[],
-        body: bodyRes as BodyResult[],
-        hand: handRes as HandResult[],
-        gesture: gestureRes,
-        object: objectRes as ObjectResult[],
         performance: this.performance,
         canvas: this.process.canvas,
         timestamp: Date.now(),
         error: null,
         width: shape[2],
         height: shape[1],
-        get persons() { return persons.join(faceRes as FaceResult[], bodyRes as BodyResult[], handRes as HandResult[], gestureRes, shape); },
       };
 
       // finally dispose input tensor
@@ -569,4 +490,4 @@ export class Human {
 
 /** Class Human as default export */
 /* eslint no-restricted-exports: ["off", { "restrictedNamedExports": ["default"] }] */
-export { Human as default, match, draw, models };
+export { Human as default, draw, match, models };

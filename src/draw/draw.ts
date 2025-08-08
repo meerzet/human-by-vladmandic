@@ -3,28 +3,24 @@
  */
 
 import * as tf from 'dist/tfjs.esm.js';
-import { mergeDeep, now } from '../util/util';
-import { env } from '../util/env';
-import { getCanvasContext, rect } from './primitives';
-import { options } from './options';
-import { face } from './face';
-import { body } from './body';
-import { hand } from './hand';
-import { object } from './object';
-import { gesture } from './gesture';
-import { defaultLabels } from './labels';
-import type { Result, PersonResult } from '../result';
 import type { AnyCanvas, DrawOptions } from '../exports';
+import type { PersonResult, Result } from '../result';
 import type { Tensor2D } from '../tfjs/types';
+import { env } from '../util/env';
+import { mergeDeep, now } from '../util/util';
+import { face } from './face';
+import { defaultLabels } from './labels';
+import { options } from './options';
+import { getCanvasContext, rect } from './primitives';
 
 let drawTime = 0;
 
-export { options } from './options';
-export { face } from './face';
 export { body } from './body';
+export { face } from './face';
+export { gesture } from './gesture';
 export { hand } from './hand';
 export { object } from './object';
-export { gesture } from './gesture';
+export { options } from './options';
 
 /** draw combined person results instead of individual detection result objects */
 export function person(inCanvas: AnyCanvas, result: PersonResult[], drawOptions?: Partial<DrawOptions>) {
@@ -85,10 +81,6 @@ export async function all(inCanvas: AnyCanvas, result: Result, drawOptions?: Par
   const localOptions = mergeDeep(options, drawOptions);
   const promise = Promise.all([
     face(inCanvas, result.face, localOptions),
-    body(inCanvas, result.body, localOptions),
-    hand(inCanvas, result.hand, localOptions),
-    object(inCanvas, result.object, localOptions),
-    gesture(inCanvas, result.gesture, localOptions), // gestures do not have buffering
     // person(inCanvas, result.persons, localOptions); // already included above
   ]);
   drawTime = env.perfadd ? drawTime + Math.round(now() - timeStamp) : Math.round(now() - timeStamp);

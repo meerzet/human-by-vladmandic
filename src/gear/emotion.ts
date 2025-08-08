@@ -5,13 +5,13 @@
  */
 
 import * as tf from 'dist/tfjs.esm.js';
-import type { Emotion } from '../result';
-import { log, now } from '../util/util';
 import type { Config } from '../config';
-import type { GraphModel, Tensor, Tensor4D } from '../tfjs/types';
-import { loadModel } from '../tfjs/load';
-import { env } from '../util/env';
+import type { Emotion } from '../result';
 import { constants } from '../tfjs/constants';
+import { loadModel } from '../tfjs/load';
+import type { GraphModel, Tensor, Tensor4D } from '../tfjs/types';
+import { env } from '../util/env';
+import { log, now } from '../util/util';
 
 let annotations: string[] = [];
 let model: GraphModel | null;

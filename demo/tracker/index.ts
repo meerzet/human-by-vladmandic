@@ -106,8 +106,6 @@ function drawLoop() { // main screen refresh loop
     const res: H.Result = dom.interpolation.checked ? human.next(human.result) : human.result; // interpolate results if enabled
     let tracking: H.FaceResult[] | H.BodyResult[] | H.ObjectResult[] = [];
     if (human.config.face.enabled) tracking = res.face;
-    else if (human.config.body.enabled) tracking = res.body;
-    else if (human.config.object.enabled) tracking = res.object;
     else log('unknown object type');
     let data: TrackerResult[] = [];
     if (dom.tracker.checked) {

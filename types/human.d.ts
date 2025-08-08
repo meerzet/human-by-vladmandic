@@ -8,7 +8,7 @@ import { Tensor4D } from '@tensorflow/tfjs-core';
 import { TensorLike } from '@tensorflow/tfjs-core';
 
 /** meta-function that performs draw for: canvas, face, body, hand */
-declare function all(inCanvas: AnyCanvas, result: Result, drawOptions?: Partial<DrawOptions>): Promise<[void, void, void, void, void] | null>;
+declare function all(inCanvas: AnyCanvas, result: Result, drawOptions?: Partial<DrawOptions>): Promise<[void] | null>;
 
 /** Defines all possible canvas types */
 export declare type AnyCanvas = HTMLCanvasElement | OffscreenCanvas;
@@ -198,12 +198,12 @@ declare namespace draw {
         tensor,
         all,
         init,
-        options,
-        face,
         body,
+        face,
+        gesture,
         hand,
         object,
-        gesture
+        options
     }
 }
 export { draw }
@@ -1049,22 +1049,12 @@ export { Rank }
 export declare interface Result {
     /** {@link FaceResult}: detection & analysis results */
     face: FaceResult[];
-    /** {@link BodyResult}: detection & analysis results */
-    body: BodyResult[];
-    /** {@link HandResult}: detection & analysis results */
-    hand: HandResult[];
-    /** {@link GestureResult}: detection & analysis results */
-    gesture: GestureResult[];
-    /** {@link ObjectResult}: detection & analysis results */
-    object: ObjectResult[];
     /** global performance object with timing values for each operation */
     performance: Record<string, number>;
     /** optional processed canvas that can be used to draw input on screen */
     canvas?: AnyCanvas | null;
     /** timestamp of detection representing the milliseconds elapsed since the UNIX epoch */
     readonly timestamp: number;
-    /** getter property that returns unified persons object  */
-    persons: PersonResult[];
     /** Last known error message */
     error: string | null;
     /** Resolution width */

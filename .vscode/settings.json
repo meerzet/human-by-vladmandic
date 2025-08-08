@@ -3,8 +3,9 @@
     "dist/*": true,
     "node_modules/*": true,
     "types": true,
-    "typedoc": true,
+    "typedoc": true
   },
   "search.useGlobalIgnoreFiles": true,
-  "search.useParentIgnoreFiles": true
+  "search.useParentIgnoreFiles": true,
+  "editor.formatOnSave": false
 }
