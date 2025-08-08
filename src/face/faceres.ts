@@ -91,7 +91,7 @@ export async function predict(image: Tensor4D, config: Config, idx: number, coun
       const gender = await genderT.data();
       const confidence = Math.trunc(200 * Math.abs((gender[0] - 0.5))) / 100;
       if (confidence > (config.face.description.minConfidence || 0)) {
-        obj.gender = gender[0] <= 0.5 ? 'female' : 'male';
+        obj.gender = gender[0] <= 0.5 ? '여성' : '남성';
         obj.genderScore = Math.min(0.99, confidence);
       }
       const argmax = tf.argMax(resT.find((t) => t.shape[1] === 100) as Tensor1D, 1);

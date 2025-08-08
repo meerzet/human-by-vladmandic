@@ -26,8 +26,8 @@ export async function load(config: Config): Promise<GraphModel> {
   if (!model) {
     model = await loadModel(config.face.emotion?.modelPath);
     rgb = model?.inputs?.[0].shape?.[3] === 3;
-    if (!rgb) annotations = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral']; // oarriaga and gear
-    else annotations = ['angry', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surprise']; // affectnet
+    if (!rgb) annotations = ['화남', '불쾌', '공포', '행복', '슬픔', '놀람', '무표정']; // oarriaga and gear
+    else annotations = ['화남', '불쾌', '공포', '행복', '무표정', '슬픔', '놀람']; // affectnet
   } else if (config.debug) {
     log('cached model:', model['modelUrl']);
   }

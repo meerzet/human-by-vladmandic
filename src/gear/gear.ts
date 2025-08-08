@@ -5,12 +5,12 @@
  */
 
 import * as tf from 'dist/tfjs.esm.js';
-import { log, now } from '../util/util';
-import { loadModel } from '../tfjs/load';
-import type { Gender, Race } from '../result';
 import type { Config } from '../config';
+import type { Gender, Race } from '../result';
+import { loadModel } from '../tfjs/load';
 import type { GraphModel, Tensor, Tensor4D } from '../tfjs/types';
 import { env } from '../util/env';
+import { log, now } from '../util/util';
 
 export interface GearType { age: number, gender: Gender, genderScore: number, race: { score: number, race: Race }[] }
 let model: GraphModel | null;
@@ -50,7 +50,7 @@ export async function predict(image: Tensor4D, config: Config, idx: number, coun
     const obj: GearType = { age: 0, gender: 'unknown', genderScore: 0, race: [] };
     if (config.face.gear?.enabled) [t.age, t.gender, t.race] = model.execute(t.resize, ['age_output', 'gender_output', 'race_output']) as Tensor[];
     const gender = await t.gender.data();
-    obj.gender = gender[0] > gender[1] ? 'male' : 'female';
+    obj.gender = gender[0] > gender[1] ? '남성' : '여성';
     obj.genderScore = Math.round(100 * (gender[0] > gender[1] ? gender[0] : gender[1])) / 100;
     const race = await t.race.data();
     for (let i = 0; i < race.length; i++) {

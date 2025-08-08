@@ -11,8 +11,8 @@ export type Box = [number, number, number, number];
 /** generic point as [x, y, z?] */
 export type Point = [number, number, number?];
 
-export type Emotion = 'angry' | 'disgust' | 'fear' | 'happy' | 'sad' | 'surprise' | 'neutral';
-export type Gender = 'male' | 'female' | 'unknown';
+export type Emotion = '화남' | '불쾌' | '공포' | '행복' | '슬픔' | '놀람' | '무표정';
+export type Gender = '남성' | '여성' | 'unknown';
 export type Race = 'white' | 'black' | 'asian' | 'indian' | 'other';
 export type FaceLandmark = 'leftEye' | 'rightEye' | 'nose' | 'mouth' | 'leftEar' | 'rightEar' | 'symmetryLine' | 'silhouette'
  | 'lipsUpperOuter' | 'lipsLowerOuter' | 'lipsUpperInner' | 'lipsLowerInner'

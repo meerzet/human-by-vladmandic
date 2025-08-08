@@ -5,13 +5,13 @@
  */
 
 import * as tf from 'dist/tfjs.esm.js';
-import { log, now } from '../util/util';
-import { loadModel } from '../tfjs/load';
-import { constants } from '../tfjs/constants';
-import type { Gender } from '../result';
 import type { Config } from '../config';
+import type { Gender } from '../result';
+import { constants } from '../tfjs/constants';
+import { loadModel } from '../tfjs/load';
 import type { GraphModel, Tensor, Tensor4D } from '../tfjs/types';
 import { env } from '../util/env';
+import { log, now } from '../util/util';
 
 let model: GraphModel | null;
 const last: { gender: Gender, genderScore: number }[] = [];
@@ -65,7 +65,7 @@ export async function predict(image: Tensor4D, config: Config, idx, count): Prom
     const obj: { gender: Gender, genderScore: number } = { gender: 'unknown', genderScore: 0 };
     if (config.face['ssrnet']?.enabled) t.gender = model.execute(t.enhance) as Tensor;
     const data = await t.gender.data();
-    obj.gender = data[0] > data[1] ? 'female' : 'male'; // returns two values 0..1, bigger one is prediction
+    obj.gender = data[0] > data[1] ? '여성' : '남성'; // returns two values 0..1, bigger one is prediction
     obj.genderScore = data[0] > data[1] ? (Math.trunc(100 * data[0]) / 100) : (Math.trunc(100 * data[1]) / 100);
     Object.keys(t).forEach((tensor) => tf.dispose(t[tensor]));
     last[idx] = obj;
