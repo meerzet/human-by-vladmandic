@@ -7,5 +7,14 @@
   },
   "search.useGlobalIgnoreFiles": true,
   "search.useParentIgnoreFiles": true,
-  "editor.formatOnSave": false
+  "editor.formatOnSave": false,
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/.hg/store/**": true,
+    "**/.dart_tool": true,
+    "**/.git/**": true,
+    "**/node_modules/**": true,
+    "**/.vscode/**": true
+  }
 }

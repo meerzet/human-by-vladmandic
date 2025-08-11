@@ -15,8 +15,14 @@
     "locations": ["dist/*", "types/*", "typedoc/*"]
   },
   "lint": {
-    "locations": [ "**/*.json", "src/**/*.ts", "test/**/*.js", "demo/**/*.js", "**/*.md" ],
-    "rules": { }
+    "locations": [
+      "**/*.json",
+      "src/**/*.ts",
+      "test/**/*.js",
+      "demo/**/*.js",
+      "**/*.md"
+    ],
+    "rules": {}
   },
   "changelog": {
     "log": "CHANGELOG.md"
@@ -29,17 +35,19 @@
     "documentRoot": ".",
     "defaultFolder": "demo",
     "defaultFile": "index.html"
-    },
+  },
   "build": {
     "global": {
       "target": "es2018",
       "sourcemap": false,
       "treeShaking": true,
       "ignoreAnnotations": true,
-      "banner": { "js": "/*\n  Human\n  homepage: <https://github.com/vladmandic/human>\n  author: <https://github.com/vladmandic>'\n*/\n" }
+      "banner": {
+        "js": "/*\n  Human\n  homepage: <https://github.com/vladmandic/human>\n  author: <https://github.com/vladmandic>'\n*/\n"
+      }
     },
     "targets": [
-      { 
+      {
         "name": "tfjs/browser/version",
         "platform": "browser",
         "format": "esm",
@@ -93,11 +101,38 @@
         "external": ["@tensorflow"],
         "typings": "types/lib",
         "typedoc": "typedoc"
+      },
+      {
+        "name": "demo/typescript",
+        "platform": "browser",
+        "format": "esm",
+        "input": "demo/typescript/index.ts",
+        "output": "demo/typescript/index.js",
+        "sourcemap": true,
+        "external": ["*/human.esm.js"]
+      },
+      {
+        "name": "demo/faceid",
+        "platform": "browser",
+        "format": "esm",
+        "input": "demo/faceid/index.ts",
+        "output": "demo/faceid/index.js",
+        "sourcemap": true,
+        "external": ["*/human.esm.js"]
+      },
+      {
+        "name": "demo/tracker",
+        "platform": "browser",
+        "format": "esm",
+        "input": "demo/tracker/index.ts",
+        "output": "demo/tracker/index.js",
+        "sourcemap": true,
+        "external": ["*/human.esm.js"]
       }
     ]
   },
   "watch": {
-    "locations": [ "src/**/*", "tfjs/**/*", "demo/**/*.ts" ]
+    "locations": ["src/**/*", "tfjs/**/*", "demo/**/*.ts"]
   },
   "typescript": {
     "allowJs": false

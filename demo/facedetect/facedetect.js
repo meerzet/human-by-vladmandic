@@ -14,6 +14,7 @@ const humanConfig = { // user configuration for human, used to fine-tune behavio
   debug: true,
   modelBasePath: 'https://vladmandic.github.io/human-models/models/',
   filter: { enabled: true, equalization: false, flip: false },
+  backend: 'humangl',
   face: {
     enabled: true,
     detector: { rotation: false, maxDetected: 100, minConfidence: 0.2, return: true, square: false },
@@ -94,7 +95,9 @@ function addFace(face, source) {
     e.preventDefault();
     document.getElementById('description').innerHTML = canvas.title;
   };
-  human.draw.tensor(face.tensor, canvas);
+  // human.draw.tensor(face.tensor, canvas);
+
+  human.tf.browser.toPixels(face.tensor, canvas);
   human.tf.dispose(face.tensor);
   return canvas;
 }
