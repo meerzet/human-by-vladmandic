@@ -24,12 +24,17 @@
   </head>
   <body>
     <div style="padding: 8px">
-      <h1 style="margin: 0">faceid demo using human library</h1>
-      look directly at camera and make sure that detection passes all of the required tests noted on the right hand side of the screen<br>
-      if input does not satisfies tests within specific timeout, no image will be selected<br>
-      once face image is approved, it will be compared with existing face database<br>
-      you can also store face descriptor with label in a browser's indexdb for future usage<br>
+      <h1 style="margin: 0">faceid demo using human library (자동 등록 모드)</h1>
+      카메라를 직접 보면 얼굴을 감지하고 기존 데이터베이스와 자동으로 매칭합니다<br>
+      알 수 없는 얼굴은 5초간 추적한 후 자동으로 등록됩니다<br>
+      등록된 얼굴은 브라우저의 IndexDB에 저장되어 향후 사용할 수 있습니다<br>
       <br>
+      <div style="background: #333; padding: 8px; border-radius: 4px; margin: 8px 0; font-size: 14px;">
+        <strong>자동 등록 시스템:</strong><br>
+        🔴 빨강: 새로운 얼굴 감지<br>
+        🟡 노랑→초록: 추적 중 (0-5초)<br>
+        🟢 초록: 알려진 얼굴 또는 등록 완료
+      </div>
       <i>note: this is not equivalent to full faceid methods as used by modern mobile phones or windows hello<br>
         as they rely on additional infrared sensors and depth-sensing and not just camera image for additional levels of security</i>
     </div>
@@ -42,6 +47,9 @@
     
     <pre id="log" style="padding: 8px"></pre>
     <div id="match" style="display: none; padding: 8px">
+      <div style="color: #888; font-size: 14px; margin-bottom: 8px;">
+        수동 제어 (자동 등록이 활성화된 상태)
+      </div>
       <label for="name">name:</label>
       <input id="name" type="text" value="" style="height: 16px; border: none; padding: 2px; margin-left: 8px">
       <span id="save" class="button" style="background-color: royalblue">save</span>

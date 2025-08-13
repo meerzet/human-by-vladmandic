@@ -96,18 +96,21 @@ export async function predict(image: Tensor4D, config: Config, idx: number, coun
 
       const ageT = resT.find((t) => t.shape[1] === 100) as tf.Tensor2D;
 
-      // 분포 평탄화 (α<1)
+      // 분포 평탄화 (α<1) - 생성 텐서 명시적 정리
       const alpha = 0.85;
-      const pPow = tf.pow(ageT, tf.scalar(alpha, 'float32'));
+      const alphaScalar = tf.scalar(alpha, 'float32');
+      const pPow = tf.pow(ageT, alphaScalar);
       const Z = tf.sum(pPow, -1);
       const pAdj = tf.div(pPow, Z);
 
-      const AGE_INDICES = tf.range(0, 100, 1, 'float32');
-      const AGE_CENTERS = tf.add(AGE_INDICES, tf.scalar(0.5));
-      const expected = tf.sum(tf.mul(pAdj, AGE_CENTERS), -1);
+      const ageIndices = tf.range(0, 100, 1, 'float32');
+      const halfScalar = tf.scalar(0.5, 'float32');
+      const ageCenters = tf.add(ageIndices, halfScalar);
+      const mulPAge = tf.mul(pAdj, ageCenters);
+      const expected = tf.sum(mulPAge, -1);
       const ageVal = (await expected.data())[0];
       obj.age = Math.round(ageVal * 10) / 10;
-      tf.dispose([expected, AGE_INDICES]);
+      tf.dispose([expected, mulPAge, ageCenters, halfScalar, ageIndices, pAdj, Z, pPow, alphaScalar]);
 
       // ! 기존 로직
       // const argmax = tf.argMax(resT.find((t) => t.shape[1] === 100) as Tensor1D, 1);

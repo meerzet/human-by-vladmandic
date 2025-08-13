@@ -8,6 +8,7 @@
  */
 
 import * as H from '../../dist/human.esm.js'; // equivalent of @vladmandic/Human
+import { FaceTracker, TrackedFace } from './face-tracker';
 import * as indexDb from './indexdb'; // methods to deal with indexdb
 
 const humanConfig: Partial<H.Config> = { // user configuration for human, used to fine-tune behavior
@@ -34,7 +35,7 @@ const humanConfig: Partial<H.Config> = { // user configuration for human, used t
 };
 
 // const matchOptions = { order: 2, multiplier: 1000, min: 0.0, max: 1.0 }; // for embedding model
-const matchOptions = { order: 2, multiplier: 25, min: 0.2, max: 0.8 }; // for faceres model
+const matchOptions: H.match.MatchOptions = { order: 2, multiplier: 20, min: 0.1, max: 0.9 }; // for faceres model
 
 const options = {
   minConfidence: 0.6, // overal face confidence for box, face, gender, real, live
@@ -55,6 +56,7 @@ const options = {
 const current: { face: H.FaceResult | null, record: indexDb.FaceRecord | null } = { face: null, record: null }; // backward-compatible current selection
 let knownFaces: indexDb.FaceRecord[] = [];
 let knownDescriptors: number[][] = [];
+let faceTracker: FaceTracker;
 
 // gesture/iris disabled: remove blink and gaze-related state
 
@@ -84,20 +86,6 @@ const log = (...msg) => { // helper method to output messages
   dom.log.innerText += msg.join(' ') + '\n';
   console.log(...msg); // eslint-disable-line no-console
 };
-
-function drawFaceCrop(ctx: CanvasRenderingContext2D, video: HTMLVideoElement, box: [number, number, number, number], destX: number, destY: number, size = 96) {
-  const [bx, by, bw, bh] = box;
-  const sx = Math.max(0, Math.floor(bx));
-  const sy = Math.max(0, Math.floor(by));
-  const sw = Math.max(1, Math.min(video.videoWidth - sx, Math.floor(bw)));
-  const sh = Math.max(1, Math.min(video.videoHeight - sy, Math.floor(bh)));
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = 'high';
-  ctx.drawImage(video, sx, sy, sw, sh, destX, Math.max(0, destY), size, size);
-  ctx.strokeStyle = 'white';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(destX - 0.5, Math.max(0, destY) - 0.5, size + 1, size + 1);
-}
 
 function getFaceCropImageData(video: HTMLVideoElement, box: [number, number, number, number], size = 128): ImageData {
   const [bx, by, bw, bh] = box;
@@ -149,10 +137,24 @@ async function detectionLoop() { // main detection + render + match loop
   const interpolated = human.next(human.result);
   const ctx = dom.canvas.getContext('2d');
   ctx?.clearRect(0, 0, dom.canvas.width, dom.canvas.height);
-  // draw and match up to 3 faces
-  const faces = human.result.face.slice(0, 3);
+  
+  // Process faces through tracker
+  const faces = interpolated.face.slice(0, 3);
+  const { newlyRegistered, updates } = await faceTracker.processFaces(faces);
+  
+  // Handle newly registered faces
+  if (newlyRegistered.length > 0) {
+    await refreshKnownFaces(); // Refresh known faces after auto-registration
+    faceTracker.updateKnownFaces(knownDescriptors, knownFaces);
+    for (const registered of newlyRegistered) {
+      log('자동 등록됨:', registered.matchedRecord?.name || 'Unknown');
+    }
+  }
+  
   const labels: string[] = [];
   const matchedRecs: Array<indexDb.FaceRecord | null> = [];
+  const trackedFaces = faceTracker.getTrackedFaces();
+  
   if (ctx) {
     ctx.save();
     ctx.font = '16px Lato';
@@ -160,81 +162,138 @@ async function detectionLoop() { // main detection + render + match loop
     ctx.strokeStyle = 'black';
     ctx.lineWidth = 2;
   }
+  
   let primaryBest = null as null | { name: string, similarity: number, record: indexDb.FaceRecord };
+  
   for (let i = 0; i < faces.length; i += 1) {
     const f = faces[i];
     let label = 'unknown';
     let matchedRec: indexDb.FaceRecord | null = null;
-    if (f.embedding && f.embedding.length > 0 && knownDescriptors.length > 0) {
-      const res = human.match.find(f.embedding, knownDescriptors, matchOptions);
-      const rec = knownFaces[res.index];
-      if (rec) {
-        matchedRec = rec;
-        label = `${rec.name} (${Math.round(res.similarity * 100)}%)`;
-        if (!primaryBest || res.similarity > primaryBest.similarity) primaryBest = { name: rec.name, similarity: res.similarity, record: rec };
+    
+    // Find corresponding tracked face
+    const tracked = trackedFaces.find(tf => 
+      tf.face.box && f.box && 
+      Math.abs(tf.face.box[0] - f.box[0]) < 50 && 
+      Math.abs(tf.face.box[1] - f.box[1]) < 50
+    );
+    
+    if (tracked) {
+      if (tracked.isMatched && tracked.matchedRecord) {
+        matchedRec = tracked.matchedRecord;
+        label = `${tracked.matchedRecord.name}`;
+        if (!primaryBest) primaryBest = { name: tracked.matchedRecord.name, similarity: 1.0, record: tracked.matchedRecord };
       } else {
-        label = `unknown (${Math.round(res.similarity * 100)}%)`;
+        // Show tracking progress for unknown faces
+        const progress = Math.min(tracked.trackingDuration / 5000, 1.0);
+        const remaining = Math.max(0, 5000 - tracked.trackingDuration);
+        label = `추적중 ${(progress * 100).toFixed(0)}% (${(remaining / 1000).toFixed(1)}s)`;
       }
     }
-    // draw box and label near face and crop preview above
+    
+    // Draw box and label
     if (ctx && f.box) {
       const [x, y, w, h] = f.box as [number, number, number, number];
-      ctx.strokeStyle = 'lime';
+      
+      // Color based on tracking status
+      if (tracked?.isMatched) {
+        ctx.strokeStyle = 'lime'; // Known face
+      } else if (tracked) {
+        const progress = Math.min(tracked.trackingDuration / 5000, 1.0);
+        ctx.strokeStyle = `rgb(${255 - Math.round(progress * 255)}, ${Math.round(progress * 255)}, 0)`; // Red to Green
+      } else {
+        ctx.strokeStyle = 'red'; // New/untracked face
+      }
+      
       ctx.strokeRect(x, y, w, h);
       const ty = Math.max(0, y - 6);
       ctx.strokeStyle = 'black';
       ctx.strokeText(label, x, ty);
       ctx.fillText(label, x, ty);
     }
+    
     labels.push(label);
     matchedRecs.push(matchedRec);
   }
-  // update current selection for save/delete (use primary best match or largest face)
+  
+  // Update current selection
   current.face = faces.sort((a, b) => (b.box[2] * b.box[3]) - (a.box[2] * a.box[3]))[0] || null;
   current.record = primaryBest ? primaryBest.record : null;
-  // update matches list UI
-  if (dom.matches) {
-    dom.matches.innerHTML = '';
-    faces.forEach((f, i) => {
-      const row = document.createElement('div');
-      row.style.display = 'flex';
-      row.style.alignItems = 'center';
-      row.style.gap = '8px';
-      row.style.margin = '4px 0';
-      const text = document.createElement('div');
-      text.innerText = `face ${i + 1}: ${labels[i] || 'unknown'}`;
-      row.appendChild(text);
-      // live crop from video
-      if (f.box && dom.video.videoWidth > 0) {
-        const [bx, by, bw, bh] = f.box as [number, number, number, number];
-        const sx = Math.max(0, Math.floor(bx));
-        const sy = Math.max(0, Math.floor(by));
-        const sw = Math.min(dom.video.videoWidth - sx, Math.floor(bw));
-        const sh = Math.min(dom.video.videoHeight - sy, Math.floor(bh));
-        const live = document.createElement('canvas');
-        live.width = 96; live.height = 96;
-        const lctx = live.getContext('2d');
-        if (lctx && sw > 0 && sh > 0) lctx.drawImage(dom.video, sx, sy, sw, sh, 0, 0, 96, 96);
-        row.appendChild(live);
-      }
-      const rec = matchedRecs[i];
-      if (rec?.image) {
-        const c = document.createElement('canvas');
-        c.width = rec.image.width;
-        c.height = rec.image.height;
-        c.style.width = '96px';
-        c.style.height = '96px';
-        const cctx = c.getContext('2d');
-        cctx?.putImageData(rec.image, 0, 0);
-        row.appendChild(c);
-      }
-      dom.matches.appendChild(row);
-    });
-    if (faces.length === 0) dom.matches.innerText = 'no faces detected';
-  }
+  
+  // Update UI
+  updateMatchesUI(faces, labels, matchedRecs, trackedFaces);
+  
   const now = human.now();
   timestamp.detect = now;
   requestAnimationFrame(detectionLoop);
+}
+
+function updateMatchesUI(faces: H.FaceResult[], labels: string[], matchedRecs: Array<indexDb.FaceRecord | null>, trackedFaces: TrackedFace[]) {
+  if (!dom.matches) return;
+  
+  dom.matches.innerHTML = '';
+  
+  if (faces.length === 0) {
+    dom.matches.innerText = 'no faces detected';
+    return;
+  }
+  
+  faces.forEach((f, i) => {
+    const row = document.createElement('div');
+    row.style.display = 'flex';
+    row.style.alignItems = 'center';
+    row.style.gap = '8px';
+    row.style.margin = '4px 0';
+    
+    const text = document.createElement('div');
+    text.innerText = `face ${i + 1}: ${labels[i] || 'unknown'}`;
+    row.appendChild(text);
+    
+    // Find tracked face info
+    const tracked = trackedFaces.find(tf => 
+      tf.face.box && f.box && 
+      Math.abs(tf.face.box[0] - f.box[0]) < 50 && 
+      Math.abs(tf.face.box[1] - f.box[1]) < 50
+    );
+    
+    // Show tracking status
+    if (tracked && !tracked.isMatched) {
+      const status = document.createElement('div');
+      status.style.fontSize = '12px';
+      status.style.color = '#888';
+      const remaining = Math.max(0, 5000 - tracked.trackingDuration);
+      status.innerText = `(${(remaining / 1000).toFixed(1)}초 후 자동 등록)`;
+      row.appendChild(status);
+    }
+    
+    // Live crop from video
+    if (f.box && dom.video.videoWidth > 0) {
+      const [bx, by, bw, bh] = f.box as [number, number, number, number];
+      const sx = Math.max(0, Math.floor(bx));
+      const sy = Math.max(0, Math.floor(by));
+      const sw = Math.min(dom.video.videoWidth - sx, Math.floor(bw));
+      const sh = Math.min(dom.video.videoHeight - sy, Math.floor(bh));
+      const live = document.createElement('canvas');
+      live.width = 96; live.height = 96;
+      const lctx = live.getContext('2d');
+      if (lctx && sw > 0 && sh > 0) lctx.drawImage(dom.video, sx, sy, sw, sh, 0, 0, 96, 96);
+      row.appendChild(live);
+    }
+    
+    // Show stored image if matched
+    const rec = matchedRecs[i];
+    if (rec?.image) {
+      const c = document.createElement('canvas');
+      c.width = rec.image.width;
+      c.height = rec.image.height;
+      c.style.width = '96px';
+      c.style.height = '96px';
+      const cctx = c.getContext('2d');
+      cctx?.putImageData(rec.image, 0, 0);
+      row.appendChild(c);
+    }
+    
+    dom.matches.appendChild(row);
+  });
 }
 
 // validation removed
@@ -284,9 +343,13 @@ async function init() {
   log('loading human models...');
   await human.load(); // preload all models
   log('initializing human...');
-  // log('face embedding model:', humanConfig.face.description.enabled ? 'faceres' : '', humanConfig.face['mobilefacenet']?.enabled ? 'mobilefacenet' : '', humanConfig.face['insightface']?.enabled ? 'insightface' : '');
   log('loading face database...');
   await refreshKnownFaces();
+  
+  // Initialize face tracker
+  faceTracker = new FaceTracker(knownDescriptors, knownFaces, matchOptions, human);
+  log('face tracker initialized');
+  
   dom.save.addEventListener('click', saveRecords);
   dom.delete.addEventListener('click', deleteRecord);
   await human.warmup(); // warmup function to initialize backend for future faster detection

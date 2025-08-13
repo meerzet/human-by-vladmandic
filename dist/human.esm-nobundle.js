@@ -5715,6 +5715,24 @@ function init() {
   options.gestureLabels = defaultLabels.gesture;
 }
 
+// src/tfjs/constants.ts
+var constants = {
+  tf255: 255,
+  tf1: 1,
+  tf2: 2,
+  tf05: 0.5,
+  tf127: 127.5,
+  rgb: [0.2989, 0.587, 0.114]
+};
+function init2() {
+  constants.tf255 = tfjs_esm_exports.scalar(255, "float32");
+  constants.tf1 = tfjs_esm_exports.scalar(1, "float32");
+  constants.tf2 = tfjs_esm_exports.scalar(2, "float32");
+  constants.tf05 = tfjs_esm_exports.scalar(0.5, "float32");
+  constants.tf127 = tfjs_esm_exports.scalar(127.5, "float32");
+  constants.rgb = tfjs_esm_exports.tensor1d([0.2989, 0.587, 0.114], "float32");
+}
+
 // models/models.json
 var models_exports = {};
 __export(models_exports, {
@@ -5833,22 +5851,376 @@ async function loadModel(modelPath) {
   return model23;
 }
 
-// src/tfjs/constants.ts
-var constants = {
-  tf255: 255,
-  tf1: 1,
-  tf2: 2,
-  tf05: 0.5,
-  tf127: 127.5,
-  rgb: [0.2989, 0.587, 0.114]
+// src/gear/emotion.ts
+var annotations = [];
+var model;
+var last2 = [];
+var lastCount = 0;
+var lastTime = 0;
+var skipped = Number.MAX_SAFE_INTEGER;
+var rgb = false;
+async function load(config3) {
+  var _a, _b, _c;
+  if (env.initial) model = null;
+  if (!model) {
+    model = await loadModel((_a = config3.face.emotion) == null ? void 0 : _a.modelPath);
+    rgb = ((_c = (_b = model == null ? void 0 : model.inputs) == null ? void 0 : _b[0].shape) == null ? void 0 : _c[3]) === 3;
+    if (!rgb) annotations = ["\uD654\uB0A8", "\uBD88\uCF8C", "\uACF5\uD3EC", "\uD589\uBCF5", "\uC2AC\uD514", "\uB180\uB78C", "\uBB34\uD45C\uC815"];
+    else annotations = ["\uD654\uB0A8", "\uBD88\uCF8C", "\uACF5\uD3EC", "\uD589\uBCF5", "\uBB34\uD45C\uC815", "\uC2AC\uD514", "\uB180\uB78C"];
+  } else if (config3.debug) {
+    log("cached model:", model["modelUrl"]);
+  }
+  return model;
+}
+async function predict(image28, config3, idx, count2) {
+  var _a, _b;
+  if (!model) return [];
+  const skipFrame = skipped < (((_a = config3.face.emotion) == null ? void 0 : _a.skipFrames) || 0);
+  const skipTime = (((_b = config3.face.emotion) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime;
+  if (config3.skipAllowed && skipTime && skipFrame && lastCount === count2 && last2[idx] && last2[idx].length > 0) {
+    skipped++;
+    return last2[idx];
+  }
+  skipped = 0;
+  return new Promise(async (resolve) => {
+    var _a2, _b2, _c;
+    const obj = [];
+    if ((_a2 = config3.face.emotion) == null ? void 0 : _a2.enabled) {
+      const t2 = {};
+      const inputSize10 = (model == null ? void 0 : model.inputs[0].shape) ? model.inputs[0].shape[2] : 0;
+      if (((_b2 = config3.face.emotion) == null ? void 0 : _b2["crop"]) > 0) {
+        const crop = (_c = config3.face.emotion) == null ? void 0 : _c["crop"];
+        const box = [[crop, crop, 1 - crop, 1 - crop]];
+        t2.resize = tfjs_esm_exports.image.cropAndResize(image28, box, [0], [inputSize10, inputSize10]);
+      } else {
+        t2.resize = tfjs_esm_exports.image.resizeBilinear(image28, [inputSize10, inputSize10], false);
+      }
+      if (rgb) {
+        t2.mul = tfjs_esm_exports.mul(t2.resize, 255);
+        t2.normalize = tfjs_esm_exports.sub(t2.mul, [103.939, 116.779, 123.68]);
+        t2.emotion = model == null ? void 0 : model.execute(t2.normalize);
+      } else {
+        t2.channels = tfjs_esm_exports.mul(t2.resize, constants.rgb);
+        t2.grayscale = tfjs_esm_exports.sum(t2.channels, 3, true);
+        t2.grayscaleSub = tfjs_esm_exports.sub(t2.grayscale, constants.tf05);
+        t2.grayscaleMul = tfjs_esm_exports.mul(t2.grayscaleSub, constants.tf2);
+        t2.emotion = model == null ? void 0 : model.execute(t2.grayscaleMul);
+      }
+      lastTime = now();
+      const data = await t2.emotion.data();
+      for (let i = 0; i < data.length; i++) {
+        if (data[i] > (config3.face.emotion.minConfidence || 0)) obj.push({ score: Math.min(0.99, Math.trunc(100 * data[i]) / 100), emotion: annotations[i] });
+      }
+      obj.sort((a, b) => b.score - a.score);
+      Object.keys(t2).forEach((tensor7) => tfjs_esm_exports.dispose(t2[tensor7]));
+    }
+    last2[idx] = obj;
+    lastCount = count2;
+    resolve(obj);
+  });
+}
+
+// src/gear/gear.ts
+var model2;
+var last3 = [];
+var raceNames = ["white", "black", "asian", "indian", "other"];
+var ageWeights = [15, 23, 28, 35.5, 45.5, 55.5, 65];
+var lastCount2 = 0;
+var lastTime2 = 0;
+var skipped2 = Number.MAX_SAFE_INTEGER;
+async function load2(config3) {
+  var _a;
+  if (env.initial) model2 = null;
+  if (!model2) model2 = await loadModel((_a = config3.face.gear) == null ? void 0 : _a.modelPath);
+  else if (config3.debug) log("cached model:", model2["modelUrl"]);
+  return model2;
+}
+async function predict2(image28, config3, idx, count2) {
+  var _a, _b;
+  if (!model2) return { age: 0, gender: "unknown", genderScore: 0, race: [] };
+  const skipFrame = skipped2 < (((_a = config3.face.gear) == null ? void 0 : _a.skipFrames) || 0);
+  const skipTime = (((_b = config3.face.gear) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime2;
+  if (config3.skipAllowed && skipTime && skipFrame && lastCount2 === count2 && last3[idx]) {
+    skipped2++;
+    return last3[idx];
+  }
+  skipped2 = 0;
+  return new Promise(async (resolve) => {
+    var _a2, _b2, _c, _d;
+    if (!(model2 == null ? void 0 : model2.inputs[0].shape)) return;
+    const t2 = {};
+    let box = [[0, 0.1, 0.9, 0.9]];
+    if (((_a2 = config3.face.gear) == null ? void 0 : _a2["crop"]) > 0) {
+      const crop = (_b2 = config3.face.gear) == null ? void 0 : _b2["crop"];
+      box = [[crop, crop, 1 - crop, 1 - crop]];
+    }
+    t2.resize = tfjs_esm_exports.image.cropAndResize(image28, box, [0], [model2.inputs[0].shape[2], model2.inputs[0].shape[1]]);
+    const obj = { age: 0, gender: "unknown", genderScore: 0, race: [] };
+    if ((_c = config3.face.gear) == null ? void 0 : _c.enabled) [t2.age, t2.gender, t2.race] = model2.execute(t2.resize, ["age_output", "gender_output", "race_output"]);
+    const gender = await t2.gender.data();
+    obj.gender = gender[0] > gender[1] ? "\uB0A8\uC131" : "\uC5EC\uC131";
+    obj.genderScore = Math.round(100 * (gender[0] > gender[1] ? gender[0] : gender[1])) / 100;
+    const race = await t2.race.data();
+    for (let i = 0; i < race.length; i++) {
+      if (race[i] > (((_d = config3.face.gear) == null ? void 0 : _d.minConfidence) || 0.2)) obj.race.push({ score: Math.round(100 * race[i]) / 100, race: raceNames[i] });
+    }
+    obj.race.sort((a, b) => b.score - a.score);
+    const ageDistribution = Array.from(await t2.age.data());
+    const ageSorted = ageDistribution.map((a, i) => [ageWeights[i], a]).sort((a, b) => b[1] - a[1]);
+    let age = ageSorted[0][0];
+    for (let i = 1; i < ageSorted.length; i++) age += ageSorted[i][1] * (ageSorted[i][0] - age);
+    obj.age = Math.round(10 * age) / 10;
+    Object.keys(t2).forEach((tensor7) => tfjs_esm_exports.dispose(t2[tensor7]));
+    last3[idx] = obj;
+    lastCount2 = count2;
+    lastTime2 = now();
+    resolve(obj);
+  });
+}
+
+// src/gear/ssrnet-age.ts
+var model3;
+var last4 = [];
+var lastCount3 = 0;
+var lastTime3 = 0;
+var skipped3 = Number.MAX_SAFE_INTEGER;
+async function load3(config3) {
+  if (env.initial) model3 = null;
+  if (!model3) model3 = await loadModel(config3.face["ssrnet"].modelPathAge);
+  else if (config3.debug) log("cached model:", model3["modelUrl"]);
+  return model3;
+}
+async function predict3(image28, config3, idx, count2) {
+  var _a, _b, _c, _d;
+  if (!model3) return { age: 0 };
+  const skipFrame = skipped3 < (((_a = config3.face["ssrnet"]) == null ? void 0 : _a.skipFrames) || 0);
+  const skipTime = (((_b = config3.face["ssrnet"]) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime3;
+  if (config3.skipAllowed && skipFrame && skipTime && lastCount3 === count2 && ((_c = last4[idx]) == null ? void 0 : _c.age) && ((_d = last4[idx]) == null ? void 0 : _d.age) > 0) {
+    skipped3++;
+    return last4[idx];
+  }
+  skipped3 = 0;
+  return new Promise(async (resolve) => {
+    var _a2, _b2, _c2;
+    if (!(model3 == null ? void 0 : model3.inputs) || !model3.inputs[0] || !model3.inputs[0].shape) return;
+    const t2 = {};
+    if (((_a2 = config3.face["ssrnet"]) == null ? void 0 : _a2["crop"]) > 0) {
+      const crop = (_b2 = config3.face["ssrnet"]) == null ? void 0 : _b2["crop"];
+      const box = [[crop, crop, 1 - crop, 1 - crop]];
+      t2.resize = tfjs_esm_exports.image.cropAndResize(image28, box, [0], [model3.inputs[0].shape[2], model3.inputs[0].shape[1]]);
+    } else {
+      t2.resize = tfjs_esm_exports.image.resizeBilinear(image28, [model3.inputs[0].shape[2], model3.inputs[0].shape[1]], false);
+    }
+    t2.enhance = tfjs_esm_exports.mul(t2.resize, constants.tf255);
+    const obj = { age: 0 };
+    if ((_c2 = config3.face["ssrnet"]) == null ? void 0 : _c2.enabled) t2.age = model3.execute(t2.enhance);
+    if (t2.age) {
+      const data = await t2.age.data();
+      obj.age = Math.trunc(10 * data[0]) / 10;
+    }
+    Object.keys(t2).forEach((tensor7) => tfjs_esm_exports.dispose(t2[tensor7]));
+    last4[idx] = obj;
+    lastCount3 = count2;
+    lastTime3 = now();
+    resolve(obj);
+  });
+}
+
+// src/gear/ssrnet-gender.ts
+var model4;
+var last5 = [];
+var lastCount4 = 0;
+var lastTime4 = 0;
+var skipped4 = Number.MAX_SAFE_INTEGER;
+var rgb2 = [0.2989, 0.587, 0.114];
+async function load4(config3) {
+  var _a;
+  if (env.initial) model4 = null;
+  if (!model4) model4 = await loadModel((_a = config3.face["ssrnet"]) == null ? void 0 : _a.modelPathGender);
+  else if (config3.debug) log("cached model:", model4["modelUrl"]);
+  return model4;
+}
+async function predict4(image28, config3, idx, count2) {
+  var _a, _b, _c, _d;
+  if (!model4) return { gender: "unknown", genderScore: 0 };
+  const skipFrame = skipped4 < (((_a = config3.face["ssrnet"]) == null ? void 0 : _a.skipFrames) || 0);
+  const skipTime = (((_b = config3.face["ssrnet"]) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime4;
+  if (config3.skipAllowed && skipFrame && skipTime && lastCount4 === count2 && ((_c = last5[idx]) == null ? void 0 : _c.gender) && ((_d = last5[idx]) == null ? void 0 : _d.genderScore) > 0) {
+    skipped4++;
+    return last5[idx];
+  }
+  skipped4 = 0;
+  return new Promise(async (resolve) => {
+    var _a2, _b2, _c2;
+    if (!(model4 == null ? void 0 : model4.inputs[0].shape)) return;
+    const t2 = {};
+    if (((_a2 = config3.face["ssrnet"]) == null ? void 0 : _a2["crop"]) > 0) {
+      const crop = (_b2 = config3.face["ssrnet"]) == null ? void 0 : _b2["crop"];
+      const box = [[crop, crop, 1 - crop, 1 - crop]];
+      t2.resize = tfjs_esm_exports.image.cropAndResize(image28, box, [0], [model4.inputs[0].shape[2], model4.inputs[0].shape[1]]);
+    } else {
+      t2.resize = tfjs_esm_exports.image.resizeBilinear(image28, [model4.inputs[0].shape[2], model4.inputs[0].shape[1]], false);
+    }
+    t2.enhance = tfjs_esm_exports.tidy(() => {
+      var _a3, _b3;
+      let normalize2;
+      if (((_b3 = (_a3 = model4 == null ? void 0 : model4.inputs) == null ? void 0 : _a3[0].shape) == null ? void 0 : _b3[3]) === 1) {
+        const [red, green, blue] = tfjs_esm_exports.split(t2.resize, 3, 3);
+        const redNorm = tfjs_esm_exports.mul(red, rgb2[0]);
+        const greenNorm = tfjs_esm_exports.mul(green, rgb2[1]);
+        const blueNorm = tfjs_esm_exports.mul(blue, rgb2[2]);
+        const grayscale = tfjs_esm_exports.addN([redNorm, greenNorm, blueNorm]);
+        normalize2 = tfjs_esm_exports.mul(tfjs_esm_exports.sub(grayscale, constants.tf05), 2);
+      } else {
+        normalize2 = tfjs_esm_exports.mul(tfjs_esm_exports.sub(t2.resize, constants.tf05), 2);
+      }
+      return normalize2;
+    });
+    const obj = { gender: "unknown", genderScore: 0 };
+    if ((_c2 = config3.face["ssrnet"]) == null ? void 0 : _c2.enabled) t2.gender = model4.execute(t2.enhance);
+    const data = await t2.gender.data();
+    obj.gender = data[0] > data[1] ? "\uC5EC\uC131" : "\uB0A8\uC131";
+    obj.genderScore = data[0] > data[1] ? Math.trunc(100 * data[0]) / 100 : Math.trunc(100 * data[1]) / 100;
+    Object.keys(t2).forEach((tensor7) => tfjs_esm_exports.dispose(t2[tensor7]));
+    last5[idx] = obj;
+    lastCount4 = count2;
+    lastTime4 = now();
+    resolve(obj);
+  });
+}
+
+// src/face/angles.ts
+var calculateGaze = (face3) => {
+  const radians = (pt1, pt2) => Math.atan2(pt1[1] - pt2[1], pt1[0] - pt2[0]);
+  if (!face3.annotations.rightEyeIris || !face3.annotations.leftEyeIris) return { bearing: 0, strength: 0 };
+  const offsetIris = [0, -0.1];
+  const eyeRatio = 1;
+  const left = (face3.mesh[33][2] || 0) > (face3.mesh[263][2] || 0);
+  const irisCenter = left ? face3.mesh[473] : face3.mesh[468];
+  const eyeCenter = left ? [(face3.mesh[133][0] + face3.mesh[33][0]) / 2, (face3.mesh[133][1] + face3.mesh[33][1]) / 2] : [(face3.mesh[263][0] + face3.mesh[362][0]) / 2, (face3.mesh[263][1] + face3.mesh[362][1]) / 2];
+  const eyeSize = left ? [face3.mesh[133][0] - face3.mesh[33][0], face3.mesh[23][1] - face3.mesh[27][1]] : [face3.mesh[263][0] - face3.mesh[362][0], face3.mesh[253][1] - face3.mesh[257][1]];
+  const eyeDiff = [
+    // x distance between extreme point and center point normalized with eye size
+    (eyeCenter[0] - irisCenter[0]) / eyeSize[0] - offsetIris[0],
+    eyeRatio * (irisCenter[1] - eyeCenter[1]) / eyeSize[1] - offsetIris[1]
+  ];
+  let strength = Math.sqrt(eyeDiff[0] * eyeDiff[0] + eyeDiff[1] * eyeDiff[1]);
+  strength = Math.min(strength, face3.boxRaw[2] / 2, face3.boxRaw[3] / 2);
+  const bearing = (radians([0, 0], eyeDiff) + Math.PI / 2) % Math.PI;
+  return { bearing, strength };
 };
-function init2() {
-  constants.tf255 = tfjs_esm_exports.scalar(255, "float32");
-  constants.tf1 = tfjs_esm_exports.scalar(1, "float32");
-  constants.tf2 = tfjs_esm_exports.scalar(2, "float32");
-  constants.tf05 = tfjs_esm_exports.scalar(0.5, "float32");
-  constants.tf127 = tfjs_esm_exports.scalar(127.5, "float32");
-  constants.rgb = tfjs_esm_exports.tensor1d([0.2989, 0.587, 0.114], "float32");
+var calculateFaceAngle = (face3, imageSize) => {
+  const normalize2 = (v) => {
+    const length = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+    v[0] /= length;
+    v[1] /= length;
+    v[2] /= length;
+    return v;
+  };
+  const subVectors = (a, b) => {
+    const x = a[0] - b[0];
+    const y = a[1] - b[1];
+    const z = a[2] - b[2];
+    return [x, y, z];
+  };
+  const crossVectors = (a, b) => {
+    const x = a[1] * b[2] - a[2] * b[1];
+    const y = a[2] * b[0] - a[0] * b[2];
+    const z = a[0] * b[1] - a[1] * b[0];
+    return [x, y, z];
+  };
+  const rotationMatrixToEulerAngle = (r) => {
+    const [r00, _r01, _r02, r10, r11, r12, r20, r21, r22] = r;
+    let thetaX;
+    let thetaY;
+    let thetaZ;
+    if (r10 < 1) {
+      if (r10 > -1) {
+        const cosThetaZ = Math.sqrt(r00 * r00 + r20 * r20);
+        thetaZ = Math.atan2(r10, cosThetaZ);
+        thetaY = Math.atan2(-r20, r00);
+        thetaX = Math.atan2(-r12, r11);
+      } else {
+        thetaZ = -Math.PI / 2;
+        thetaY = -Math.atan2(r21, r22);
+        thetaX = 0;
+      }
+    } else {
+      thetaZ = Math.PI / 2;
+      thetaY = Math.atan2(r21, r22);
+      thetaX = 0;
+    }
+    if (Number.isNaN(thetaX)) thetaX = 0;
+    if (Number.isNaN(thetaY)) thetaY = 0;
+    if (Number.isNaN(thetaZ)) thetaZ = 0;
+    return { pitch: -thetaX, yaw: -thetaY, roll: -thetaZ };
+  };
+  const mesh = face3.meshRaw;
+  if (!mesh || mesh.length < 300) return { angle: { pitch: 0, yaw: 0, roll: 0 }, matrix: [1, 0, 0, 0, 1, 0, 0, 0, 1], gaze: { bearing: 0, strength: 0 } };
+  const size2 = Math.max(face3.boxRaw[2] * imageSize[0], face3.boxRaw[3] * imageSize[1]) / 1.5;
+  const pts = [mesh[10], mesh[152], mesh[234], mesh[454]].map((pt) => [pt[0] * imageSize[0] / size2, pt[1] * imageSize[1] / size2, pt[2]]);
+  const yAxis = normalize2(subVectors(pts[1], pts[0]));
+  let xAxis = normalize2(subVectors(pts[3], pts[2]));
+  const zAxis = normalize2(crossVectors(xAxis, yAxis));
+  xAxis = crossVectors(yAxis, zAxis);
+  const matrix = [
+    xAxis[0],
+    xAxis[1],
+    xAxis[2],
+    yAxis[0],
+    yAxis[1],
+    yAxis[2],
+    zAxis[0],
+    zAxis[1],
+    zAxis[2]
+  ];
+  const angle = rotationMatrixToEulerAngle(matrix);
+  const gaze = mesh.length === 478 ? calculateGaze(face3) : { bearing: 0, strength: 0 };
+  return { angle, matrix, gaze };
+};
+
+// src/face/anthropometry.ts
+function calculateCameraDistance(face3, width) {
+  const f = face3 == null ? void 0 : face3.annotations;
+  if (!(f == null ? void 0 : f.leftEyeIris) || !(f == null ? void 0 : f.rightEyeIris)) return 0;
+  const irisSize = Math.max(Math.abs(f.leftEyeIris[3][0] - f.leftEyeIris[1][0]), Math.abs(f.rightEyeIris[3][0] - f.rightEyeIris[1][0])) / width;
+  const cameraDistance = Math.round(1.17 / irisSize) / 100;
+  return cameraDistance;
+}
+
+// src/face/antispoof.ts
+var model5;
+var cached = [];
+var skipped5 = Number.MAX_SAFE_INTEGER;
+var lastCount5 = 0;
+var lastTime5 = 0;
+async function load5(config3) {
+  var _a;
+  if (env.initial) model5 = null;
+  if (!model5) model5 = await loadModel((_a = config3.face.antispoof) == null ? void 0 : _a.modelPath);
+  else if (config3.debug) log("cached model:", model5["modelUrl"]);
+  return model5;
+}
+async function predict5(image28, config3, idx, count2) {
+  var _a, _b;
+  if (!(model5 == null ? void 0 : model5["executor"])) return 0;
+  const skipTime = (((_a = config3.face.antispoof) == null ? void 0 : _a.skipTime) || 0) > now() - lastTime5;
+  const skipFrame = skipped5 < (((_b = config3.face.antispoof) == null ? void 0 : _b.skipFrames) || 0);
+  if (config3.skipAllowed && skipTime && skipFrame && lastCount5 === count2 && cached[idx]) {
+    skipped5++;
+    return cached[idx];
+  }
+  skipped5 = 0;
+  return new Promise(async (resolve) => {
+    const resize = tfjs_esm_exports.image.resizeBilinear(image28, [(model5 == null ? void 0 : model5.inputs[0].shape) ? model5.inputs[0].shape[2] : 0, (model5 == null ? void 0 : model5.inputs[0].shape) ? model5.inputs[0].shape[1] : 0], false);
+    const res = model5 == null ? void 0 : model5.execute(resize);
+    const num = (await res.data())[0];
+    cached[idx] = Math.round(100 * num) / 100;
+    lastCount5 = count2;
+    lastTime5 = now();
+    tfjs_esm_exports.dispose([resize, res]);
+    resolve(cached[idx]);
+  });
 }
 
 // src/face/facemeshutil.ts
@@ -6031,20 +6403,20 @@ var calculateFaceBox = (mesh, previousBox) => {
 
 // src/face/blazeface.ts
 var keypointsCount = 6;
-var model;
+var model6;
 var anchors = null;
 var inputSize = 0;
 var inputSizeT = null;
 var size = () => inputSize;
-async function load(config3) {
+async function load6(config3) {
   var _a;
-  if (env.initial) model = null;
-  if (!model) model = await loadModel((_a = config3.face.detector) == null ? void 0 : _a.modelPath);
-  else if (config3.debug) log("cached model:", model["modelUrl"]);
-  inputSize = model["executor"] && model.inputs[0].shape ? model.inputs[0].shape[2] : 256;
+  if (env.initial) model6 = null;
+  if (!model6) model6 = await loadModel((_a = config3.face.detector) == null ? void 0 : _a.modelPath);
+  else if (config3.debug) log("cached model:", model6["modelUrl"]);
+  inputSize = model6["executor"] && model6.inputs[0].shape ? model6.inputs[0].shape[2] : 256;
   inputSizeT = tfjs_esm_exports.scalar(inputSize, "int32");
   anchors = tfjs_esm_exports.tensor2d(generateAnchors(inputSize));
-  return model;
+  return model6;
 }
 function decodeBoxes(boxOutputs) {
   if (!anchors || !inputSizeT) return tfjs_esm_exports.zeros([0, 0]);
@@ -6081,7 +6453,7 @@ async function getBoxes(inputImage, config3) {
   t2.resized = tfjs_esm_exports.image.resizeBilinear(t2.padded, [inputSize, inputSize]);
   t2.div = tfjs_esm_exports.div(t2.resized, constants.tf127);
   t2.normalized = tfjs_esm_exports.sub(t2.div, constants.tf1);
-  const res = model == null ? void 0 : model.execute(t2.normalized);
+  const res = model6 == null ? void 0 : model6.execute(t2.normalized);
   if (Array.isArray(res) && res.length > 2) {
     const sorted = res.sort((a, b) => a.size - b.size);
     t2.concat384 = tfjs_esm_exports.concat([sorted[0], sorted[2]], 2);
@@ -6138,7 +6510,7 @@ async function getBoxes(inputImage, config3) {
 }
 
 // src/face/iris.ts
-var model2;
+var model7;
 var inputSize2 = 0;
 var leftOutline = meshAnnotations.leftEyeLower0;
 var rightOutline = meshAnnotations.rightEyeLower0;
@@ -6152,14 +6524,14 @@ var irisLandmarks = {
   index: 71,
   numCoordinates: 76
 };
-async function load2(config3) {
+async function load7(config3) {
   var _a, _b;
-  if (env.initial) model2 = null;
-  if (!model2) model2 = await loadModel((_a = config3.face.iris) == null ? void 0 : _a.modelPath);
-  else if (config3.debug) log("cached model:", model2["modelUrl"]);
-  inputSize2 = (model2 == null ? void 0 : model2["executor"]) && ((_b = model2.inputs) == null ? void 0 : _b[0].shape) ? model2.inputs[0].shape[2] : 0;
+  if (env.initial) model7 = null;
+  if (!model7) model7 = await loadModel((_a = config3.face.iris) == null ? void 0 : _a.modelPath);
+  else if (config3.debug) log("cached model:", model7["modelUrl"]);
+  inputSize2 = (model7 == null ? void 0 : model7["executor"]) && ((_b = model7.inputs) == null ? void 0 : _b[0].shape) ? model7.inputs[0].shape[2] : 0;
   if (inputSize2 === -1) inputSize2 = 64;
-  return model2;
+  return model7;
 }
 function replaceIrisCoords(rawCoords, newCoords, prefix, keys) {
   for (let i = 0; i < irisIndices.length; i++) {
@@ -6228,13 +6600,13 @@ var getAdjustedIrisCoords = (rawCoords, irisCoords, direction) => {
 };
 async function augmentIris(rawCoords, face3, meshSize, config3) {
   var _a, _b;
-  if (!(model2 == null ? void 0 : model2["executor"])) return rawCoords;
+  if (!(model7 == null ? void 0 : model7["executor"])) return rawCoords;
   const { box: leftEyeBox, boxSize: leftEyeBoxSize, crop: leftEyeCrop } = getEyeBox(rawCoords, face3, eyeLandmarks.leftBounds[0], eyeLandmarks.leftBounds[1], meshSize, true, ((_a = config3.face.iris) == null ? void 0 : _a.scale) || 2.3);
   const { box: rightEyeBox, boxSize: rightEyeBoxSize, crop: rightEyeCrop } = getEyeBox(rawCoords, face3, eyeLandmarks.rightBounds[0], eyeLandmarks.rightBounds[1], meshSize, true, ((_b = config3.face.iris) == null ? void 0 : _b.scale) || 2.3);
   const combined = tfjs_esm_exports.concat([leftEyeCrop, rightEyeCrop]);
   tfjs_esm_exports.dispose(leftEyeCrop);
   tfjs_esm_exports.dispose(rightEyeCrop);
-  const eyePredictions = model2.execute(combined);
+  const eyePredictions = model7.execute(combined);
   tfjs_esm_exports.dispose(combined);
   const eyePredictionsData = await eyePredictions.data();
   tfjs_esm_exports.dispose(eyePredictions);
@@ -6294,9 +6666,9 @@ var cache = {
   skipped: Number.MAX_SAFE_INTEGER,
   timestamp: 0
 };
-var model3 = null;
+var model8 = null;
 var inputSize3 = 0;
-async function predict(input, config3) {
+async function predict6(input, config3) {
   var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
   const skipTime = (((_a = config3.face.detector) == null ? void 0 : _a.skipTime) || 0) > now() - cache.timestamp;
   const skipFrame = cache.skipped < (((_b = config3.face.detector) == null ? void 0 : _b.skipFrames) || 0);
@@ -6337,7 +6709,7 @@ async function predict(input, config3) {
       if (equilized) face3.tensor = equilized;
     }
     face3.boxScore = Math.round(100 * box.confidence) / 100;
-    if (!((_e = config3.face.mesh) == null ? void 0 : _e.enabled) || !(model3 == null ? void 0 : model3["executor"])) {
+    if (!((_e = config3.face.mesh) == null ? void 0 : _e.enabled) || !(model8 == null ? void 0 : model8["executor"])) {
       face3.box = clampBox(box, input);
       face3.boxRaw = getRawBox(box, input);
       face3.score = face3.boxScore;
@@ -6345,7 +6717,7 @@ async function predict(input, config3) {
       face3.mesh = box.landmarks;
       face3.meshRaw = face3.mesh.map((pt) => [pt[0] / (input.shape[2] || 0), pt[1] / (input.shape[1] || 0), (pt[2] || 0) / size2]);
       for (const key of Object.keys(blazeFaceLandmarks)) face3.annotations[key] = [face3.mesh[blazeFaceLandmarks[key]]];
-    } else if (!model3) {
+    } else if (!model8) {
       if (config3.debug) log("face mesh detection requested, but model is not loaded");
     } else {
       if (((_f = config3.face.attention) == null ? void 0 : _f.enabled) && !env.kernels.includes("atan2")) {
@@ -6353,7 +6725,7 @@ async function predict(input, config3) {
         tfjs_esm_exports.dispose(face3.tensor);
         return faces;
       }
-      const results = model3.execute(face3.tensor);
+      const results = model8.execute(face3.tensor);
       const confidenceT = results.find((t2) => t2.shape[t2.shape.length - 1] === 1);
       const faceConfidence = await confidenceT.data();
       face3.faceScore = Math.round(100 * faceConfidence[0]) / 100;
@@ -6403,123 +6775,54 @@ async function predict(input, config3) {
   cache.boxes = newCache;
   return faces;
 }
-async function load3(config3) {
+async function load8(config3) {
   var _a, _b, _c, _d, _e, _f;
-  if (env.initial) model3 = null;
-  if (((_a = config3.face.attention) == null ? void 0 : _a.enabled) && (model3 == null ? void 0 : model3["signature"])) {
-    if (Object.keys(((_b = model3 == null ? void 0 : model3["signature"]) == null ? void 0 : _b.outputs) || {}).length < 6) model3 = null;
+  if (env.initial) model8 = null;
+  if (((_a = config3.face.attention) == null ? void 0 : _a.enabled) && (model8 == null ? void 0 : model8["signature"])) {
+    if (Object.keys(((_b = model8 == null ? void 0 : model8["signature"]) == null ? void 0 : _b.outputs) || {}).length < 6) model8 = null;
   }
-  if (!model3) {
-    if ((_c = config3.face.attention) == null ? void 0 : _c.enabled) model3 = await loadModel(config3.face.attention.modelPath);
-    else model3 = await loadModel((_d = config3.face.mesh) == null ? void 0 : _d.modelPath);
+  if (!model8) {
+    if ((_c = config3.face.attention) == null ? void 0 : _c.enabled) model8 = await loadModel(config3.face.attention.modelPath);
+    else model8 = await loadModel((_d = config3.face.mesh) == null ? void 0 : _d.modelPath);
   } else if (config3.debug) {
-    log("cached model:", model3["modelUrl"]);
+    log("cached model:", model8["modelUrl"]);
   }
-  inputSize3 = model3["executor"] && ((_e = model3 == null ? void 0 : model3.inputs) == null ? void 0 : _e[0].shape) ? (_f = model3 == null ? void 0 : model3.inputs) == null ? void 0 : _f[0].shape[2] : 256;
-  return model3;
+  inputSize3 = model8["executor"] && ((_e = model8 == null ? void 0 : model8.inputs) == null ? void 0 : _e[0].shape) ? (_f = model8 == null ? void 0 : model8.inputs) == null ? void 0 : _f[0].shape[2] : 256;
+  return model8;
 }
 var triangulation = TRI468;
 var uvmap = UV468;
 
-// src/gear/emotion.ts
-var annotations = [];
-var model4;
-var last2 = [];
-var lastCount = 0;
-var lastTime = 0;
-var skipped = Number.MAX_SAFE_INTEGER;
-var rgb = false;
-async function load4(config3) {
-  var _a, _b, _c;
-  if (env.initial) model4 = null;
-  if (!model4) {
-    model4 = await loadModel((_a = config3.face.emotion) == null ? void 0 : _a.modelPath);
-    rgb = ((_c = (_b = model4 == null ? void 0 : model4.inputs) == null ? void 0 : _b[0].shape) == null ? void 0 : _c[3]) === 3;
-    if (!rgb) annotations = ["\uD654\uB0A8", "\uBD88\uCF8C", "\uACF5\uD3EC", "\uD589\uBCF5", "\uC2AC\uD514", "\uB180\uB78C", "\uBB34\uD45C\uC815"];
-    else annotations = ["\uD654\uB0A8", "\uBD88\uCF8C", "\uACF5\uD3EC", "\uD589\uBCF5", "\uBB34\uD45C\uC815", "\uC2AC\uD514", "\uB180\uB78C"];
-  } else if (config3.debug) {
-    log("cached model:", model4["modelUrl"]);
-  }
-  return model4;
-}
-async function predict2(image28, config3, idx, count2) {
-  var _a, _b;
-  if (!model4) return [];
-  const skipFrame = skipped < (((_a = config3.face.emotion) == null ? void 0 : _a.skipFrames) || 0);
-  const skipTime = (((_b = config3.face.emotion) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime;
-  if (config3.skipAllowed && skipTime && skipFrame && lastCount === count2 && last2[idx] && last2[idx].length > 0) {
-    skipped++;
-    return last2[idx];
-  }
-  skipped = 0;
-  return new Promise(async (resolve) => {
-    var _a2, _b2, _c;
-    const obj = [];
-    if ((_a2 = config3.face.emotion) == null ? void 0 : _a2.enabled) {
-      const t2 = {};
-      const inputSize10 = (model4 == null ? void 0 : model4.inputs[0].shape) ? model4.inputs[0].shape[2] : 0;
-      if (((_b2 = config3.face.emotion) == null ? void 0 : _b2["crop"]) > 0) {
-        const crop = (_c = config3.face.emotion) == null ? void 0 : _c["crop"];
-        const box = [[crop, crop, 1 - crop, 1 - crop]];
-        t2.resize = tfjs_esm_exports.image.cropAndResize(image28, box, [0], [inputSize10, inputSize10]);
-      } else {
-        t2.resize = tfjs_esm_exports.image.resizeBilinear(image28, [inputSize10, inputSize10], false);
-      }
-      if (rgb) {
-        t2.mul = tfjs_esm_exports.mul(t2.resize, 255);
-        t2.normalize = tfjs_esm_exports.sub(t2.mul, [103.939, 116.779, 123.68]);
-        t2.emotion = model4 == null ? void 0 : model4.execute(t2.normalize);
-      } else {
-        t2.channels = tfjs_esm_exports.mul(t2.resize, constants.rgb);
-        t2.grayscale = tfjs_esm_exports.sum(t2.channels, 3, true);
-        t2.grayscaleSub = tfjs_esm_exports.sub(t2.grayscale, constants.tf05);
-        t2.grayscaleMul = tfjs_esm_exports.mul(t2.grayscaleSub, constants.tf2);
-        t2.emotion = model4 == null ? void 0 : model4.execute(t2.grayscaleMul);
-      }
-      lastTime = now();
-      const data = await t2.emotion.data();
-      for (let i = 0; i < data.length; i++) {
-        if (data[i] > (config3.face.emotion.minConfidence || 0)) obj.push({ score: Math.min(0.99, Math.trunc(100 * data[i]) / 100), emotion: annotations[i] });
-      }
-      obj.sort((a, b) => b.score - a.score);
-      Object.keys(t2).forEach((tensor7) => tfjs_esm_exports.dispose(t2[tensor7]));
-    }
-    last2[idx] = obj;
-    lastCount = count2;
-    resolve(obj);
-  });
-}
-
 // src/face/faceres.ts
-var model5;
-var last3 = [];
-var lastTime2 = 0;
-var lastCount2 = 0;
-var skipped2 = Number.MAX_SAFE_INTEGER;
-async function load5(config3) {
+var model9;
+var last6 = [];
+var lastTime6 = 0;
+var lastCount6 = 0;
+var skipped6 = Number.MAX_SAFE_INTEGER;
+async function load9(config3) {
   var _a;
-  if (env.initial) model5 = null;
-  if (!model5) model5 = await loadModel((_a = config3.face.description) == null ? void 0 : _a.modelPath);
-  else if (config3.debug) log("cached model:", model5["modelUrl"]);
-  return model5;
+  if (env.initial) model9 = null;
+  if (!model9) model9 = await loadModel((_a = config3.face.description) == null ? void 0 : _a.modelPath);
+  else if (config3.debug) log("cached model:", model9["modelUrl"]);
+  return model9;
 }
 function enhance(input, config3) {
   var _a, _b;
   const tensor7 = input.image || input.tensor || input;
-  if (!(model5 == null ? void 0 : model5.inputs[0].shape)) return tensor7;
+  if (!(model9 == null ? void 0 : model9.inputs[0].shape)) return tensor7;
   let crop;
   if (((_a = config3.face.description) == null ? void 0 : _a["crop"]) > 0) {
     const cropval = (_b = config3.face.description) == null ? void 0 : _b["crop"];
     const box = [[cropval, cropval, 1 - cropval, 1 - cropval]];
-    crop = tfjs_esm_exports.image.cropAndResize(tensor7, box, [0], [model5.inputs[0].shape[2], model5.inputs[0].shape[1]]);
+    crop = tfjs_esm_exports.image.cropAndResize(tensor7, box, [0], [model9.inputs[0].shape[2], model9.inputs[0].shape[1]]);
   } else {
-    crop = tfjs_esm_exports.image.resizeBilinear(tensor7, [model5.inputs[0].shape[2], model5.inputs[0].shape[1]], false);
+    crop = tfjs_esm_exports.image.resizeBilinear(tensor7, [model9.inputs[0].shape[2], model9.inputs[0].shape[1]], false);
   }
   const norm = tfjs_esm_exports.mul(crop, constants.tf255);
   tfjs_esm_exports.dispose(crop);
   return norm;
 }
-async function predict3(image28, config3, idx, count2) {
+async function predict7(image28, config3, idx, count2) {
   var _a, _b, _c, _d;
   const obj = {
     age: 0,
@@ -6527,20 +6830,20 @@ async function predict3(image28, config3, idx, count2) {
     genderScore: 0,
     descriptor: []
   };
-  if (!(model5 == null ? void 0 : model5["executor"])) return obj;
-  const skipFrame = skipped2 < (((_a = config3.face.description) == null ? void 0 : _a.skipFrames) || 0);
-  const skipTime = (((_b = config3.face.description) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime2;
-  if (config3.skipAllowed && skipFrame && skipTime && lastCount2 === count2 && ((_c = last3 == null ? void 0 : last3[idx]) == null ? void 0 : _c.age) > 0 && ((_d = last3 == null ? void 0 : last3[idx]) == null ? void 0 : _d.genderScore) > 0) {
-    skipped2++;
-    return last3[idx];
+  if (!(model9 == null ? void 0 : model9["executor"])) return obj;
+  const skipFrame = skipped6 < (((_a = config3.face.description) == null ? void 0 : _a.skipFrames) || 0);
+  const skipTime = (((_b = config3.face.description) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime6;
+  if (config3.skipAllowed && skipFrame && skipTime && lastCount6 === count2 && ((_c = last6 == null ? void 0 : last6[idx]) == null ? void 0 : _c.age) > 0 && ((_d = last6 == null ? void 0 : last6[idx]) == null ? void 0 : _d.genderScore) > 0) {
+    skipped6++;
+    return last6[idx];
   }
-  skipped2 = 0;
+  skipped6 = 0;
   return new Promise(async (resolve) => {
     var _a2;
     if ((_a2 = config3.face.description) == null ? void 0 : _a2.enabled) {
       const enhanced = enhance(image28, config3);
-      const resT = model5 == null ? void 0 : model5.execute(enhanced);
-      lastTime2 = now();
+      const resT = model9 == null ? void 0 : model9.execute(enhanced);
+      lastTime6 = now();
       tfjs_esm_exports.dispose(enhanced);
       const genderT = resT.find((t2) => t2.shape[1] === 1);
       const gender = await genderT.data();
@@ -6551,24 +6854,101 @@ async function predict3(image28, config3, idx, count2) {
       }
       const ageT = resT.find((t2) => t2.shape[1] === 100);
       const alpha2 = 0.85;
-      const pPow = tfjs_esm_exports.pow(ageT, tfjs_esm_exports.scalar(alpha2, "float32"));
+      const alphaScalar = tfjs_esm_exports.scalar(alpha2, "float32");
+      const pPow = tfjs_esm_exports.pow(ageT, alphaScalar);
       const Z = tfjs_esm_exports.sum(pPow, -1);
       const pAdj = tfjs_esm_exports.div(pPow, Z);
-      const AGE_INDICES = tfjs_esm_exports.range(0, 100, 1, "float32");
-      const AGE_CENTERS = tfjs_esm_exports.add(AGE_INDICES, tfjs_esm_exports.scalar(0.5));
-      const expected = tfjs_esm_exports.sum(tfjs_esm_exports.mul(pAdj, AGE_CENTERS), -1);
+      const ageIndices = tfjs_esm_exports.range(0, 100, 1, "float32");
+      const halfScalar = tfjs_esm_exports.scalar(0.5, "float32");
+      const ageCenters = tfjs_esm_exports.add(ageIndices, halfScalar);
+      const mulPAge = tfjs_esm_exports.mul(pAdj, ageCenters);
+      const expected = tfjs_esm_exports.sum(mulPAge, -1);
       const ageVal = (await expected.data())[0];
       obj.age = Math.round(ageVal * 10) / 10;
-      tfjs_esm_exports.dispose([expected, AGE_INDICES]);
-      if (Number.isNaN(gender[0]) || Number.isNaN(ageVal)) log("faceres error:", { model: model5, result: resT });
+      tfjs_esm_exports.dispose([expected, mulPAge, ageCenters, halfScalar, ageIndices, pAdj, Z, pPow, alphaScalar]);
+      if (Number.isNaN(gender[0]) || Number.isNaN(ageVal)) log("faceres error:", { model: model9, result: resT });
       const desc = resT.find((t2) => t2.shape[1] === 1024);
       const descriptor = desc ? await desc.data() : [];
       obj.descriptor = Array.from(descriptor);
       resT.forEach((t2) => tfjs_esm_exports.dispose(t2));
     }
-    last3[idx] = obj;
-    lastCount2 = count2;
+    last6[idx] = obj;
+    lastCount6 = count2;
     resolve(obj);
+  });
+}
+
+// src/face/insightface.ts
+var model10;
+var last7 = [];
+var lastCount7 = 0;
+var lastTime7 = 0;
+var skipped7 = Number.MAX_SAFE_INTEGER;
+async function load10(config3) {
+  if (env.initial) model10 = null;
+  if (!model10) model10 = await loadModel(config3.face["insightface"].modelPath);
+  else if (config3.debug) log("cached model:", model10["modelUrl"]);
+  return model10;
+}
+async function predict8(input, config3, idx, count2) {
+  var _a, _b;
+  if (!(model10 == null ? void 0 : model10["executor"])) return [];
+  const skipFrame = skipped7 < (((_a = config3.face["insightface"]) == null ? void 0 : _a.skipFrames) || 0);
+  const skipTime = (((_b = config3.face["insightface"]) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime7;
+  if (config3.skipAllowed && skipTime && skipFrame && lastCount7 === count2 && last7[idx]) {
+    skipped7++;
+    return last7[idx];
+  }
+  return new Promise(async (resolve) => {
+    var _a2;
+    let data = [];
+    if (((_a2 = config3.face["insightface"]) == null ? void 0 : _a2.enabled) && (model10 == null ? void 0 : model10.inputs[0].shape)) {
+      const t2 = {};
+      t2.crop = tfjs_esm_exports.image.resizeBilinear(input, [model10.inputs[0].shape[2], model10.inputs[0].shape[1]], false);
+      t2.data = model10.execute(t2.crop);
+      const output = await t2.data.data();
+      data = Array.from(output);
+      Object.keys(t2).forEach((tensor7) => tfjs_esm_exports.dispose(t2[tensor7]));
+    }
+    last7[idx] = data;
+    lastCount7 = count2;
+    lastTime7 = now();
+    resolve(data);
+  });
+}
+
+// src/face/liveness.ts
+var model11;
+var cached2 = [];
+var skipped8 = Number.MAX_SAFE_INTEGER;
+var lastCount8 = 0;
+var lastTime8 = 0;
+async function load11(config3) {
+  var _a;
+  if (env.initial) model11 = null;
+  if (!model11) model11 = await loadModel((_a = config3.face.liveness) == null ? void 0 : _a.modelPath);
+  else if (config3.debug) log("cached model:", model11["modelUrl"]);
+  return model11;
+}
+async function predict9(image28, config3, idx, count2) {
+  var _a, _b;
+  if (!(model11 == null ? void 0 : model11["executor"])) return 0;
+  const skipTime = (((_a = config3.face.liveness) == null ? void 0 : _a.skipTime) || 0) > now() - lastTime8;
+  const skipFrame = skipped8 < (((_b = config3.face.liveness) == null ? void 0 : _b.skipFrames) || 0);
+  if (config3.skipAllowed && skipTime && skipFrame && lastCount8 === count2 && cached2[idx]) {
+    skipped8++;
+    return cached2[idx];
+  }
+  skipped8 = 0;
+  return new Promise(async (resolve) => {
+    const resize = tfjs_esm_exports.image.resizeBilinear(image28, [(model11 == null ? void 0 : model11.inputs[0].shape) ? model11.inputs[0].shape[2] : 0, (model11 == null ? void 0 : model11.inputs[0].shape) ? model11.inputs[0].shape[1] : 0], false);
+    const res = model11 == null ? void 0 : model11.execute(resize);
+    const num = (await res.data())[0];
+    cached2[idx] = Math.round(100 * num) / 100;
+    lastCount8 = count2;
+    lastTime8 = now();
+    tfjs_esm_exports.dispose([resize, res]);
+    resolve(cached2[idx]);
   });
 }
 
@@ -6606,302 +6986,24 @@ async function mask(face3) {
   return output;
 }
 
-// src/face/antispoof.ts
-var model6;
-var cached = [];
-var skipped3 = Number.MAX_SAFE_INTEGER;
-var lastCount3 = 0;
-var lastTime3 = 0;
-async function load6(config3) {
-  var _a;
-  if (env.initial) model6 = null;
-  if (!model6) model6 = await loadModel((_a = config3.face.antispoof) == null ? void 0 : _a.modelPath);
-  else if (config3.debug) log("cached model:", model6["modelUrl"]);
-  return model6;
-}
-async function predict4(image28, config3, idx, count2) {
-  var _a, _b;
-  if (!(model6 == null ? void 0 : model6["executor"])) return 0;
-  const skipTime = (((_a = config3.face.antispoof) == null ? void 0 : _a.skipTime) || 0) > now() - lastTime3;
-  const skipFrame = skipped3 < (((_b = config3.face.antispoof) == null ? void 0 : _b.skipFrames) || 0);
-  if (config3.skipAllowed && skipTime && skipFrame && lastCount3 === count2 && cached[idx]) {
-    skipped3++;
-    return cached[idx];
-  }
-  skipped3 = 0;
-  return new Promise(async (resolve) => {
-    const resize = tfjs_esm_exports.image.resizeBilinear(image28, [(model6 == null ? void 0 : model6.inputs[0].shape) ? model6.inputs[0].shape[2] : 0, (model6 == null ? void 0 : model6.inputs[0].shape) ? model6.inputs[0].shape[1] : 0], false);
-    const res = model6 == null ? void 0 : model6.execute(resize);
-    const num = (await res.data())[0];
-    cached[idx] = Math.round(100 * num) / 100;
-    lastCount3 = count2;
-    lastTime3 = now();
-    tfjs_esm_exports.dispose([resize, res]);
-    resolve(cached[idx]);
-  });
-}
-
-// src/face/liveness.ts
-var model7;
-var cached2 = [];
-var skipped4 = Number.MAX_SAFE_INTEGER;
-var lastCount4 = 0;
-var lastTime4 = 0;
-async function load7(config3) {
-  var _a;
-  if (env.initial) model7 = null;
-  if (!model7) model7 = await loadModel((_a = config3.face.liveness) == null ? void 0 : _a.modelPath);
-  else if (config3.debug) log("cached model:", model7["modelUrl"]);
-  return model7;
-}
-async function predict5(image28, config3, idx, count2) {
-  var _a, _b;
-  if (!(model7 == null ? void 0 : model7["executor"])) return 0;
-  const skipTime = (((_a = config3.face.liveness) == null ? void 0 : _a.skipTime) || 0) > now() - lastTime4;
-  const skipFrame = skipped4 < (((_b = config3.face.liveness) == null ? void 0 : _b.skipFrames) || 0);
-  if (config3.skipAllowed && skipTime && skipFrame && lastCount4 === count2 && cached2[idx]) {
-    skipped4++;
-    return cached2[idx];
-  }
-  skipped4 = 0;
-  return new Promise(async (resolve) => {
-    const resize = tfjs_esm_exports.image.resizeBilinear(image28, [(model7 == null ? void 0 : model7.inputs[0].shape) ? model7.inputs[0].shape[2] : 0, (model7 == null ? void 0 : model7.inputs[0].shape) ? model7.inputs[0].shape[1] : 0], false);
-    const res = model7 == null ? void 0 : model7.execute(resize);
-    const num = (await res.data())[0];
-    cached2[idx] = Math.round(100 * num) / 100;
-    lastCount4 = count2;
-    lastTime4 = now();
-    tfjs_esm_exports.dispose([resize, res]);
-    resolve(cached2[idx]);
-  });
-}
-
-// src/gear/gear.ts
-var model8;
-var last4 = [];
-var raceNames = ["white", "black", "asian", "indian", "other"];
-var ageWeights = [15, 23, 28, 35.5, 45.5, 55.5, 65];
-var lastCount5 = 0;
-var lastTime5 = 0;
-var skipped5 = Number.MAX_SAFE_INTEGER;
-async function load8(config3) {
-  var _a;
-  if (env.initial) model8 = null;
-  if (!model8) model8 = await loadModel((_a = config3.face.gear) == null ? void 0 : _a.modelPath);
-  else if (config3.debug) log("cached model:", model8["modelUrl"]);
-  return model8;
-}
-async function predict6(image28, config3, idx, count2) {
-  var _a, _b;
-  if (!model8) return { age: 0, gender: "unknown", genderScore: 0, race: [] };
-  const skipFrame = skipped5 < (((_a = config3.face.gear) == null ? void 0 : _a.skipFrames) || 0);
-  const skipTime = (((_b = config3.face.gear) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime5;
-  if (config3.skipAllowed && skipTime && skipFrame && lastCount5 === count2 && last4[idx]) {
-    skipped5++;
-    return last4[idx];
-  }
-  skipped5 = 0;
-  return new Promise(async (resolve) => {
-    var _a2, _b2, _c, _d;
-    if (!(model8 == null ? void 0 : model8.inputs[0].shape)) return;
-    const t2 = {};
-    let box = [[0, 0.1, 0.9, 0.9]];
-    if (((_a2 = config3.face.gear) == null ? void 0 : _a2["crop"]) > 0) {
-      const crop = (_b2 = config3.face.gear) == null ? void 0 : _b2["crop"];
-      box = [[crop, crop, 1 - crop, 1 - crop]];
-    }
-    t2.resize = tfjs_esm_exports.image.cropAndResize(image28, box, [0], [model8.inputs[0].shape[2], model8.inputs[0].shape[1]]);
-    const obj = { age: 0, gender: "unknown", genderScore: 0, race: [] };
-    if ((_c = config3.face.gear) == null ? void 0 : _c.enabled) [t2.age, t2.gender, t2.race] = model8.execute(t2.resize, ["age_output", "gender_output", "race_output"]);
-    const gender = await t2.gender.data();
-    obj.gender = gender[0] > gender[1] ? "\uB0A8\uC131" : "\uC5EC\uC131";
-    obj.genderScore = Math.round(100 * (gender[0] > gender[1] ? gender[0] : gender[1])) / 100;
-    const race = await t2.race.data();
-    for (let i = 0; i < race.length; i++) {
-      if (race[i] > (((_d = config3.face.gear) == null ? void 0 : _d.minConfidence) || 0.2)) obj.race.push({ score: Math.round(100 * race[i]) / 100, race: raceNames[i] });
-    }
-    obj.race.sort((a, b) => b.score - a.score);
-    const ageDistribution = Array.from(await t2.age.data());
-    const ageSorted = ageDistribution.map((a, i) => [ageWeights[i], a]).sort((a, b) => b[1] - a[1]);
-    let age = ageSorted[0][0];
-    for (let i = 1; i < ageSorted.length; i++) age += ageSorted[i][1] * (ageSorted[i][0] - age);
-    obj.age = Math.round(10 * age) / 10;
-    Object.keys(t2).forEach((tensor7) => tfjs_esm_exports.dispose(t2[tensor7]));
-    last4[idx] = obj;
-    lastCount5 = count2;
-    lastTime5 = now();
-    resolve(obj);
-  });
-}
-
-// src/gear/ssrnet-age.ts
-var model9;
-var last5 = [];
-var lastCount6 = 0;
-var lastTime6 = 0;
-var skipped6 = Number.MAX_SAFE_INTEGER;
-async function load9(config3) {
-  if (env.initial) model9 = null;
-  if (!model9) model9 = await loadModel(config3.face["ssrnet"].modelPathAge);
-  else if (config3.debug) log("cached model:", model9["modelUrl"]);
-  return model9;
-}
-async function predict7(image28, config3, idx, count2) {
-  var _a, _b, _c, _d;
-  if (!model9) return { age: 0 };
-  const skipFrame = skipped6 < (((_a = config3.face["ssrnet"]) == null ? void 0 : _a.skipFrames) || 0);
-  const skipTime = (((_b = config3.face["ssrnet"]) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime6;
-  if (config3.skipAllowed && skipFrame && skipTime && lastCount6 === count2 && ((_c = last5[idx]) == null ? void 0 : _c.age) && ((_d = last5[idx]) == null ? void 0 : _d.age) > 0) {
-    skipped6++;
-    return last5[idx];
-  }
-  skipped6 = 0;
-  return new Promise(async (resolve) => {
-    var _a2, _b2, _c2;
-    if (!(model9 == null ? void 0 : model9.inputs) || !model9.inputs[0] || !model9.inputs[0].shape) return;
-    const t2 = {};
-    if (((_a2 = config3.face["ssrnet"]) == null ? void 0 : _a2["crop"]) > 0) {
-      const crop = (_b2 = config3.face["ssrnet"]) == null ? void 0 : _b2["crop"];
-      const box = [[crop, crop, 1 - crop, 1 - crop]];
-      t2.resize = tfjs_esm_exports.image.cropAndResize(image28, box, [0], [model9.inputs[0].shape[2], model9.inputs[0].shape[1]]);
-    } else {
-      t2.resize = tfjs_esm_exports.image.resizeBilinear(image28, [model9.inputs[0].shape[2], model9.inputs[0].shape[1]], false);
-    }
-    t2.enhance = tfjs_esm_exports.mul(t2.resize, constants.tf255);
-    const obj = { age: 0 };
-    if ((_c2 = config3.face["ssrnet"]) == null ? void 0 : _c2.enabled) t2.age = model9.execute(t2.enhance);
-    if (t2.age) {
-      const data = await t2.age.data();
-      obj.age = Math.trunc(10 * data[0]) / 10;
-    }
-    Object.keys(t2).forEach((tensor7) => tfjs_esm_exports.dispose(t2[tensor7]));
-    last5[idx] = obj;
-    lastCount6 = count2;
-    lastTime6 = now();
-    resolve(obj);
-  });
-}
-
-// src/gear/ssrnet-gender.ts
-var model10;
-var last6 = [];
-var lastCount7 = 0;
-var lastTime7 = 0;
-var skipped7 = Number.MAX_SAFE_INTEGER;
-var rgb2 = [0.2989, 0.587, 0.114];
-async function load10(config3) {
-  var _a;
-  if (env.initial) model10 = null;
-  if (!model10) model10 = await loadModel((_a = config3.face["ssrnet"]) == null ? void 0 : _a.modelPathGender);
-  else if (config3.debug) log("cached model:", model10["modelUrl"]);
-  return model10;
-}
-async function predict8(image28, config3, idx, count2) {
-  var _a, _b, _c, _d;
-  if (!model10) return { gender: "unknown", genderScore: 0 };
-  const skipFrame = skipped7 < (((_a = config3.face["ssrnet"]) == null ? void 0 : _a.skipFrames) || 0);
-  const skipTime = (((_b = config3.face["ssrnet"]) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime7;
-  if (config3.skipAllowed && skipFrame && skipTime && lastCount7 === count2 && ((_c = last6[idx]) == null ? void 0 : _c.gender) && ((_d = last6[idx]) == null ? void 0 : _d.genderScore) > 0) {
-    skipped7++;
-    return last6[idx];
-  }
-  skipped7 = 0;
-  return new Promise(async (resolve) => {
-    var _a2, _b2, _c2;
-    if (!(model10 == null ? void 0 : model10.inputs[0].shape)) return;
-    const t2 = {};
-    if (((_a2 = config3.face["ssrnet"]) == null ? void 0 : _a2["crop"]) > 0) {
-      const crop = (_b2 = config3.face["ssrnet"]) == null ? void 0 : _b2["crop"];
-      const box = [[crop, crop, 1 - crop, 1 - crop]];
-      t2.resize = tfjs_esm_exports.image.cropAndResize(image28, box, [0], [model10.inputs[0].shape[2], model10.inputs[0].shape[1]]);
-    } else {
-      t2.resize = tfjs_esm_exports.image.resizeBilinear(image28, [model10.inputs[0].shape[2], model10.inputs[0].shape[1]], false);
-    }
-    t2.enhance = tfjs_esm_exports.tidy(() => {
-      var _a3, _b3;
-      let normalize2;
-      if (((_b3 = (_a3 = model10 == null ? void 0 : model10.inputs) == null ? void 0 : _a3[0].shape) == null ? void 0 : _b3[3]) === 1) {
-        const [red, green, blue] = tfjs_esm_exports.split(t2.resize, 3, 3);
-        const redNorm = tfjs_esm_exports.mul(red, rgb2[0]);
-        const greenNorm = tfjs_esm_exports.mul(green, rgb2[1]);
-        const blueNorm = tfjs_esm_exports.mul(blue, rgb2[2]);
-        const grayscale = tfjs_esm_exports.addN([redNorm, greenNorm, blueNorm]);
-        normalize2 = tfjs_esm_exports.mul(tfjs_esm_exports.sub(grayscale, constants.tf05), 2);
-      } else {
-        normalize2 = tfjs_esm_exports.mul(tfjs_esm_exports.sub(t2.resize, constants.tf05), 2);
-      }
-      return normalize2;
-    });
-    const obj = { gender: "unknown", genderScore: 0 };
-    if ((_c2 = config3.face["ssrnet"]) == null ? void 0 : _c2.enabled) t2.gender = model10.execute(t2.enhance);
-    const data = await t2.gender.data();
-    obj.gender = data[0] > data[1] ? "\uC5EC\uC131" : "\uB0A8\uC131";
-    obj.genderScore = data[0] > data[1] ? Math.trunc(100 * data[0]) / 100 : Math.trunc(100 * data[1]) / 100;
-    Object.keys(t2).forEach((tensor7) => tfjs_esm_exports.dispose(t2[tensor7]));
-    last6[idx] = obj;
-    lastCount7 = count2;
-    lastTime7 = now();
-    resolve(obj);
-  });
-}
-
 // src/face/mobilefacenet.ts
-var model11;
-var last7 = [];
-var lastCount8 = 0;
-var lastTime8 = 0;
-var skipped8 = Number.MAX_SAFE_INTEGER;
-async function load11(config3) {
-  var _a;
-  if (env.initial) model11 = null;
-  if (!model11) model11 = await loadModel((_a = config3.face["mobilefacenet"]) == null ? void 0 : _a.modelPath);
-  else if (config3.debug) log("cached model:", model11["modelUrl"]);
-  return model11;
-}
-async function predict9(input, config3, idx, count2) {
-  var _a, _b;
-  if (!(model11 == null ? void 0 : model11["executor"])) return [];
-  const skipFrame = skipped8 < (((_a = config3.face["mobilefacenet"]) == null ? void 0 : _a.skipFrames) || 0);
-  const skipTime = (((_b = config3.face["mobilefacenet"]) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime8;
-  if (config3.skipAllowed && skipTime && skipFrame && lastCount8 === count2 && last7[idx]) {
-    skipped8++;
-    return last7[idx];
-  }
-  return new Promise(async (resolve) => {
-    var _a2;
-    let data = [];
-    if (((_a2 = config3.face["mobilefacenet"]) == null ? void 0 : _a2.enabled) && (model11 == null ? void 0 : model11.inputs[0].shape)) {
-      const t2 = {};
-      t2.crop = tfjs_esm_exports.image.resizeBilinear(input, [model11.inputs[0].shape[2], model11.inputs[0].shape[1]], false);
-      t2.data = model11.execute(t2.crop);
-      const output = await t2.data.data();
-      data = Array.from(output);
-      Object.keys(t2).forEach((tensor7) => tfjs_esm_exports.dispose(t2[tensor7]));
-    }
-    last7[idx] = data;
-    lastCount8 = count2;
-    lastTime8 = now();
-    resolve(data);
-  });
-}
-
-// src/face/insightface.ts
 var model12;
 var last8 = [];
 var lastCount9 = 0;
 var lastTime9 = 0;
 var skipped9 = Number.MAX_SAFE_INTEGER;
 async function load12(config3) {
+  var _a;
   if (env.initial) model12 = null;
-  if (!model12) model12 = await loadModel(config3.face["insightface"].modelPath);
+  if (!model12) model12 = await loadModel((_a = config3.face["mobilefacenet"]) == null ? void 0 : _a.modelPath);
   else if (config3.debug) log("cached model:", model12["modelUrl"]);
   return model12;
 }
 async function predict10(input, config3, idx, count2) {
   var _a, _b;
   if (!(model12 == null ? void 0 : model12["executor"])) return [];
-  const skipFrame = skipped9 < (((_a = config3.face["insightface"]) == null ? void 0 : _a.skipFrames) || 0);
-  const skipTime = (((_b = config3.face["insightface"]) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime9;
+  const skipFrame = skipped9 < (((_a = config3.face["mobilefacenet"]) == null ? void 0 : _a.skipFrames) || 0);
+  const skipTime = (((_b = config3.face["mobilefacenet"]) == null ? void 0 : _b.skipTime) || 0) > now() - lastTime9;
   if (config3.skipAllowed && skipTime && skipFrame && lastCount9 === count2 && last8[idx]) {
     skipped9++;
     return last8[idx];
@@ -6909,7 +7011,7 @@ async function predict10(input, config3, idx, count2) {
   return new Promise(async (resolve) => {
     var _a2;
     let data = [];
-    if (((_a2 = config3.face["insightface"]) == null ? void 0 : _a2.enabled) && (model12 == null ? void 0 : model12.inputs[0].shape)) {
+    if (((_a2 = config3.face["mobilefacenet"]) == null ? void 0 : _a2.enabled) && (model12 == null ? void 0 : model12.inputs[0].shape)) {
       const t2 = {};
       t2.crop = tfjs_esm_exports.image.resizeBilinear(input, [model12.inputs[0].shape[2], model12.inputs[0].shape[1]], false);
       t2.data = model12.execute(t2.crop);
@@ -6924,106 +7026,38 @@ async function predict10(input, config3, idx, count2) {
   });
 }
 
-// src/face/angles.ts
-var calculateGaze = (face3) => {
-  const radians = (pt1, pt2) => Math.atan2(pt1[1] - pt2[1], pt1[0] - pt2[0]);
-  if (!face3.annotations.rightEyeIris || !face3.annotations.leftEyeIris) return { bearing: 0, strength: 0 };
-  const offsetIris = [0, -0.1];
-  const eyeRatio = 1;
-  const left = (face3.mesh[33][2] || 0) > (face3.mesh[263][2] || 0);
-  const irisCenter = left ? face3.mesh[473] : face3.mesh[468];
-  const eyeCenter = left ? [(face3.mesh[133][0] + face3.mesh[33][0]) / 2, (face3.mesh[133][1] + face3.mesh[33][1]) / 2] : [(face3.mesh[263][0] + face3.mesh[362][0]) / 2, (face3.mesh[263][1] + face3.mesh[362][1]) / 2];
-  const eyeSize = left ? [face3.mesh[133][0] - face3.mesh[33][0], face3.mesh[23][1] - face3.mesh[27][1]] : [face3.mesh[263][0] - face3.mesh[362][0], face3.mesh[253][1] - face3.mesh[257][1]];
-  const eyeDiff = [
-    // x distance between extreme point and center point normalized with eye size
-    (eyeCenter[0] - irisCenter[0]) / eyeSize[0] - offsetIris[0],
-    eyeRatio * (irisCenter[1] - eyeCenter[1]) / eyeSize[1] - offsetIris[1]
-  ];
-  let strength = Math.sqrt(eyeDiff[0] * eyeDiff[0] + eyeDiff[1] * eyeDiff[1]);
-  strength = Math.min(strength, face3.boxRaw[2] / 2, face3.boxRaw[3] / 2);
-  const bearing = (radians([0, 0], eyeDiff) + Math.PI / 2) % Math.PI;
-  return { bearing, strength };
-};
-var calculateFaceAngle = (face3, imageSize) => {
-  const normalize2 = (v) => {
-    const length = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
-    v[0] /= length;
-    v[1] /= length;
-    v[2] /= length;
-    return v;
-  };
-  const subVectors = (a, b) => {
-    const x = a[0] - b[0];
-    const y = a[1] - b[1];
-    const z = a[2] - b[2];
-    return [x, y, z];
-  };
-  const crossVectors = (a, b) => {
-    const x = a[1] * b[2] - a[2] * b[1];
-    const y = a[2] * b[0] - a[0] * b[2];
-    const z = a[0] * b[1] - a[1] * b[0];
-    return [x, y, z];
-  };
-  const rotationMatrixToEulerAngle = (r) => {
-    const [r00, _r01, _r02, r10, r11, r12, r20, r21, r22] = r;
-    let thetaX;
-    let thetaY;
-    let thetaZ;
-    if (r10 < 1) {
-      if (r10 > -1) {
-        const cosThetaZ = Math.sqrt(r00 * r00 + r20 * r20);
-        thetaZ = Math.atan2(r10, cosThetaZ);
-        thetaY = Math.atan2(-r20, r00);
-        thetaX = Math.atan2(-r12, r11);
-      } else {
-        thetaZ = -Math.PI / 2;
-        thetaY = -Math.atan2(r21, r22);
-        thetaX = 0;
-      }
-    } else {
-      thetaZ = Math.PI / 2;
-      thetaY = Math.atan2(r21, r22);
-      thetaX = 0;
-    }
-    if (Number.isNaN(thetaX)) thetaX = 0;
-    if (Number.isNaN(thetaY)) thetaY = 0;
-    if (Number.isNaN(thetaZ)) thetaZ = 0;
-    return { pitch: -thetaX, yaw: -thetaY, roll: -thetaZ };
-  };
-  const mesh = face3.meshRaw;
-  if (!mesh || mesh.length < 300) return { angle: { pitch: 0, yaw: 0, roll: 0 }, matrix: [1, 0, 0, 0, 1, 0, 0, 0, 1], gaze: { bearing: 0, strength: 0 } };
-  const size2 = Math.max(face3.boxRaw[2] * imageSize[0], face3.boxRaw[3] * imageSize[1]) / 1.5;
-  const pts = [mesh[10], mesh[152], mesh[234], mesh[454]].map((pt) => [pt[0] * imageSize[0] / size2, pt[1] * imageSize[1] / size2, pt[2]]);
-  const yAxis = normalize2(subVectors(pts[1], pts[0]));
-  let xAxis = normalize2(subVectors(pts[3], pts[2]));
-  const zAxis = normalize2(crossVectors(xAxis, yAxis));
-  xAxis = crossVectors(yAxis, zAxis);
-  const matrix = [
-    xAxis[0],
-    xAxis[1],
-    xAxis[2],
-    yAxis[0],
-    yAxis[1],
-    yAxis[2],
-    zAxis[0],
-    zAxis[1],
-    zAxis[2]
-  ];
-  const angle = rotationMatrixToEulerAngle(matrix);
-  const gaze = mesh.length === 478 ? calculateGaze(face3) : { bearing: 0, strength: 0 };
-  return { angle, matrix, gaze };
-};
-
-// src/face/anthropometry.ts
-function calculateCameraDistance(face3, width) {
-  const f = face3 == null ? void 0 : face3.annotations;
-  if (!(f == null ? void 0 : f.leftEyeIris) || !(f == null ? void 0 : f.rightEyeIris)) return 0;
-  const irisSize = Math.max(Math.abs(f.leftEyeIris[3][0] - f.leftEyeIris[1][0]), Math.abs(f.rightEyeIris[3][0] - f.rightEyeIris[1][0])) / width;
-  const cameraDistance = Math.round(1.17 / irisSize) / 100;
-  return cameraDistance;
-}
-
 // src/face/face.ts
+function centerX(f) {
+  if (f.box && f.box.length === 4) {
+    const [x, , w] = [f.box[0], f.box[1], f.box[2]];
+    return x + w / 2;
+  }
+  if (f.mesh && f.mesh.length) {
+    let minX = Infinity;
+    let maxX = -Infinity;
+    for (const pt of f.mesh) {
+      if (pt[0] < minX) minX = pt[0];
+      if (pt[0] > maxX) maxX = pt[0];
+    }
+    return (minX + maxX) / 2;
+  }
+  return Number.MAX_SAFE_INTEGER;
+}
+function centerY(f) {
+  if (f.box && f.box.length === 4) {
+    return f.box[1] + f.box[3] / 2;
+  }
+  if (f.mesh && f.mesh.length) {
+    let minY = Infinity;
+    let maxY = -Infinity;
+    for (const pt of f.mesh) {
+      if (pt[1] < minY) minY = pt[1];
+      if (pt[1] > maxY) maxY = pt[1];
+    }
+    return (minY + maxY) / 2;
+  }
+  return Number.MAX_SAFE_INTEGER;
+}
 var detectFace = async (instance, input) => {
   var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w;
   let timeStamp = now();
@@ -7038,7 +7072,7 @@ var detectFace = async (instance, input) => {
   let descRes;
   const faceRes = [];
   instance.state = "run:face";
-  const faces = await predict(input, instance.config);
+  const faces = await predict6(input, instance.config);
   instance.performance.face = env.perfadd ? (instance.performance.face || 0) + Math.trunc(now() - timeStamp) : Math.trunc(now() - timeStamp);
   if (!input.shape || input.shape.length !== 4) return [];
   if (!faces) return [];
@@ -7056,83 +7090,83 @@ var detectFace = async (instance, input) => {
     const rotation = faces[i].mesh && faces[i].mesh.length > 200 ? calculateFaceAngle(faces[i], [input.shape[2], input.shape[1]]) : null;
     instance.analyze("Start Emotion:");
     if (instance.config.async) {
-      emotionRes = ((_b = instance.config.face.emotion) == null ? void 0 : _b.enabled) ? predict2(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : [];
+      emotionRes = ((_b = instance.config.face.emotion) == null ? void 0 : _b.enabled) ? predict(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : [];
     } else {
       instance.state = "run:emotion";
       timeStamp = now();
-      emotionRes = ((_c = instance.config.face.emotion) == null ? void 0 : _c.enabled) ? await predict2(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : [];
+      emotionRes = ((_c = instance.config.face.emotion) == null ? void 0 : _c.enabled) ? await predict(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : [];
       instance.performance.emotion = env.perfadd ? (instance.performance.emotion || 0) + Math.trunc(now() - timeStamp) : Math.trunc(now() - timeStamp);
     }
     instance.analyze("End Emotion:");
     instance.analyze("Start AntiSpoof:");
     if (instance.config.async) {
-      antispoofRes = ((_d = instance.config.face.antispoof) == null ? void 0 : _d.enabled) ? predict4(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : 0;
+      antispoofRes = ((_d = instance.config.face.antispoof) == null ? void 0 : _d.enabled) ? predict5(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : 0;
     } else {
       instance.state = "run:antispoof";
       timeStamp = now();
-      antispoofRes = ((_e = instance.config.face.antispoof) == null ? void 0 : _e.enabled) ? await predict4(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : 0;
+      antispoofRes = ((_e = instance.config.face.antispoof) == null ? void 0 : _e.enabled) ? await predict5(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : 0;
       instance.performance.antispoof = env.perfadd ? (instance.performance.antispoof || 0) + Math.trunc(now() - timeStamp) : Math.trunc(now() - timeStamp);
     }
     instance.analyze("End AntiSpoof:");
     instance.analyze("Start Liveness:");
     if (instance.config.async) {
-      livenessRes = ((_f = instance.config.face.liveness) == null ? void 0 : _f.enabled) ? predict5(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : 0;
+      livenessRes = ((_f = instance.config.face.liveness) == null ? void 0 : _f.enabled) ? predict9(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : 0;
     } else {
       instance.state = "run:liveness";
       timeStamp = now();
-      livenessRes = ((_g = instance.config.face.liveness) == null ? void 0 : _g.enabled) ? await predict5(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : 0;
+      livenessRes = ((_g = instance.config.face.liveness) == null ? void 0 : _g.enabled) ? await predict9(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : 0;
       instance.performance.liveness = env.perfadd ? (instance.performance.antispoof || 0) + Math.trunc(now() - timeStamp) : Math.trunc(now() - timeStamp);
     }
     instance.analyze("End Liveness:");
     instance.analyze("Start GEAR:");
     if (instance.config.async) {
-      gearRes = ((_h = instance.config.face.gear) == null ? void 0 : _h.enabled) ? predict6(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : null;
+      gearRes = ((_h = instance.config.face.gear) == null ? void 0 : _h.enabled) ? predict2(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : null;
     } else {
       instance.state = "run:gear";
       timeStamp = now();
-      gearRes = ((_i = instance.config.face.gear) == null ? void 0 : _i.enabled) ? await predict6(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : null;
+      gearRes = ((_i = instance.config.face.gear) == null ? void 0 : _i.enabled) ? await predict2(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : null;
       instance.performance.gear = Math.trunc(now() - timeStamp);
     }
     instance.analyze("End GEAR:");
     instance.analyze("Start SSRNet:");
     if (instance.config.async) {
-      ageRes = ((_j = instance.config.face["ssrnet"]) == null ? void 0 : _j.enabled) ? predict7(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : null;
-      genderRes = ((_k = instance.config.face["ssrnet"]) == null ? void 0 : _k.enabled) ? predict8(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : null;
+      ageRes = ((_j = instance.config.face["ssrnet"]) == null ? void 0 : _j.enabled) ? predict3(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : null;
+      genderRes = ((_k = instance.config.face["ssrnet"]) == null ? void 0 : _k.enabled) ? predict4(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : null;
     } else {
       instance.state = "run:ssrnet";
       timeStamp = now();
-      ageRes = ((_l = instance.config.face["ssrnet"]) == null ? void 0 : _l.enabled) ? await predict7(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : null;
-      genderRes = ((_m = instance.config.face["ssrnet"]) == null ? void 0 : _m.enabled) ? await predict8(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : null;
+      ageRes = ((_l = instance.config.face["ssrnet"]) == null ? void 0 : _l.enabled) ? await predict3(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : null;
+      genderRes = ((_m = instance.config.face["ssrnet"]) == null ? void 0 : _m.enabled) ? await predict4(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : null;
       instance.performance.ssrnet = Math.trunc(now() - timeStamp);
     }
     instance.analyze("End SSRNet:");
     instance.analyze("Start MobileFaceNet:");
     if (instance.config.async) {
-      mobilefacenetRes = ((_n = instance.config.face["mobilefacenet"]) == null ? void 0 : _n.enabled) ? predict9(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : null;
+      mobilefacenetRes = ((_n = instance.config.face["mobilefacenet"]) == null ? void 0 : _n.enabled) ? predict10(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : null;
     } else {
       instance.state = "run:mobilefacenet";
       timeStamp = now();
-      mobilefacenetRes = ((_o = instance.config.face["mobilefacenet"]) == null ? void 0 : _o.enabled) ? await predict9(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : null;
+      mobilefacenetRes = ((_o = instance.config.face["mobilefacenet"]) == null ? void 0 : _o.enabled) ? await predict10(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : null;
       instance.performance.mobilefacenet = Math.trunc(now() - timeStamp);
     }
     instance.analyze("End MobileFaceNet:");
     instance.analyze("Start InsightFace:");
     if (instance.config.async) {
-      insightfaceRes = ((_p = instance.config.face["insightface"]) == null ? void 0 : _p.enabled) ? predict10(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : null;
+      insightfaceRes = ((_p = instance.config.face["insightface"]) == null ? void 0 : _p.enabled) ? predict8(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : null;
     } else {
       instance.state = "run:mobilefacenet";
       timeStamp = now();
-      insightfaceRes = ((_q = instance.config.face["insightface"]) == null ? void 0 : _q.enabled) ? await predict10(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : null;
+      insightfaceRes = ((_q = instance.config.face["insightface"]) == null ? void 0 : _q.enabled) ? await predict8(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length) : null;
       instance.performance.mobilefacenet = Math.trunc(now() - timeStamp);
     }
     instance.analyze("End InsightFace:");
     instance.analyze("Start Description:");
     if (instance.config.async) {
-      descRes = predict3(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length);
+      descRes = predict7(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length);
     } else {
       instance.state = "run:description";
       timeStamp = now();
-      descRes = await predict3(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length);
+      descRes = await predict7(faces[i].tensor || tfjs_esm_exports.tensor([]), instance.config, i, faces.length);
       instance.performance.description = env.perfadd ? (instance.performance.description || 0) + Math.trunc(now() - timeStamp) : Math.trunc(now() - timeStamp);
     }
     instance.analyze("End Description:");
@@ -7185,6 +7219,11 @@ var detectFace = async (instance, input) => {
     faceRes.push(res);
     instance.analyze("End Face");
   }
+  faceRes.sort((a, b) => {
+    const dx = centerX(a) - centerX(b);
+    if (dx !== 0) return dx;
+    return centerY(a) - centerY(b);
+  });
   instance.analyze("End FaceMesh:");
   if (instance.config.async) {
     if (instance.performance.face) delete instance.performance.face;
@@ -8122,18 +8161,18 @@ var Models = class {
     if (env.initial) this.reset();
     if (instance) this.instance = instance;
     const m = {};
-    m.blazeface = this.instance.config.face.enabled && !this.models.blazeface ? load(this.instance.config) : null;
-    m.antispoof = this.instance.config.face.enabled && ((_a = this.instance.config.face.antispoof) == null ? void 0 : _a.enabled) && !this.models.antispoof ? load6(this.instance.config) : null;
-    m.liveness = this.instance.config.face.enabled && ((_b = this.instance.config.face.liveness) == null ? void 0 : _b.enabled) && !this.models.liveness ? load7(this.instance.config) : null;
-    m.faceres = this.instance.config.face.enabled && ((_c = this.instance.config.face.description) == null ? void 0 : _c.enabled) && !this.models.faceres ? load5(this.instance.config) : null;
-    m.emotion = this.instance.config.face.enabled && ((_d = this.instance.config.face.emotion) == null ? void 0 : _d.enabled) && !this.models.emotion ? load4(this.instance.config) : null;
-    m.iris = this.instance.config.face.enabled && ((_e = this.instance.config.face.iris) == null ? void 0 : _e.enabled) && !((_f = this.instance.config.face.attention) == null ? void 0 : _f.enabled) && !this.models.iris ? load2(this.instance.config) : null;
-    m.facemesh = this.instance.config.face.enabled && ((_g = this.instance.config.face.mesh) == null ? void 0 : _g.enabled) && !this.models.facemesh ? load3(this.instance.config) : null;
-    m.gear = this.instance.config.face.enabled && ((_h = this.instance.config.face["gear"]) == null ? void 0 : _h.enabled) && !this.models.gear ? load8(this.instance.config) : null;
-    m.ssrnetage = this.instance.config.face.enabled && ((_i = this.instance.config.face["ssrnet"]) == null ? void 0 : _i.enabled) && !this.models.ssrnetage ? load9(this.instance.config) : null;
-    m.ssrnetgender = this.instance.config.face.enabled && ((_j = this.instance.config.face["ssrnet"]) == null ? void 0 : _j.enabled) && !this.models.ssrnetgender ? load10(this.instance.config) : null;
-    m.mobilefacenet = this.instance.config.face.enabled && ((_k = this.instance.config.face["mobilefacenet"]) == null ? void 0 : _k.enabled) && !this.models.mobilefacenet ? load11(this.instance.config) : null;
-    m.insightface = this.instance.config.face.enabled && ((_l = this.instance.config.face["insightface"]) == null ? void 0 : _l.enabled) && !this.models.insightface ? load12(this.instance.config) : null;
+    m.blazeface = this.instance.config.face.enabled && !this.models.blazeface ? load6(this.instance.config) : null;
+    m.antispoof = this.instance.config.face.enabled && ((_a = this.instance.config.face.antispoof) == null ? void 0 : _a.enabled) && !this.models.antispoof ? load5(this.instance.config) : null;
+    m.liveness = this.instance.config.face.enabled && ((_b = this.instance.config.face.liveness) == null ? void 0 : _b.enabled) && !this.models.liveness ? load11(this.instance.config) : null;
+    m.faceres = this.instance.config.face.enabled && ((_c = this.instance.config.face.description) == null ? void 0 : _c.enabled) && !this.models.faceres ? load9(this.instance.config) : null;
+    m.emotion = this.instance.config.face.enabled && ((_d = this.instance.config.face.emotion) == null ? void 0 : _d.enabled) && !this.models.emotion ? load(this.instance.config) : null;
+    m.iris = this.instance.config.face.enabled && ((_e = this.instance.config.face.iris) == null ? void 0 : _e.enabled) && !((_f = this.instance.config.face.attention) == null ? void 0 : _f.enabled) && !this.models.iris ? load7(this.instance.config) : null;
+    m.facemesh = this.instance.config.face.enabled && ((_g = this.instance.config.face.mesh) == null ? void 0 : _g.enabled) && !this.models.facemesh ? load8(this.instance.config) : null;
+    m.gear = this.instance.config.face.enabled && ((_h = this.instance.config.face["gear"]) == null ? void 0 : _h.enabled) && !this.models.gear ? load2(this.instance.config) : null;
+    m.ssrnetage = this.instance.config.face.enabled && ((_i = this.instance.config.face["ssrnet"]) == null ? void 0 : _i.enabled) && !this.models.ssrnetage ? load3(this.instance.config) : null;
+    m.ssrnetgender = this.instance.config.face.enabled && ((_j = this.instance.config.face["ssrnet"]) == null ? void 0 : _j.enabled) && !this.models.ssrnetgender ? load4(this.instance.config) : null;
+    m.mobilefacenet = this.instance.config.face.enabled && ((_k = this.instance.config.face["mobilefacenet"]) == null ? void 0 : _k.enabled) && !this.models.mobilefacenet ? load12(this.instance.config) : null;
+    m.insightface = this.instance.config.face.enabled && ((_l = this.instance.config.face["insightface"]) == null ? void 0 : _l.enabled) && !this.models.insightface ? load10(this.instance.config) : null;
     m.blazepose = this.instance.config.body.enabled && !this.models.blazepose && ((_m = this.instance.config.body.modelPath) == null ? void 0 : _m.includes("blazepose")) ? loadPose(this.instance.config) : null;
     m.blazeposedetect = this.instance.config.body.enabled && !this.models.blazeposedetect && this.instance.config.body["detector"] && this.instance.config.body["detector"].modelPath ? loadDetect(this.instance.config) : null;
     m.efficientpose = this.instance.config.body.enabled && !this.models.efficientpose && ((_n = this.instance.config.body.modelPath) == null ? void 0 : _n.includes("efficientpose")) ? load14(this.instance.config) : null;

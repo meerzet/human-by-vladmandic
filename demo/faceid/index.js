@@ -4,6 +4,9 @@
   author: <https://github.com/vladmandic>'
 */
 
+var __defProp = Object.defineProperty;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
 
 // demo/faceid/index.ts
 import * as H from "../../dist/human.esm.js";
@@ -58,6 +61,148 @@ async function remove(faceRecord) {
   log("delete:", faceRecord);
 }
 
+// demo/faceid/face-tracker.ts
+var FaceTracker = class {
+  constructor(knownDescriptors2, knownFaces2, matchOptions2, human2) {
+    this.knownDescriptors = knownDescriptors2;
+    this.knownFaces = knownFaces2;
+    this.matchOptions = matchOptions2;
+    this.human = human2;
+    __publicField(this, "trackedFaces", /* @__PURE__ */ new Map());
+    __publicField(this, "trackingThreshold", 5e3);
+    // 5 seconds
+    __publicField(this, "similarityThreshold", 0.6);
+    // threshold for considering faces as same person
+    __publicField(this, "autoSaveEnabled", true);
+  }
+  updateKnownFaces(descriptors, faces) {
+    this.knownDescriptors = descriptors;
+    this.knownFaces = faces;
+  }
+  generateFaceId(face) {
+    if (!face.box) return Math.random().toString();
+    const [x, y, w, h] = face.box;
+    return `${Math.round(x)}_${Math.round(y)}_${Math.round(w)}_${Math.round(h)}`;
+  }
+  isSameFace(face1, face2) {
+    if (!face1.box || !face2.box) return false;
+    const [x1, y1, w1, h1] = face1.box;
+    const [x2, y2, w2, h2] = face2.box;
+    const positionThreshold = 50;
+    const sizeThreshold = 30;
+    return Math.abs(x1 - x2) < positionThreshold && Math.abs(y1 - y2) < positionThreshold && Math.abs(w1 - w2) < sizeThreshold && Math.abs(h1 - h2) < sizeThreshold;
+  }
+  findMatchingKnownFace(face) {
+    if (!face.embedding || face.embedding.length === 0 || this.knownDescriptors.length === 0) {
+      return null;
+    }
+    const res = this.human.match.find(face.embedding, this.knownDescriptors, this.matchOptions);
+    const record = this.knownFaces[res.index];
+    if (record && res.similarity > this.similarityThreshold) {
+      return { record, similarity: res.similarity };
+    }
+    return null;
+  }
+  async processFaces(faces) {
+    const now = Date.now();
+    const currentFaceIds = /* @__PURE__ */ new Set();
+    const newlyRegistered = [];
+    const updates = [];
+    for (const face of faces) {
+      if (!face.embedding || face.embedding.length === 0) continue;
+      const matchResult = this.findMatchingKnownFace(face);
+      const isMatched = matchResult !== null;
+      let trackedFace = null;
+      for (const [id, tracked] of this.trackedFaces) {
+        if (this.isSameFace(face, tracked.face)) {
+          trackedFace = tracked;
+          currentFaceIds.add(id);
+          break;
+        }
+      }
+      if (!trackedFace) {
+        const id = this.generateFaceId(face);
+        trackedFace = {
+          id,
+          face,
+          firstSeen: now,
+          lastSeen: now,
+          trackingDuration: 0,
+          isMatched,
+          matchedRecord: matchResult == null ? void 0 : matchResult.record
+        };
+        this.trackedFaces.set(id, trackedFace);
+        currentFaceIds.add(id);
+      } else {
+        trackedFace.face = face;
+        trackedFace.lastSeen = now;
+        trackedFace.trackingDuration = now - trackedFace.firstSeen;
+        trackedFace.isMatched = isMatched;
+        trackedFace.matchedRecord = matchResult == null ? void 0 : matchResult.record;
+      }
+      if (!trackedFace.isMatched && trackedFace.trackingDuration >= this.trackingThreshold && this.autoSaveEnabled) {
+        await this.autoRegisterFace(trackedFace);
+        newlyRegistered.push(trackedFace);
+      }
+      updates.push(trackedFace);
+    }
+    for (const [id, tracked] of this.trackedFaces) {
+      if (!currentFaceIds.has(id)) {
+        if (now - tracked.lastSeen > 2e3) {
+          this.trackedFaces.delete(id);
+        }
+      }
+    }
+    return { newlyRegistered, updates };
+  }
+  async autoRegisterFace(trackedFace) {
+    try {
+      const timestamp2 = (/* @__PURE__ */ new Date()).toLocaleString("ko-KR");
+      const autoName = `Unknown_${timestamp2}`;
+      const image = this.getFaceCropImageData(trackedFace.face);
+      const record = {
+        id: 0,
+        // will be auto-incremented
+        name: autoName,
+        descriptor: trackedFace.face.embedding,
+        image
+      };
+      await save(record);
+      trackedFace.isMatched = true;
+      console.log("Auto-registered face:", autoName);
+    } catch (error) {
+      console.error("Failed to auto-register face:", error);
+    }
+  }
+  getFaceCropImageData(face) {
+    if (!face.box) {
+      const canvas2 = document.createElement("canvas");
+      canvas2.width = canvas2.height = 128;
+      const ctx2 = canvas2.getContext("2d");
+      return ctx2.getImageData(0, 0, 128, 128);
+    }
+    const video = document.getElementById("video");
+    const [bx, by, bw, bh] = face.box;
+    const sx = Math.max(0, Math.floor(bx));
+    const sy = Math.max(0, Math.floor(by));
+    const sw = Math.max(1, Math.min(video.videoWidth - sx, Math.floor(bw)));
+    const sh = Math.max(1, Math.min(video.videoHeight - sy, Math.floor(bh)));
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 128;
+    const ctx = canvas.getContext("2d");
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, 128, 128);
+    return ctx.getImageData(0, 0, 128, 128);
+  }
+  getTrackedFaces() {
+    return Array.from(this.trackedFaces.values());
+  }
+  getTrackingInfo(faceId) {
+    return this.trackedFaces.get(faceId) || null;
+  }
+};
+
 // demo/faceid/index.ts
 var humanConfig = {
   // user configuration for human, used to fine-tune behavior
@@ -87,7 +232,7 @@ var humanConfig = {
   object: { enabled: false }
   // gesture: { enabled: true }, // parses face and iris gestures
 };
-var matchOptions = { order: 2, multiplier: 25, min: 0.2, max: 0.8 };
+var matchOptions = { order: 2, multiplier: 20, min: 0.1, max: 0.9 };
 var _a, _b, _c, _d;
 var options = {
   minConfidence: 0.6,
@@ -113,6 +258,7 @@ var options = {
 var current = { face: null, record: null };
 var knownFaces = [];
 var knownDescriptors = [];
+var faceTracker;
 var human = new H.Human(humanConfig);
 human.env.perfadd = false;
 human.draw.options.font = 'small-caps 18px "Lato"';
@@ -176,14 +322,24 @@ async function webCam() {
   };
 }
 async function detectionLoop() {
+  var _a2;
   if (dom.video.paused) return;
   await human.detect(dom.video);
   const interpolated = human.next(human.result);
   const ctx = dom.canvas.getContext("2d");
   ctx == null ? void 0 : ctx.clearRect(0, 0, dom.canvas.width, dom.canvas.height);
-  const faces = human.result.face.slice(0, 3);
+  const faces = interpolated.face.slice(0, 3);
+  const { newlyRegistered, updates } = await faceTracker.processFaces(faces);
+  if (newlyRegistered.length > 0) {
+    await refreshKnownFaces();
+    faceTracker.updateKnownFaces(knownDescriptors, knownFaces);
+    for (const registered of newlyRegistered) {
+      log2("\uC790\uB3D9 \uB4F1\uB85D\uB428:", ((_a2 = registered.matchedRecord) == null ? void 0 : _a2.name) || "Unknown");
+    }
+  }
   const labels = [];
   const matchedRecs = [];
+  const trackedFaces = faceTracker.getTrackedFaces();
   if (ctx) {
     ctx.save();
     ctx.font = "16px Lato";
@@ -196,20 +352,30 @@ async function detectionLoop() {
     const f = faces[i];
     let label = "unknown";
     let matchedRec = null;
-    if (f.embedding && f.embedding.length > 0 && knownDescriptors.length > 0) {
-      const res = human.match.find(f.embedding, knownDescriptors, matchOptions);
-      const rec = knownFaces[res.index];
-      if (rec) {
-        matchedRec = rec;
-        label = `${rec.name} (${Math.round(res.similarity * 100)}%)`;
-        if (!primaryBest || res.similarity > primaryBest.similarity) primaryBest = { name: rec.name, similarity: res.similarity, record: rec };
+    const tracked = trackedFaces.find(
+      (tf) => tf.face.box && f.box && Math.abs(tf.face.box[0] - f.box[0]) < 50 && Math.abs(tf.face.box[1] - f.box[1]) < 50
+    );
+    if (tracked) {
+      if (tracked.isMatched && tracked.matchedRecord) {
+        matchedRec = tracked.matchedRecord;
+        label = `${tracked.matchedRecord.name}`;
+        if (!primaryBest) primaryBest = { name: tracked.matchedRecord.name, similarity: 1, record: tracked.matchedRecord };
       } else {
-        label = `unknown (${Math.round(res.similarity * 100)}%)`;
+        const progress = Math.min(tracked.trackingDuration / 5e3, 1);
+        const remaining = Math.max(0, 5e3 - tracked.trackingDuration);
+        label = `\uCD94\uC801\uC911 ${(progress * 100).toFixed(0)}% (${(remaining / 1e3).toFixed(1)}s)`;
       }
     }
     if (ctx && f.box) {
       const [x, y, w, h] = f.box;
-      ctx.strokeStyle = "lime";
+      if (tracked == null ? void 0 : tracked.isMatched) {
+        ctx.strokeStyle = "lime";
+      } else if (tracked) {
+        const progress = Math.min(tracked.trackingDuration / 5e3, 1);
+        ctx.strokeStyle = `rgb(${255 - Math.round(progress * 255)}, ${Math.round(progress * 255)}, 0)`;
+      } else {
+        ctx.strokeStyle = "red";
+      }
       ctx.strokeRect(x, y, w, h);
       const ty = Math.max(0, y - 6);
       ctx.strokeStyle = "black";
@@ -221,48 +387,64 @@ async function detectionLoop() {
   }
   current.face = faces.sort((a, b) => b.box[2] * b.box[3] - a.box[2] * a.box[3])[0] || null;
   current.record = primaryBest ? primaryBest.record : null;
-  if (dom.matches) {
-    dom.matches.innerHTML = "";
-    faces.forEach((f, i) => {
-      const row = document.createElement("div");
-      row.style.display = "flex";
-      row.style.alignItems = "center";
-      row.style.gap = "8px";
-      row.style.margin = "4px 0";
-      const text = document.createElement("div");
-      text.innerText = `face ${i + 1}: ${labels[i] || "unknown"}`;
-      row.appendChild(text);
-      if (f.box && dom.video.videoWidth > 0) {
-        const [bx, by, bw, bh] = f.box;
-        const sx = Math.max(0, Math.floor(bx));
-        const sy = Math.max(0, Math.floor(by));
-        const sw = Math.min(dom.video.videoWidth - sx, Math.floor(bw));
-        const sh = Math.min(dom.video.videoHeight - sy, Math.floor(bh));
-        const live = document.createElement("canvas");
-        live.width = 96;
-        live.height = 96;
-        const lctx = live.getContext("2d");
-        if (lctx && sw > 0 && sh > 0) lctx.drawImage(dom.video, sx, sy, sw, sh, 0, 0, 96, 96);
-        row.appendChild(live);
-      }
-      const rec = matchedRecs[i];
-      if (rec == null ? void 0 : rec.image) {
-        const c = document.createElement("canvas");
-        c.width = rec.image.width;
-        c.height = rec.image.height;
-        c.style.width = "96px";
-        c.style.height = "96px";
-        const cctx = c.getContext("2d");
-        cctx == null ? void 0 : cctx.putImageData(rec.image, 0, 0);
-        row.appendChild(c);
-      }
-      dom.matches.appendChild(row);
-    });
-    if (faces.length === 0) dom.matches.innerText = "no faces detected";
-  }
+  updateMatchesUI(faces, labels, matchedRecs, trackedFaces);
   const now = human.now();
   timestamp.detect = now;
   requestAnimationFrame(detectionLoop);
+}
+function updateMatchesUI(faces, labels, matchedRecs, trackedFaces) {
+  if (!dom.matches) return;
+  dom.matches.innerHTML = "";
+  if (faces.length === 0) {
+    dom.matches.innerText = "no faces detected";
+    return;
+  }
+  faces.forEach((f, i) => {
+    const row = document.createElement("div");
+    row.style.display = "flex";
+    row.style.alignItems = "center";
+    row.style.gap = "8px";
+    row.style.margin = "4px 0";
+    const text = document.createElement("div");
+    text.innerText = `face ${i + 1}: ${labels[i] || "unknown"}`;
+    row.appendChild(text);
+    const tracked = trackedFaces.find(
+      (tf) => tf.face.box && f.box && Math.abs(tf.face.box[0] - f.box[0]) < 50 && Math.abs(tf.face.box[1] - f.box[1]) < 50
+    );
+    if (tracked && !tracked.isMatched) {
+      const status = document.createElement("div");
+      status.style.fontSize = "12px";
+      status.style.color = "#888";
+      const remaining = Math.max(0, 5e3 - tracked.trackingDuration);
+      status.innerText = `(${(remaining / 1e3).toFixed(1)}\uCD08 \uD6C4 \uC790\uB3D9 \uB4F1\uB85D)`;
+      row.appendChild(status);
+    }
+    if (f.box && dom.video.videoWidth > 0) {
+      const [bx, by, bw, bh] = f.box;
+      const sx = Math.max(0, Math.floor(bx));
+      const sy = Math.max(0, Math.floor(by));
+      const sw = Math.min(dom.video.videoWidth - sx, Math.floor(bw));
+      const sh = Math.min(dom.video.videoHeight - sy, Math.floor(bh));
+      const live = document.createElement("canvas");
+      live.width = 96;
+      live.height = 96;
+      const lctx = live.getContext("2d");
+      if (lctx && sw > 0 && sh > 0) lctx.drawImage(dom.video, sx, sy, sw, sh, 0, 0, 96, 96);
+      row.appendChild(live);
+    }
+    const rec = matchedRecs[i];
+    if (rec == null ? void 0 : rec.image) {
+      const c = document.createElement("canvas");
+      c.width = rec.image.width;
+      c.height = rec.image.height;
+      c.style.width = "96px";
+      c.style.height = "96px";
+      const cctx = c.getContext("2d");
+      cctx == null ? void 0 : cctx.putImageData(rec.image, 0, 0);
+      row.appendChild(c);
+    }
+    dom.matches.appendChild(row);
+  });
 }
 async function saveRecords() {
   var _a2;
@@ -309,6 +491,8 @@ async function init() {
   log2("initializing human...");
   log2("loading face database...");
   await refreshKnownFaces();
+  faceTracker = new FaceTracker(knownDescriptors, knownFaces, matchOptions, human);
+  log2("face tracker initialized");
   dom.save.addEventListener("click", saveRecords);
   dom.delete.addEventListener("click", deleteRecord);
   await human.warmup();

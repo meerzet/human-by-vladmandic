@@ -744,3 +744,516 @@
 2025-08-11 16:36:19 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/manifest+json","size":304,"url":"/manifest.webmanifest","remote":"::1"} 
 2025-08-11 16:36:19 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
 2025-08-11 16:36:21 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":4033,"url":"/index-pwa.js","remote":"::1"} 
+2025-08-12 09:46:55 [36mINFO: [39m @vladmandic/human version 3.3.5 
+2025-08-12 09:46:55 [36mINFO: [39m User: nine Platform: darwin Arch: arm64 Node: v22.18.0 
+2025-08-12 09:46:55 [36mINFO: [39m Application: {"name":"@vladmandic/human","version":"3.3.5"} 
+2025-08-12 09:46:55 [36mINFO: [39m Environment: {"profile":"development","config":".build.json","package":"package.json","tsconfig":true,"eslintrc":true,"git":true} 
+2025-08-12 09:46:55 [36mINFO: [39m Toolchain: {"build":"0.10.2","esbuild":"0.24.2","typescript":"5.7.3","typedoc":"0.27.6","eslint":"8.57.0"} 
+2025-08-12 09:46:55 [36mINFO: [39m Build: {"profile":"development","steps":["serve","watch","compile"]} 
+2025-08-12 09:46:55 [35mSTATE:[39m WebServer: {"ssl":false,"port":8000,"root":"."} 
+2025-08-12 09:46:55 [35mSTATE:[39m WebServer: {"ssl":true,"port":8001,"root":".","sslKey":"node_modules/@vladmandic/build/cert/https.key","sslCrt":"node_modules/@vladmandic/build/cert/https.crt"} 
+2025-08-12 09:46:55 [35mSTATE:[39m Watch: {"locations":["src/**/*","tfjs/**/*","demo/**/*.ts"]} 
+2025-08-12 09:46:55 [35mSTATE:[39m Compile: {"name":"tfjs/browser/version","format":"esm","platform":"browser","input":"tfjs/tf-version.ts","output":"dist/tfjs.version.js","files":1,"inputBytes":1289,"outputBytes":963} 
+2025-08-12 09:46:55 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/nobundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":2,"inputBytes":2008,"outputBytes":1044} 
+2025-08-12 09:46:55 [35mSTATE:[39m Compile: {"name":"human/browser/esm/nobundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm-nobundle.js","files":78,"inputBytes":652285,"outputBytes":322185} 
+2025-08-12 09:46:55 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/bundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":10,"inputBytes":2008,"outputBytes":1267572} 
+2025-08-12 09:46:55 [35mSTATE:[39m Compile: {"name":"human/browser/iife/bundle","format":"iife","platform":"browser","input":"src/human.ts","output":"dist/human.js","files":78,"inputBytes":1918813,"outputBytes":1466764} 
+2025-08-12 09:46:55 [35mSTATE:[39m Compile: {"name":"human/browser/esm/bundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm.js","files":78,"inputBytes":1918813,"outputBytes":1867140} 
+2025-08-12 09:46:55 [35mSTATE:[39m Compile: {"name":"demo/typescript","format":"esm","platform":"browser","input":"demo/typescript/index.ts","output":"demo/typescript/index.js","files":1,"inputBytes":6318,"outputBytes":4521} 
+2025-08-12 09:46:55 [35mSTATE:[39m Compile: {"name":"demo/faceid","format":"esm","platform":"browser","input":"demo/faceid/index.ts","output":"demo/faceid/index.js","files":3,"inputBytes":24620,"outputBytes":18970} 
+2025-08-12 09:46:55 [35mSTATE:[39m Compile: {"name":"demo/tracker","format":"esm","platform":"browser","input":"demo/tracker/index.ts","output":"demo/tracker/index.js","files":2,"inputBytes":54249,"outputBytes":50914} 
+2025-08-12 09:46:55 [36mINFO: [39m Listening... ["http://localhost:8000","https://localhost:8001"] 
+2025-08-12 09:46:59 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/html","size":3989,"url":"/faceid/index.html","remote":"::1"} 
+2025-08-12 09:46:59 [33mWARN: [39m HTTP: {"method":"GET","ver":"1.1","status":404,"url":"/.well-known/appspecific/com.chrome.devtools.json","remote":"::1"} 
+2025-08-12 09:46:59 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":18970,"url":"/faceid/index.js","remote":"::1"} 
+2025-08-12 09:46:59 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"font/woff2","size":181500,"url":"/assets/lato-light.woff2","remote":"::1"} 
+2025-08-12 09:46:59 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":1867140,"url":"/dist/human.esm.js","remote":"::1"} 
+2025-08-12 09:47:00 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/octet-stream","size":3306994,"url":"/dist/human.esm.js.map","remote":"::1"} 
+2025-08-12 09:47:00 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/octet-stream","size":38784,"url":"/faceid/index.js.map","remote":"::1"} 
+2025-08-12 09:47:00 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/x-icon","size":261950,"url":"/favicon.ico","remote":"::1"} 
+2025-08-12 09:47:00 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/manifest+json","size":304,"url":"/manifest.webmanifest","remote":"::1"} 
+2025-08-12 09:47:00 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:47:01 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":4033,"url":"/index-pwa.js","remote":"::1"} 
+2025-08-12 09:50:07 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:50:09 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:50:10 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:50:20 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:50:20 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/html","size":3989,"url":"/faceid/index.html","remote":"::1"} 
+2025-08-12 09:50:21 [33mWARN: [39m HTTP: {"method":"GET","ver":"1.1","status":404,"url":"/.well-known/appspecific/com.chrome.devtools.json","remote":"::1"} 
+2025-08-12 09:50:21 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":18970,"url":"/faceid/index.js","remote":"::1"} 
+2025-08-12 09:50:21 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/manifest+json","size":304,"url":"/manifest.webmanifest","remote":"::1"} 
+2025-08-12 09:50:21 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"font/woff2","size":181500,"url":"/assets/lato-light.woff2","remote":"::1"} 
+2025-08-12 09:50:21 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":1867140,"url":"/dist/human.esm.js","remote":"::1"} 
+2025-08-12 09:50:21 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/octet-stream","size":3306994,"url":"/dist/human.esm.js.map","remote":"::1"} 
+2025-08-12 09:50:21 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/octet-stream","size":38784,"url":"/faceid/index.js.map","remote":"::1"} 
+2025-08-12 09:50:21 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:50:21 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/x-icon","size":261950,"url":"/favicon.ico","remote":"::1"} 
+2025-08-12 09:50:21 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:50:23 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":4033,"url":"/index-pwa.js","remote":"::1"} 
+2025-08-12 09:50:36 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:50:37 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:50:40 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:50:41 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:50:43 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:50:45 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:50:46 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:50:51 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:50:52 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:51:15 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:51:16 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:51:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:51:19 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:51:21 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:51:22 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:51:45 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:51:46 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:51:51 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:51:52 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:52:15 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:52:16 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:52:21 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:52:22 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:52:40 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:52:41 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:52:42 [36mINFO: [39m Watch: {"event":"modify","input":"demo/faceid/face-tracker.ts"} 
+2025-08-12 09:52:42 [35mSTATE:[39m Compile: {"name":"tfjs/browser/version","format":"esm","platform":"browser","input":"tfjs/tf-version.ts","output":"dist/tfjs.version.js","files":1,"inputBytes":1289,"outputBytes":963} 
+2025-08-12 09:52:42 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/nobundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":2,"inputBytes":2008,"outputBytes":1044} 
+2025-08-12 09:52:42 [35mSTATE:[39m Compile: {"name":"human/browser/esm/nobundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm-nobundle.js","files":78,"inputBytes":652285,"outputBytes":322185} 
+2025-08-12 09:52:42 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/bundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":10,"inputBytes":2008,"outputBytes":1267572} 
+2025-08-12 09:52:42 [35mSTATE:[39m Compile: {"name":"human/browser/iife/bundle","format":"iife","platform":"browser","input":"src/human.ts","output":"dist/human.js","files":78,"inputBytes":1918813,"outputBytes":1466764} 
+2025-08-12 09:52:43 [35mSTATE:[39m Compile: {"name":"human/browser/esm/bundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm.js","files":78,"inputBytes":1918813,"outputBytes":1867140} 
+2025-08-12 09:52:43 [35mSTATE:[39m Compile: {"name":"demo/typescript","format":"esm","platform":"browser","input":"demo/typescript/index.ts","output":"demo/typescript/index.js","files":1,"inputBytes":6318,"outputBytes":4521} 
+2025-08-12 09:52:43 [35mSTATE:[39m Compile: {"name":"demo/faceid","format":"esm","platform":"browser","input":"demo/faceid/index.ts","output":"demo/faceid/index.js","files":3,"inputBytes":24620,"outputBytes":18970} 
+2025-08-12 09:52:43 [35mSTATE:[39m Compile: {"name":"demo/tracker","format":"esm","platform":"browser","input":"demo/tracker/index.ts","output":"demo/tracker/index.js","files":2,"inputBytes":54249,"outputBytes":50914} 
+2025-08-12 09:52:43 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/html","size":3989,"url":"/faceid/index.html","remote":"::1"} 
+2025-08-12 09:52:43 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:52:43 [33mWARN: [39m HTTP: {"method":"GET","ver":"1.1","status":404,"url":"/.well-known/appspecific/com.chrome.devtools.json","remote":"::1"} 
+2025-08-12 09:52:43 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":18970,"url":"/faceid/index.js","remote":"::1"} 
+2025-08-12 09:52:43 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/manifest+json","size":304,"url":"/manifest.webmanifest","remote":"::1"} 
+2025-08-12 09:52:43 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"font/woff2","size":181500,"url":"/assets/lato-light.woff2","remote":"::1"} 
+2025-08-12 09:52:43 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":1867140,"url":"/dist/human.esm.js","remote":"::1"} 
+2025-08-12 09:52:43 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:52:43 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/octet-stream","size":3306994,"url":"/dist/human.esm.js.map","remote":"::1"} 
+2025-08-12 09:52:43 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/octet-stream","size":38784,"url":"/faceid/index.js.map","remote":"::1"} 
+2025-08-12 09:52:43 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:52:43 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/x-icon","size":261950,"url":"/favicon.ico","remote":"::1"} 
+2025-08-12 09:52:45 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:52:46 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":4033,"url":"/index-pwa.js","remote":"::1"} 
+2025-08-12 09:52:46 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:53:01 [36mINFO: [39m Watch: {"event":"modify","input":"demo/faceid/face-tracker.ts"} 
+2025-08-12 09:53:01 [35mSTATE:[39m Compile: {"name":"tfjs/browser/version","format":"esm","platform":"browser","input":"tfjs/tf-version.ts","output":"dist/tfjs.version.js","files":1,"inputBytes":1289,"outputBytes":963} 
+2025-08-12 09:53:01 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/nobundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":2,"inputBytes":2008,"outputBytes":1044} 
+2025-08-12 09:53:01 [35mSTATE:[39m Compile: {"name":"human/browser/esm/nobundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm-nobundle.js","files":78,"inputBytes":652285,"outputBytes":322185} 
+2025-08-12 09:53:01 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/bundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":10,"inputBytes":2008,"outputBytes":1267572} 
+2025-08-12 09:53:01 [35mSTATE:[39m Compile: {"name":"human/browser/iife/bundle","format":"iife","platform":"browser","input":"src/human.ts","output":"dist/human.js","files":78,"inputBytes":1918813,"outputBytes":1466764} 
+2025-08-12 09:53:01 [35mSTATE:[39m Compile: {"name":"human/browser/esm/bundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm.js","files":78,"inputBytes":1918813,"outputBytes":1867140} 
+2025-08-12 09:53:01 [35mSTATE:[39m Compile: {"name":"demo/typescript","format":"esm","platform":"browser","input":"demo/typescript/index.ts","output":"demo/typescript/index.js","files":1,"inputBytes":6318,"outputBytes":4521} 
+2025-08-12 09:53:01 [35mSTATE:[39m Compile: {"name":"demo/faceid","format":"esm","platform":"browser","input":"demo/faceid/index.ts","output":"demo/faceid/index.js","files":3,"inputBytes":24620,"outputBytes":18970} 
+2025-08-12 09:53:01 [35mSTATE:[39m Compile: {"name":"demo/tracker","format":"esm","platform":"browser","input":"demo/tracker/index.ts","output":"demo/tracker/index.js","files":2,"inputBytes":54249,"outputBytes":50914} 
+2025-08-12 09:53:03 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/html","size":3989,"url":"/faceid/index.html","remote":"::1"} 
+2025-08-12 09:53:03 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:53:03 [33mWARN: [39m HTTP: {"method":"GET","ver":"1.1","status":404,"url":"/.well-known/appspecific/com.chrome.devtools.json","remote":"::1"} 
+2025-08-12 09:53:03 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":18970,"url":"/faceid/index.js","remote":"::1"} 
+2025-08-12 09:53:03 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/manifest+json","size":304,"url":"/manifest.webmanifest","remote":"::1"} 
+2025-08-12 09:53:03 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"font/woff2","size":181500,"url":"/assets/lato-light.woff2","remote":"::1"} 
+2025-08-12 09:53:03 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":1867140,"url":"/dist/human.esm.js","remote":"::1"} 
+2025-08-12 09:53:03 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/octet-stream","size":3306994,"url":"/dist/human.esm.js.map","remote":"::1"} 
+2025-08-12 09:53:03 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/octet-stream","size":38784,"url":"/faceid/index.js.map","remote":"::1"} 
+2025-08-12 09:53:03 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:53:03 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:53:03 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/x-icon","size":261950,"url":"/favicon.ico","remote":"::1"} 
+2025-08-12 09:53:05 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":4033,"url":"/index-pwa.js","remote":"::1"} 
+2025-08-12 09:53:15 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:53:16 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:53:19 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:53:20 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:53:33 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:53:34 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:53:45 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:53:46 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:53:54 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:53:55 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:54:03 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:54:04 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:54:05 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:54:06 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:54:15 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:54:33 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:54:34 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:54:39 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:54:41 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:54:45 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:54:46 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:54:56 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:54:57 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:55:03 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:55:04 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:55:15 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:55:16 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:55:33 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:55:34 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:55:45 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:55:46 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:55:50 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:55:51 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:56:03 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:56:04 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:56:06 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:56:07 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:56:15 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:56:16 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:56:33 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:56:34 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:56:36 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:56:37 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:56:45 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:56:46 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:57:03 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:57:04 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:57:15 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:57:16 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:57:21 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:57:22 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:57:33 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:57:34 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:57:45 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:57:46 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:58:03 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:58:04 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:58:15 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:58:17 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:58:33 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:58:34 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:58:44 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:58:45 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:58:46 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:59:03 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:59:04 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:59:15 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:59:16 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:59:22 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:59:23 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:59:33 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:59:34 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:59:45 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:59:46 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:59:52 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:59:53 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:59:56 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 09:59:57 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:00:03 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:00:04 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:00:14 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:00:15 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:00:17 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:00:32 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:00:33 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:00:34 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:00:38 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:00:39 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:00:44 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:00:45 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:00:47 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:00:53 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:00:54 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:01:03 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:01:04 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:01:10 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:01:12 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:01:16 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:01:17 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:01:23 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:01:24 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:01:45 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:01:47 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:01:53 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:01:55 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:02:03 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:02:05 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:02:09 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:02:11 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:02:15 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:02:17 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:02:32 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:02:33 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:02:35 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:02:45 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:02:47 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:03:02 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:03:03 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:03:06 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:03:07 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:03:10 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:03:15 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:03:16 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:03:24 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:03:26 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:03:45 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:03:47 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:03:49 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:03:51 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:04:15 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:04:17 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:04:19 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:04:21 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:04:38 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:04:40 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:04:42 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:04:45 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:04:47 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:04:49 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:04:51 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:05:10 [36mINFO: [39m Watch: {"event":"modify","input":"demo/faceid/face-tracker.ts"} 
+2025-08-12 10:05:11 [35mSTATE:[39m Compile: {"name":"tfjs/browser/version","format":"esm","platform":"browser","input":"tfjs/tf-version.ts","output":"dist/tfjs.version.js","files":1,"inputBytes":1289,"outputBytes":963} 
+2025-08-12 10:05:11 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/nobundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":2,"inputBytes":2008,"outputBytes":1044} 
+2025-08-12 10:05:11 [35mSTATE:[39m Compile: {"name":"human/browser/esm/nobundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm-nobundle.js","files":78,"inputBytes":652285,"outputBytes":322185} 
+2025-08-12 10:05:11 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/bundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":10,"inputBytes":2008,"outputBytes":1267572} 
+2025-08-12 10:05:11 [35mSTATE:[39m Compile: {"name":"human/browser/iife/bundle","format":"iife","platform":"browser","input":"src/human.ts","output":"dist/human.js","files":78,"inputBytes":1918813,"outputBytes":1466764} 
+2025-08-12 10:05:11 [35mSTATE:[39m Compile: {"name":"human/browser/esm/bundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm.js","files":78,"inputBytes":1918813,"outputBytes":1867140} 
+2025-08-12 10:05:11 [35mSTATE:[39m Compile: {"name":"demo/typescript","format":"esm","platform":"browser","input":"demo/typescript/index.ts","output":"demo/typescript/index.js","files":1,"inputBytes":6318,"outputBytes":4521} 
+2025-08-12 10:05:11 [35mSTATE:[39m Compile: {"name":"demo/faceid","format":"esm","platform":"browser","input":"demo/faceid/index.ts","output":"demo/faceid/index.js","files":3,"inputBytes":24658,"outputBytes":18991} 
+2025-08-12 10:05:11 [35mSTATE:[39m Compile: {"name":"demo/tracker","format":"esm","platform":"browser","input":"demo/tracker/index.ts","output":"demo/tracker/index.js","files":2,"inputBytes":54249,"outputBytes":50914} 
+2025-08-12 10:06:51 [36mINFO: [39m Watch: {"event":"modify","input":"demo/faceid/index.ts"} 
+2025-08-12 10:06:51 [35mSTATE:[39m Compile: {"name":"tfjs/browser/version","format":"esm","platform":"browser","input":"tfjs/tf-version.ts","output":"dist/tfjs.version.js","files":1,"inputBytes":1289,"outputBytes":963} 
+2025-08-12 10:06:51 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/nobundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":2,"inputBytes":2008,"outputBytes":1044} 
+2025-08-12 10:06:51 [35mSTATE:[39m Compile: {"name":"human/browser/esm/nobundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm-nobundle.js","files":78,"inputBytes":652285,"outputBytes":322185} 
+2025-08-12 10:06:51 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/bundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":10,"inputBytes":2008,"outputBytes":1267572} 
+2025-08-12 10:06:51 [35mSTATE:[39m Compile: {"name":"human/browser/iife/bundle","format":"iife","platform":"browser","input":"src/human.ts","output":"dist/human.js","files":78,"inputBytes":1918813,"outputBytes":1466764} 
+2025-08-12 10:06:51 [35mSTATE:[39m Compile: {"name":"human/browser/esm/bundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm.js","files":78,"inputBytes":1918813,"outputBytes":1867140} 
+2025-08-12 10:06:51 [35mSTATE:[39m Compile: {"name":"demo/typescript","format":"esm","platform":"browser","input":"demo/typescript/index.ts","output":"demo/typescript/index.js","files":1,"inputBytes":6318,"outputBytes":4521} 
+2025-08-12 10:06:51 [35mSTATE:[39m Compile: {"name":"demo/faceid","format":"esm","platform":"browser","input":"demo/faceid/index.ts","output":"demo/faceid/index.js","files":3,"inputBytes":23970,"outputBytes":18991} 
+2025-08-12 10:06:51 [35mSTATE:[39m Compile: {"name":"demo/tracker","format":"esm","platform":"browser","input":"demo/tracker/index.ts","output":"demo/tracker/index.js","files":2,"inputBytes":54249,"outputBytes":50914} 
+2025-08-12 10:06:58 [36mINFO: [39m Watch: {"event":"modify","input":"demo/faceid/face-tracker.ts"} 
+2025-08-12 10:06:58 [35mSTATE:[39m Compile: {"name":"tfjs/browser/version","format":"esm","platform":"browser","input":"tfjs/tf-version.ts","output":"dist/tfjs.version.js","files":1,"inputBytes":1289,"outputBytes":963} 
+2025-08-12 10:06:58 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/nobundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":2,"inputBytes":2008,"outputBytes":1044} 
+2025-08-12 10:06:58 [35mSTATE:[39m Compile: {"name":"human/browser/esm/nobundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm-nobundle.js","files":78,"inputBytes":652285,"outputBytes":322185} 
+2025-08-12 10:06:58 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/bundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":10,"inputBytes":2008,"outputBytes":1267572} 
+2025-08-12 10:06:58 [35mSTATE:[39m Compile: {"name":"human/browser/iife/bundle","format":"iife","platform":"browser","input":"src/human.ts","output":"dist/human.js","files":78,"inputBytes":1918813,"outputBytes":1466764} 
+2025-08-12 10:06:58 [35mSTATE:[39m Compile: {"name":"human/browser/esm/bundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm.js","files":78,"inputBytes":1918813,"outputBytes":1867140} 
+2025-08-12 10:06:58 [35mSTATE:[39m Compile: {"name":"demo/typescript","format":"esm","platform":"browser","input":"demo/typescript/index.ts","output":"demo/typescript/index.js","files":1,"inputBytes":6318,"outputBytes":4521} 
+2025-08-12 10:06:58 [35mSTATE:[39m Compile: {"name":"demo/faceid","format":"esm","platform":"browser","input":"demo/faceid/index.ts","output":"demo/faceid/index.js","files":3,"inputBytes":23970,"outputBytes":18991} 
+2025-08-12 10:06:58 [35mSTATE:[39m Compile: {"name":"demo/tracker","format":"esm","platform":"browser","input":"demo/tracker/index.ts","output":"demo/tracker/index.js","files":2,"inputBytes":54249,"outputBytes":50914} 
+2025-08-12 10:08:37 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/html","size":3989,"url":"/faceid/index.html","remote":"::1"} 
+2025-08-12 10:08:37 [33mWARN: [39m HTTP: {"method":"GET","ver":"1.1","status":404,"url":"/.well-known/appspecific/com.chrome.devtools.json","remote":"::1"} 
+2025-08-12 10:08:37 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":18991,"url":"/faceid/index.js","remote":"::1"} 
+2025-08-12 10:08:37 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"font/woff2","size":181500,"url":"/assets/lato-light.woff2","remote":"::1"} 
+2025-08-12 10:08:38 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":1867140,"url":"/dist/human.esm.js","remote":"::1"} 
+2025-08-12 10:08:38 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/manifest+json","size":304,"url":"/manifest.webmanifest","remote":"::1"} 
+2025-08-12 10:08:38 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:08:38 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/octet-stream","size":3306994,"url":"/dist/human.esm.js.map","remote":"::1"} 
+2025-08-12 10:08:38 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/octet-stream","size":38115,"url":"/faceid/index.js.map","remote":"::1"} 
+2025-08-12 10:08:38 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:08:38 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/html","size":3989,"url":"/faceid/index.html","remote":"::1"} 
+2025-08-12 10:08:38 [33mWARN: [39m HTTP: {"method":"GET","ver":"1.1","status":404,"url":"/.well-known/appspecific/com.chrome.devtools.json","remote":"::1"} 
+2025-08-12 10:08:38 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":18991,"url":"/faceid/index.js","remote":"::1"} 
+2025-08-12 10:08:38 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/manifest+json","size":304,"url":"/manifest.webmanifest","remote":"::1"} 
+2025-08-12 10:08:38 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"font/woff2","size":181500,"url":"/assets/lato-light.woff2","remote":"::1"} 
+2025-08-12 10:08:38 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":1867140,"url":"/dist/human.esm.js","remote":"::1"} 
+2025-08-12 10:08:38 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/octet-stream","size":38115,"url":"/faceid/index.js.map","remote":"::1"} 
+2025-08-12 10:08:38 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/octet-stream","size":3306994,"url":"/dist/human.esm.js.map","remote":"::1"} 
+2025-08-12 10:08:38 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:08:38 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:08:38 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/x-icon","size":261950,"url":"/favicon.ico","remote":"::1"} 
+2025-08-12 10:08:40 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":4033,"url":"/index-pwa.js","remote":"::1"} 
+2025-08-12 10:08:42 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:08:43 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:08:45 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:08:47 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:09:08 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:09:09 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:09:15 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:09:17 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:09:27 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:09:28 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:09:38 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:09:39 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:09:45 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:09:46 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:10:08 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:10:09 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:10:11 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:10:15 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:10:16 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:10:40 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:10:41 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:10:43 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:10:45 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:10:46 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:11:10 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:11:11 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:11:15 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-12 10:11:16 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-13 16:49:56 [36mINFO: [39m @vladmandic/human version 3.3.5 
+2025-08-13 16:49:56 [36mINFO: [39m User: nine Platform: darwin Arch: arm64 Node: v22.18.0 
+2025-08-13 16:49:56 [36mINFO: [39m Application: {"name":"@vladmandic/human","version":"3.3.5"} 
+2025-08-13 16:49:56 [36mINFO: [39m Environment: {"profile":"development","config":".build.json","package":"package.json","tsconfig":true,"eslintrc":true,"git":true} 
+2025-08-13 16:49:56 [36mINFO: [39m Toolchain: {"build":"0.10.2","esbuild":"0.24.2","typescript":"5.7.3","typedoc":"0.27.6","eslint":"8.57.0"} 
+2025-08-13 16:49:56 [36mINFO: [39m Build: {"profile":"development","steps":["serve","watch","compile"]} 
+2025-08-13 16:49:56 [35mSTATE:[39m WebServer: {"ssl":false,"port":8000,"root":"."} 
+2025-08-13 16:49:57 [35mSTATE:[39m WebServer: {"ssl":true,"port":8001,"root":".","sslKey":"node_modules/@vladmandic/build/cert/https.key","sslCrt":"node_modules/@vladmandic/build/cert/https.crt"} 
+2025-08-13 16:49:57 [35mSTATE:[39m Watch: {"locations":["src/**/*","tfjs/**/*","demo/**/*.ts"]} 
+2025-08-13 16:49:57 [35mSTATE:[39m Compile: {"name":"tfjs/browser/version","format":"esm","platform":"browser","input":"tfjs/tf-version.ts","output":"dist/tfjs.version.js","files":1,"inputBytes":1289,"outputBytes":963} 
+2025-08-13 16:49:57 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/nobundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":2,"inputBytes":2008,"outputBytes":1044} 
+2025-08-13 16:49:57 [35mSTATE:[39m Compile: {"name":"human/browser/esm/nobundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm-nobundle.js","files":78,"inputBytes":653407,"outputBytes":323088} 
+2025-08-13 16:49:57 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/bundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":10,"inputBytes":2008,"outputBytes":1267572} 
+2025-08-13 16:49:57 [35mSTATE:[39m Compile: {"name":"human/browser/iife/bundle","format":"iife","platform":"browser","input":"src/human.ts","output":"dist/human.js","files":78,"inputBytes":1919935,"outputBytes":1467267} 
+2025-08-13 16:49:57 [35mSTATE:[39m Compile: {"name":"human/browser/esm/bundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm.js","files":78,"inputBytes":1919935,"outputBytes":1868058} 
+2025-08-13 16:49:57 [35mSTATE:[39m Compile: {"name":"demo/typescript","format":"esm","platform":"browser","input":"demo/typescript/index.ts","output":"demo/typescript/index.js","files":1,"inputBytes":6318,"outputBytes":4521} 
+2025-08-13 16:49:57 [35mSTATE:[39m Compile: {"name":"demo/faceid","format":"esm","platform":"browser","input":"demo/faceid/index.ts","output":"demo/faceid/index.js","files":3,"inputBytes":23970,"outputBytes":18991} 
+2025-08-13 16:49:57 [35mSTATE:[39m Compile: {"name":"demo/tracker","format":"esm","platform":"browser","input":"demo/tracker/index.ts","output":"demo/tracker/index.js","files":2,"inputBytes":54249,"outputBytes":50914} 
+2025-08-13 16:49:57 [36mINFO: [39m Listening... ["http://localhost:8000","https://localhost:8001"] 
+2025-08-13 16:50:01 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/html","size":7551,"url":"/","remote":"::1"} 
+2025-08-13 16:50:01 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/css","size":107884,"url":"/icons.css","remote":"::1"} 
+2025-08-13 16:50:01 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":44999,"url":"/index.js","remote":"::1"} 
+2025-08-13 16:50:01 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":1868058,"url":"/dist/human.esm.js","remote":"::1"} 
+2025-08-13 16:50:01 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"font/woff2","size":181500,"url":"/assets/lato-light.woff2","remote":"::1"} 
+2025-08-13 16:50:01 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":14308,"url":"/helpers/menu.js","remote":"::1"} 
+2025-08-13 16:50:01 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":10535,"url":"/helpers/gl-bench.js","remote":"::1"} 
+2025-08-13 16:50:01 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":3397,"url":"/helpers/webrtc.js","remote":"::1"} 
+2025-08-13 16:50:01 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":5689,"url":"/helpers/jsonview.js","remote":"::1"} 
+2025-08-13 16:50:02 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/manifest+json","size":304,"url":"/manifest.webmanifest","remote":"::1"} 
+2025-08-13 16:50:02 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-13 16:50:03 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":4033,"url":"/index-pwa.js","remote":"::1"} 
+2025-08-13 16:50:05 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/html","size":7551,"url":"/","remote":"::1"} 
+2025-08-13 16:50:05 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/css","size":107884,"url":"/icons.css","remote":"::1"} 
+2025-08-13 16:50:05 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":44999,"url":"/index.js","remote":"::1"} 
+2025-08-13 16:50:05 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":14308,"url":"/helpers/menu.js","remote":"::1"} 
+2025-08-13 16:50:05 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":10535,"url":"/helpers/gl-bench.js","remote":"::1"} 
+2025-08-13 16:50:05 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":1868058,"url":"/dist/human.esm.js","remote":"::1"} 
+2025-08-13 16:50:05 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":3397,"url":"/helpers/webrtc.js","remote":"::1"} 
+2025-08-13 16:50:05 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":5689,"url":"/helpers/jsonview.js","remote":"::1"} 
+2025-08-13 16:50:05 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"font/woff2","size":181500,"url":"/assets/lato-light.woff2","remote":"::1"} 
+2025-08-13 16:50:05 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/manifest+json","size":304,"url":"/manifest.webmanifest","remote":"::1"} 
+2025-08-13 16:50:05 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-13 16:50:07 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":4033,"url":"/index-pwa.js","remote":"::1"} 
+2025-08-13 16:50:36 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":4033,"url":"/index-pwa.js","remote":"::1"} 
+2025-08-13 16:51:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/html","size":7551,"url":"/","remote":"::1"} 
+2025-08-13 16:51:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/css","size":107884,"url":"/icons.css","remote":"::1"} 
+2025-08-13 16:51:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":44999,"url":"/index.js","remote":"::1"} 
+2025-08-13 16:51:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":14308,"url":"/helpers/menu.js","remote":"::1"} 
+2025-08-13 16:51:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":1868058,"url":"/dist/human.esm.js","remote":"::1"} 
+2025-08-13 16:51:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":3397,"url":"/helpers/webrtc.js","remote":"::1"} 
+2025-08-13 16:51:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":5689,"url":"/helpers/jsonview.js","remote":"::1"} 
+2025-08-13 16:51:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":10535,"url":"/helpers/gl-bench.js","remote":"::1"} 
+2025-08-13 16:51:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"font/woff2","size":181500,"url":"/assets/lato-light.woff2","remote":"::1"} 
+2025-08-13 16:51:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/x-icon","size":261950,"url":"/favicon.ico","remote":"::1"} 
+2025-08-13 16:51:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/manifest+json","size":304,"url":"/manifest.webmanifest","remote":"::1"} 
+2025-08-13 16:51:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-13 16:51:20 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":4033,"url":"/index-pwa.js","remote":"::1"} 
+2025-08-13 16:53:11 [36mINFO: [39m Watch: {"event":"modify","input":"src/face/face.ts"} 
+2025-08-13 16:53:11 [35mSTATE:[39m Compile: {"name":"tfjs/browser/version","format":"esm","platform":"browser","input":"tfjs/tf-version.ts","output":"dist/tfjs.version.js","files":1,"inputBytes":1289,"outputBytes":963} 
+2025-08-13 16:53:11 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/nobundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":2,"inputBytes":2008,"outputBytes":1044} 
+2025-08-13 16:53:11 [35mSTATE:[39m Compile: {"name":"human/browser/esm/nobundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm-nobundle.js","files":78,"inputBytes":653425,"outputBytes":322179} 
+2025-08-13 16:53:11 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/bundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":10,"inputBytes":2008,"outputBytes":1267572} 
+2025-08-13 16:53:12 [35mSTATE:[39m Compile: {"name":"human/browser/iife/bundle","format":"iife","platform":"browser","input":"src/human.ts","output":"dist/human.js","files":78,"inputBytes":1919953,"outputBytes":1466764} 
+2025-08-13 16:53:12 [35mSTATE:[39m Compile: {"name":"human/browser/esm/bundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm.js","files":78,"inputBytes":1919953,"outputBytes":1867134} 
+2025-08-13 16:53:12 [35mSTATE:[39m Compile: {"name":"demo/typescript","format":"esm","platform":"browser","input":"demo/typescript/index.ts","output":"demo/typescript/index.js","files":1,"inputBytes":6318,"outputBytes":4521} 
+2025-08-13 16:53:12 [35mSTATE:[39m Compile: {"name":"demo/faceid","format":"esm","platform":"browser","input":"demo/faceid/index.ts","output":"demo/faceid/index.js","files":3,"inputBytes":23970,"outputBytes":18991} 
+2025-08-13 16:53:12 [35mSTATE:[39m Compile: {"name":"demo/tracker","format":"esm","platform":"browser","input":"demo/tracker/index.ts","output":"demo/tracker/index.js","files":2,"inputBytes":54249,"outputBytes":50914} 
+2025-08-13 16:53:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/manifest+json","size":304,"url":"/manifest.webmanifest","remote":"::1"} 
+2025-08-13 16:53:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-13 16:53:20 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":4033,"url":"/index-pwa.js","remote":"::1"} 
+2025-08-13 16:54:22 [36mINFO: [39m Watch: {"event":"modify","input":"src/face/face.ts"} 
+2025-08-13 16:54:22 [35mSTATE:[39m Compile: {"name":"tfjs/browser/version","format":"esm","platform":"browser","input":"tfjs/tf-version.ts","output":"dist/tfjs.version.js","files":1,"inputBytes":1289,"outputBytes":963} 
+2025-08-13 16:54:22 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/nobundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":2,"inputBytes":2008,"outputBytes":1044} 
+2025-08-13 16:54:22 [35mSTATE:[39m Compile: {"name":"human/browser/esm/nobundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm-nobundle.js","files":78,"inputBytes":653407,"outputBytes":323088} 
+2025-08-13 16:54:22 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/bundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":10,"inputBytes":2008,"outputBytes":1267572} 
+2025-08-13 16:54:22 [35mSTATE:[39m Compile: {"name":"human/browser/iife/bundle","format":"iife","platform":"browser","input":"src/human.ts","output":"dist/human.js","files":78,"inputBytes":1919935,"outputBytes":1467267} 
+2025-08-13 16:54:22 [35mSTATE:[39m Compile: {"name":"human/browser/esm/bundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm.js","files":78,"inputBytes":1919935,"outputBytes":1868058} 
+2025-08-13 16:54:22 [35mSTATE:[39m Compile: {"name":"demo/typescript","format":"esm","platform":"browser","input":"demo/typescript/index.ts","output":"demo/typescript/index.js","files":1,"inputBytes":6318,"outputBytes":4521} 
+2025-08-13 16:54:22 [35mSTATE:[39m Compile: {"name":"demo/faceid","format":"esm","platform":"browser","input":"demo/faceid/index.ts","output":"demo/faceid/index.js","files":3,"inputBytes":23970,"outputBytes":18991} 
+2025-08-13 16:54:22 [35mSTATE:[39m Compile: {"name":"demo/tracker","format":"esm","platform":"browser","input":"demo/tracker/index.ts","output":"demo/tracker/index.js","files":2,"inputBytes":54249,"outputBytes":50914} 
+2025-08-13 16:54:56 [36mINFO: [39m Watch: {"event":"modify","input":"src/face/face.ts"} 
+2025-08-13 16:54:56 [35mSTATE:[39m Compile: {"name":"tfjs/browser/version","format":"esm","platform":"browser","input":"tfjs/tf-version.ts","output":"dist/tfjs.version.js","files":1,"inputBytes":1289,"outputBytes":963} 
+2025-08-13 16:54:56 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/nobundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":2,"inputBytes":2008,"outputBytes":1044} 
+2025-08-13 16:54:56 [35mSTATE:[39m Compile: {"name":"human/browser/esm/nobundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm-nobundle.js","files":78,"inputBytes":653524,"outputBytes":322179} 
+2025-08-13 16:54:56 [36mINFO: [39m Watch: {"event":"modify","input":"src/face/face.ts","skip":true} 
+2025-08-13 16:54:57 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/bundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":10,"inputBytes":2008,"outputBytes":1267572} 
+2025-08-13 16:54:57 [35mSTATE:[39m Compile: {"name":"human/browser/iife/bundle","format":"iife","platform":"browser","input":"src/human.ts","output":"dist/human.js","files":78,"inputBytes":1920052,"outputBytes":1466764} 
+2025-08-13 16:54:57 [35mSTATE:[39m Compile: {"name":"human/browser/esm/bundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm.js","files":78,"inputBytes":1920052,"outputBytes":1867134} 
+2025-08-13 16:54:57 [35mSTATE:[39m Compile: {"name":"demo/typescript","format":"esm","platform":"browser","input":"demo/typescript/index.ts","output":"demo/typescript/index.js","files":1,"inputBytes":6318,"outputBytes":4521} 
+2025-08-13 16:54:57 [35mSTATE:[39m Compile: {"name":"demo/faceid","format":"esm","platform":"browser","input":"demo/faceid/index.ts","output":"demo/faceid/index.js","files":3,"inputBytes":23970,"outputBytes":18991} 
+2025-08-13 16:54:57 [35mSTATE:[39m Compile: {"name":"demo/tracker","format":"esm","platform":"browser","input":"demo/tracker/index.ts","output":"demo/tracker/index.js","files":2,"inputBytes":54249,"outputBytes":50914} 
+2025-08-13 16:55:02 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/manifest+json","size":304,"url":"/manifest.webmanifest","remote":"::1"} 
+2025-08-13 16:55:02 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-13 16:55:04 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":4033,"url":"/index-pwa.js","remote":"::1"} 
+2025-08-13 16:55:09 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/html","size":7551,"url":"/","remote":"::1"} 
+2025-08-13 16:55:09 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/css","size":107884,"url":"/icons.css","remote":"::1"} 
+2025-08-13 16:55:09 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":44999,"url":"/index.js","remote":"::1"} 
+2025-08-13 16:55:10 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":1867134,"url":"/dist/human.esm.js","remote":"::1"} 
+2025-08-13 16:55:10 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":14308,"url":"/helpers/menu.js","remote":"::1"} 
+2025-08-13 16:55:10 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":10535,"url":"/helpers/gl-bench.js","remote":"::1"} 
+2025-08-13 16:55:10 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":3397,"url":"/helpers/webrtc.js","remote":"::1"} 
+2025-08-13 16:55:10 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":5689,"url":"/helpers/jsonview.js","remote":"::1"} 
+2025-08-13 16:55:10 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"font/woff2","size":181500,"url":"/assets/lato-light.woff2","remote":"::1"} 
+2025-08-13 16:55:10 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/manifest+json","size":304,"url":"/manifest.webmanifest","remote":"::1"} 
+2025-08-13 16:55:10 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/x-icon","size":261950,"url":"/favicon.ico","remote":"::1"} 
+2025-08-13 16:55:10 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-13 16:55:11 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":4033,"url":"/index-pwa.js","remote":"::1"} 
+2025-08-13 16:56:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/html","size":7551,"url":"/","remote":"::1"} 
+2025-08-13 16:56:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/css","size":107884,"url":"/icons.css","remote":"::1"} 
+2025-08-13 16:56:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":44999,"url":"/index.js","remote":"::1"} 
+2025-08-13 16:56:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":14308,"url":"/helpers/menu.js","remote":"::1"} 
+2025-08-13 16:56:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":10535,"url":"/helpers/gl-bench.js","remote":"::1"} 
+2025-08-13 16:56:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":3397,"url":"/helpers/webrtc.js","remote":"::1"} 
+2025-08-13 16:56:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":5689,"url":"/helpers/jsonview.js","remote":"::1"} 
+2025-08-13 16:56:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":1867134,"url":"/dist/human.esm.js","remote":"::1"} 
+2025-08-13 16:56:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"font/woff2","size":181500,"url":"/assets/lato-light.woff2","remote":"::1"} 
+2025-08-13 16:56:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/x-icon","size":261950,"url":"/favicon.ico","remote":"::1"} 
+2025-08-13 16:56:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/manifest+json","size":304,"url":"/manifest.webmanifest","remote":"::1"} 
+2025-08-13 16:56:18 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-13 16:56:20 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":4033,"url":"/index-pwa.js","remote":"::1"} 
+2025-08-13 17:00:06 [36mINFO: [39m Watch: {"event":"modify","input":"src/face/face.ts"} 
+2025-08-13 17:00:07 [35mSTATE:[39m Compile: {"name":"tfjs/browser/version","format":"esm","platform":"browser","input":"tfjs/tf-version.ts","output":"dist/tfjs.version.js","files":1,"inputBytes":1289,"outputBytes":963} 
+2025-08-13 17:00:07 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/nobundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":2,"inputBytes":2008,"outputBytes":1044} 
+2025-08-13 17:00:07 [35mSTATE:[39m Compile: {"name":"human/browser/esm/nobundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm-nobundle.js","files":78,"inputBytes":653407,"outputBytes":323088} 
+2025-08-13 17:00:07 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/bundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":10,"inputBytes":2008,"outputBytes":1267572} 
+2025-08-13 17:00:07 [35mSTATE:[39m Compile: {"name":"human/browser/iife/bundle","format":"iife","platform":"browser","input":"src/human.ts","output":"dist/human.js","files":78,"inputBytes":1919935,"outputBytes":1467267} 
+2025-08-13 17:00:07 [35mSTATE:[39m Compile: {"name":"human/browser/esm/bundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm.js","files":78,"inputBytes":1919935,"outputBytes":1868058} 
+2025-08-13 17:00:07 [35mSTATE:[39m Compile: {"name":"demo/typescript","format":"esm","platform":"browser","input":"demo/typescript/index.ts","output":"demo/typescript/index.js","files":1,"inputBytes":6318,"outputBytes":4521} 
+2025-08-13 17:00:07 [35mSTATE:[39m Compile: {"name":"demo/faceid","format":"esm","platform":"browser","input":"demo/faceid/index.ts","output":"demo/faceid/index.js","files":3,"inputBytes":23970,"outputBytes":18991} 
+2025-08-13 17:00:07 [35mSTATE:[39m Compile: {"name":"demo/tracker","format":"esm","platform":"browser","input":"demo/tracker/index.ts","output":"demo/tracker/index.js","files":2,"inputBytes":54249,"outputBytes":50914} 
+2025-08-13 17:16:47 [36mINFO: [39m Watch: {"event":"modify","input":"src/face/faceres.ts"} 
+2025-08-13 17:16:48 [35mSTATE:[39m Compile: {"name":"tfjs/browser/version","format":"esm","platform":"browser","input":"tfjs/tf-version.ts","output":"dist/tfjs.version.js","files":1,"inputBytes":1289,"outputBytes":963} 
+2025-08-13 17:16:48 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/nobundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":2,"inputBytes":2008,"outputBytes":1044} 
+2025-08-13 17:16:48 [35mSTATE:[39m Compile: {"name":"human/browser/esm/nobundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm-nobundle.js","files":78,"inputBytes":653614,"outputBytes":323262} 
+2025-08-13 17:16:48 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/bundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":10,"inputBytes":2008,"outputBytes":1267572} 
+2025-08-13 17:16:48 [35mSTATE:[39m Compile: {"name":"human/browser/iife/bundle","format":"iife","platform":"browser","input":"src/human.ts","output":"dist/human.js","files":78,"inputBytes":1920142,"outputBytes":1467303} 
+2025-08-13 17:16:48 [35mSTATE:[39m Compile: {"name":"human/browser/esm/bundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm.js","files":78,"inputBytes":1920142,"outputBytes":1868234} 
+2025-08-13 17:16:48 [35mSTATE:[39m Compile: {"name":"demo/typescript","format":"esm","platform":"browser","input":"demo/typescript/index.ts","output":"demo/typescript/index.js","files":1,"inputBytes":6318,"outputBytes":4521} 
+2025-08-13 17:16:48 [35mSTATE:[39m Compile: {"name":"demo/faceid","format":"esm","platform":"browser","input":"demo/faceid/index.ts","output":"demo/faceid/index.js","files":3,"inputBytes":23970,"outputBytes":18991} 
+2025-08-13 17:16:48 [35mSTATE:[39m Compile: {"name":"demo/tracker","format":"esm","platform":"browser","input":"demo/tracker/index.ts","output":"demo/tracker/index.js","files":2,"inputBytes":54249,"outputBytes":50914} 
+2025-08-13 17:17:13 [36mINFO: [39m Watch: {"event":"modify","input":"src/face/faceres.ts"} 
+2025-08-13 17:17:13 [36mINFO: [39m Watch: {"event":"modify","input":"src/face/faceres.ts","skip":true} 
+2025-08-13 17:17:13 [35mSTATE:[39m Compile: {"name":"tfjs/browser/version","format":"esm","platform":"browser","input":"tfjs/tf-version.ts","output":"dist/tfjs.version.js","files":1,"inputBytes":1289,"outputBytes":963} 
+2025-08-13 17:17:13 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/nobundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":2,"inputBytes":2008,"outputBytes":1044} 
+2025-08-13 17:17:13 [35mSTATE:[39m Compile: {"name":"human/browser/esm/nobundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm-nobundle.js","files":78,"inputBytes":653614,"outputBytes":323262} 
+2025-08-13 17:17:14 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/bundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":10,"inputBytes":2008,"outputBytes":1267572} 
+2025-08-13 17:17:14 [35mSTATE:[39m Compile: {"name":"human/browser/iife/bundle","format":"iife","platform":"browser","input":"src/human.ts","output":"dist/human.js","files":78,"inputBytes":1920142,"outputBytes":1467303} 
+2025-08-13 17:17:14 [35mSTATE:[39m Compile: {"name":"human/browser/esm/bundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm.js","files":78,"inputBytes":1920142,"outputBytes":1868234} 
+2025-08-13 17:17:14 [35mSTATE:[39m Compile: {"name":"demo/typescript","format":"esm","platform":"browser","input":"demo/typescript/index.ts","output":"demo/typescript/index.js","files":1,"inputBytes":6318,"outputBytes":4521} 
+2025-08-13 17:17:14 [35mSTATE:[39m Compile: {"name":"demo/faceid","format":"esm","platform":"browser","input":"demo/faceid/index.ts","output":"demo/faceid/index.js","files":3,"inputBytes":23970,"outputBytes":18991} 
+2025-08-13 17:17:14 [35mSTATE:[39m Compile: {"name":"demo/tracker","format":"esm","platform":"browser","input":"demo/tracker/index.ts","output":"demo/tracker/index.js","files":2,"inputBytes":54249,"outputBytes":50914} 
+2025-08-13 17:30:52 [36mINFO: [39m Watch: {"event":"modify","input":"src/face/faceres.ts"} 
+2025-08-13 17:30:52 [35mSTATE:[39m Compile: {"name":"tfjs/browser/version","format":"esm","platform":"browser","input":"tfjs/tf-version.ts","output":"dist/tfjs.version.js","files":1,"inputBytes":1289,"outputBytes":963} 
+2025-08-13 17:30:52 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/nobundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":2,"inputBytes":2008,"outputBytes":1044} 
+2025-08-13 17:30:52 [36mINFO: [39m Watch: {"event":"modify","input":"src/face/faceres.ts","skip":true} 
+2025-08-13 17:30:52 [35mSTATE:[39m Compile: {"name":"human/browser/esm/nobundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm-nobundle.js","files":78,"inputBytes":653614,"outputBytes":323262} 
+2025-08-13 17:30:53 [35mSTATE:[39m Compile: {"name":"tfjs/browser/esm/bundle","format":"esm","platform":"browser","input":"tfjs/tf-browser.ts","output":"dist/tfjs.esm.js","files":10,"inputBytes":2008,"outputBytes":1267572} 
+2025-08-13 17:30:53 [35mSTATE:[39m Compile: {"name":"human/browser/iife/bundle","format":"iife","platform":"browser","input":"src/human.ts","output":"dist/human.js","files":78,"inputBytes":1920142,"outputBytes":1467303} 
+2025-08-13 17:30:53 [35mSTATE:[39m Compile: {"name":"human/browser/esm/bundle","format":"esm","platform":"browser","input":"src/human.ts","output":"dist/human.esm.js","files":78,"inputBytes":1920142,"outputBytes":1868234} 
+2025-08-13 17:30:53 [35mSTATE:[39m Compile: {"name":"demo/typescript","format":"esm","platform":"browser","input":"demo/typescript/index.ts","output":"demo/typescript/index.js","files":1,"inputBytes":6318,"outputBytes":4521} 
+2025-08-13 17:30:53 [35mSTATE:[39m Compile: {"name":"demo/faceid","format":"esm","platform":"browser","input":"demo/faceid/index.ts","output":"demo/faceid/index.js","files":3,"inputBytes":23970,"outputBytes":18991} 
+2025-08-13 17:30:53 [35mSTATE:[39m Compile: {"name":"demo/tracker","format":"esm","platform":"browser","input":"demo/tracker/index.ts","output":"demo/tracker/index.js","files":2,"inputBytes":54249,"outputBytes":50914} 
+2025-08-13 17:32:24 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/html","size":7551,"url":"/","remote":"::1"} 
+2025-08-13 17:32:24 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/css","size":107884,"url":"/icons.css","remote":"::1"} 
+2025-08-13 17:32:24 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":44999,"url":"/index.js","remote":"::1"} 
+2025-08-13 17:32:24 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":14308,"url":"/helpers/menu.js","remote":"::1"} 
+2025-08-13 17:32:24 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":3397,"url":"/helpers/webrtc.js","remote":"::1"} 
+2025-08-13 17:32:24 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":10535,"url":"/helpers/gl-bench.js","remote":"::1"} 
+2025-08-13 17:32:24 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":5689,"url":"/helpers/jsonview.js","remote":"::1"} 
+2025-08-13 17:32:24 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":1868234,"url":"/dist/human.esm.js","remote":"::1"} 
+2025-08-13 17:32:24 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"font/woff2","size":181500,"url":"/assets/lato-light.woff2","remote":"::1"} 
+2025-08-13 17:32:24 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"application/manifest+json","size":304,"url":"/manifest.webmanifest","remote":"::1"} 
+2025-08-13 17:32:24 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"image/png","size":142790,"url":"/assets/icon.png","remote":"::1"} 
+2025-08-13 17:32:26 [32mDATA: [39m HTTP: {"method":"GET","ver":"1.1","status":200,"mime":"text/javascript","size":4033,"url":"/index-pwa.js","remote":"::1"} 

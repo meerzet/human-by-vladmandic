@@ -4,26 +4,61 @@
  */
 
 import * as tf from 'dist/tfjs.esm.js';
-import { log, now } from '../util/util';
-import { env } from '../util/env';
-import * as facemesh from './facemesh';
 import * as emotion from '../gear/emotion';
-import * as faceres from './faceres';
-import * as mask from './mask';
-import * as antispoof from './antispoof';
-import * as liveness from './liveness';
 import * as gear from '../gear/gear';
 import * as ssrnetAge from '../gear/ssrnet-age';
 import * as ssrnetGender from '../gear/ssrnet-gender';
-import * as mobilefacenet from './mobilefacenet';
-import * as insightface from './insightface';
-import type { FaceResult, Emotion, Gender, Race } from '../result';
-import type { Tensor4D } from '../tfjs/types';
 import type { Human } from '../human';
+import type { Emotion, FaceResult, Gender, Race } from '../result';
+import type { Tensor4D } from '../tfjs/types';
+import { env } from '../util/env';
+import { log, now } from '../util/util';
 import { calculateFaceAngle } from './angles';
 import { calculateCameraDistance } from './anthropometry';
+import * as antispoof from './antispoof';
+import * as facemesh from './facemesh';
+import * as faceres from './faceres';
+import * as insightface from './insightface';
+import * as liveness from './liveness';
+import * as mask from './mask';
+import * as mobilefacenet from './mobilefacenet';
 
 interface DescRes { age: number, gender: Gender, genderScore: number, descriptor: number[], race?: { score: number, race: Race }[] }
+
+// util: box 중심 x 계산 (box 없으면 mesh로 추정)
+function centerX(f: FaceResult): number {
+  if (f.box && f.box.length === 4) {
+    const [x, , w] = [f.box[0], f.box[1], f.box[2]];
+    return x + w / 2;
+  }
+  if (f.mesh && f.mesh.length) {
+    let minX = Infinity;
+    let maxX = -Infinity;
+    for (const pt of f.mesh) {
+      if (pt[0] < minX) minX = pt[0];
+      if (pt[0] > maxX) maxX = pt[0];
+    }
+    return (minX + maxX) / 2;
+  }
+  // 안전망: 정보 없으면 큰 값
+  return Number.MAX_SAFE_INTEGER;
+}
+
+function centerY(f: FaceResult): number {
+  if (f.box && f.box.length === 4) {
+    return f.box[1] + f.box[3] / 2;
+  }
+  if (f.mesh && f.mesh.length) {
+    let minY = Infinity;
+    let maxY = -Infinity;
+    for (const pt of f.mesh) {
+      if (pt[1] < minY) minY = pt[1];
+      if (pt[1] > maxY) maxY = pt[1];
+    }
+    return (minY + maxY) / 2;
+  }
+  return Number.MAX_SAFE_INTEGER;
+}
 
 export const detectFace = async (instance: Human /* instance of human */, input: Tensor4D): Promise<FaceResult[]> => {
   // run facemesh, includes blazeface and iris
@@ -221,6 +256,12 @@ export const detectFace = async (instance: Human /* instance of human */, input:
     faceRes.push(res);
     instance.analyze('End Face');
   }
+  faceRes.sort((a, b) => {
+    const dx = centerX(a) - centerX(b);
+    if (dx !== 0) return dx;
+    // 2) x가 거의 같은 경우 위->아래로 안정화 (선택)
+    return centerY(a) - centerY(b);
+  });
   instance.analyze('End FaceMesh:');
   if (instance.config.async) {
     if (instance.performance.face) delete instance.performance.face;
